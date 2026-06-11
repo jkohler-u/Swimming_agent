@@ -34,7 +34,6 @@
     <texture name="grid" type="2d" builtin="checker" width="512" height="512" rgb1=".1 .2 .3" rgb2=".2 .3 .4"/>
     <material name="grid" texture="grid" texrepeat="1 1" texuniform="true" reflectance=".2"/>
   </asset>
-
   <default>
     <motor ctrlrange="-1 1" ctrllimited="true"/>
     <default class="body">
@@ -113,8 +112,8 @@
   </default>
 
   <worldbody>
-    <!--<geom name="floor" size="0 0 .05" type="plane" material="grid" condim="3"/> -->
-    <light name="spotlight" mode="targetbodycom" target="torso" diffuse=".8 .8 .8" specular="0.3 0.3 0.3" pos="0 -6 4" cutoff="30"/>
+<!-- Change this line in your <worldbody> section -->
+    <geom name="floor" size="0 0 .05" type="plane" pos="0 0 -2" material="grid" condim="3"/>    <light name="spotlight" mode="targetbodycom" target="torso" diffuse=".8 .8 .8" specular="0.3 0.3 0.3" pos="0 -6 4" cutoff="30"/>
     <light name="top" pos="0 0 2" mode="trackcom"/>
     <body name="torso" pos="0 0 1.282" childclass="body">
       <camera name="back" pos="-3 0 1" xyaxes="0 -1 0 1 0 2" mode="trackcom"/>
