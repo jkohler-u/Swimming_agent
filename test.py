@@ -38,15 +38,3 @@ model.learn(total_timesteps=100000)
 model.save("ppo_custom_humanoid")
 train_env.close()
 
-# 4. Visualization
-# Pass "human" here so the environment is created with rendering enabled
-eval_env = make_custom_env(render_mode="human") 
-
-observation, info = eval_env.reset()
-for _ in range(40000):
-    action, _ = model.predict(observation, deterministic=True)
-    observation, reward, terminated, truncated, info = eval_env.step(action)
-    if terminated or truncated:
-        observation, info = eval_env.reset()
-
-eval_env.close()
