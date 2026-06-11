@@ -1,44 +1,29 @@
-import gymnasium as gym
+import os
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+
 from stable_baselines3 import PPO
-
-# Same wrapper used during training
-class CustomHumanoidWrapper(gym.Wrapper):
-    def __init__(self, env):
-        super().__init__(env)
-
-    def step(self, action):
-        observation, reward, terminated, truncated, info = self.env.step(action)
-        reward += 0.1
-        return observation, reward, terminated, truncated, info
+from new_swimmer import SwimmingHumanoidEnv
 
 
 def make_custom_env(render_mode="human"):
-    env = gym.make("Humanoid-v4", render_mode=render_mode)
-    env = CustomHumanoidWrapper(env)
-    return env
+    return SwimmingHumanoidEnv(
+        xml_file="humanoid.xml",
+        render_mode=render_mode
+    )
 
 
-# Load trained model
+print("Creating environment...")
+env = make_custom_env(render_mode="human")
+
 print("Loading model...")
-model = PPO.load("ppo_custom_humanoid")
+model = PPO.load("ppo_swimming_humanoid", env=env)
 print("Model loaded")
 
-env = make_custom_env(render_mode="human")
-print("Environment created")
+obs, info = env.reset()
 
-try:
-    obs, info = env.reset()
+while True:
+    action, _ = model.predict(obs, deterministic=True)
+    obs, reward, terminated, truncated, info = env.step(action)
 
-    while True:
-        action, _ = model.predict(obs, deterministic=True)
-        obs, reward, terminated, truncated, info = env.step(action)
-
-        if terminated or truncated:
-            print("Resetting episode")
-            obs, info = env.reset()
-
-except Exception as e:
-    print("ERROR:", e)
-
-finally:
-    env.close()
+    if terminated or truncated:
+        obs, info = env.reset()
