@@ -9,8 +9,16 @@ class CustomHumanoidWrapper(gym.Wrapper):
 
     def step(self, action):
         observation, reward, terminated, truncated, info = self.env.step(action)
-        # Custom reward modification
-        reward += 0.1 
+        # # Classic reward 
+        # reward += 0.1 
+
+        # Let's assume observation[0] is the forward velocity of the torso
+        forward_vel = observation[0] 
+
+        if forward_vel > 0:
+            reward += forward_vel * 2.0 # Bonus for moving forward
+        else:
+            reward -= 1.0 # Penalty for moving backward or standing still
         return observation, reward, terminated, truncated, info
 
 # 2. Updated helper function to handle render_mode correctly
@@ -26,7 +34,7 @@ train_env = make_vec_env(lambda: make_custom_env(), n_envs=4)
 
 model = PPO("MlpPolicy", train_env, verbose=1)
 print("Training on Custom Humanoid...")
-model.learn(total_timesteps=100_000)
+model.learn(total_timesteps=100000)
 model.save("ppo_custom_humanoid")
 train_env.close()
 
