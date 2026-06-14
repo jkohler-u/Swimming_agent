@@ -1,5 +1,5 @@
 <!-- Copyright 2021 DeepMind Technologies Limited
-    # https://github.com/google-deepmind/mujoco/blob/main/model/humanoid/humanoid.xml
+
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
      You may obtain a copy of the License at
@@ -14,10 +14,7 @@
 -->
 
 <mujoco model="Humanoid">
-  <option timestep="0.005"
-        integrator="implicitfast"
-        density="1000"
-        viscosity="0.001"/>
+  <option timestep="0.005"/>
 
   <visual>
     <map force="0.1" zfar="30"/>
@@ -40,15 +37,7 @@
     <default class="body">
 
       <!-- geoms -->
-      <geom type="capsule"
-        condim="1"
-        friction=".7"
-        solimp=".9 .99 .003"
-        solref=".015 1"
-        material="body"
-        group="1"
-        fluidshape="ellipsoid"
-        fluidcoef="0.5 0.25 1.5 1.0 1.0"/>
+      <geom type="capsule" condim="1" friction=".7" solimp=".9 .99 .003" solref=".015 1" material="body" group="1"/>
       <default class="thigh">
         <geom size=".06"/>
       </default>
@@ -112,12 +101,12 @@
     </default>
   </default>
 
-  <worldbody>
-    <geom name="floor" size="0 0 .05" type="plane" material="grid" condim="3"/>
+<worldbody>
+    <geom name="water_surface" type="plane" size="10 10 0.01" pos="0 0 2.25" rgba="0 0.5 1 0.3" contype="0" conaffinity="0"/>
+    <geom name="floor" type="plane" size="0 0 .05" material="grid" condim="3" rgba="0.1 0.4 0.6 1"/>
     <light name="spotlight" mode="targetbodycom" target="torso" diffuse=".8 .8 .8" specular="0.3 0.3 0.3" pos="0 -6 4" cutoff="30"/>
     <light name="top" pos="0 0 2" mode="trackcom"/>
-    <body name="torso" pos="0 0 10" childclass="body">
-      <camera name="back" pos="-3 0 1" xyaxes="0 -1 0 1 0 2" mode="trackcom"/>
+    <body name="torso" pos="0 0 2.282" childclass="body">      <camera name="back" pos="-3 0 1" xyaxes="0 -1 0 1 0 2" mode="trackcom"/>
       <camera name="side" pos="0 -3 1" xyaxes="1 0 0 0 1 2" mode="trackcom"/>
       <freejoint name="root"/>
       <geom name="torso" fromto="0 -.07 0 0 .07 0" size=".07"/>
