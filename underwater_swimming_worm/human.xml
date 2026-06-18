@@ -1,0 +1,74 @@
+<mujoco model="human_swimmer">
+    <option gravity="0 0 -0.1" timestep="0.005" viscosity="1.0" density="1000">
+        <flag energy="enable"/>
+    </option>
+
+    <asset>
+        <texture name="grid" type="2d" builtin="checker" width="512" height="512" rgb1=".1 .2 .3" rgb2=".2 .3 .4"/>
+        <material name="grid" texture="grid" texrepeat="1 1" texuniform="true" reflectance=".2"/>
+    </asset>
+
+    <default>
+        <joint damping="0.5"/>
+        <geom friction="0.001 0.001 0.001"/>
+    </default>
+
+    <worldbody>
+        <!-- Main Directional Light -->
+        <light name="sun" pos="0 0 10" dir="0.2 -0.2 -1" diffuse="0.8 0.8 0.8" specular="0.3 0.3 0.3" castshadow="true"/>
+        <!-- Fill Light -->
+        <light name="fill" pos="0 0 -5" dir="0 0 1" diffuse="0.3 0.3 0.4" specular="0.1 0.1 0.1"/>
+        <!-- Ambient Light -->
+        <light name="ambient" pos="0 0 0" diffuse="0.1 0.1 0.2" specular="0 0 0"/>
+
+        <geom name="floor" type="plane" size="0 0 .05" material="grid" condim="3" rgba="0.1 0.4 0.6 1"/>
+
+        <camera name="main_camera" pos="5 5 5" xyaxes="1 0 0 0 0 1"/>
+        <camera name="chase_cam" pos="0 -4 2" mode="trackcom" xyaxes="0 1 0 0 0 1"/> 
+                
+        <body name="torso" pos="0 0 1.2">
+            <freejoint name="root"/>
+            <geom name="chest" type="capsule" size="0.15 0.1 0.2" rgba="0.7 0.7 0.7 1"/>
+            
+            <!-- Head -->
+            <body name="head" pos="0 0 0.3">
+                <geom type="sphere" size="0.1" rgba="0.9 0.8 0.7 1"/>
+            </body>
+
+            <!-- Right Arm -->
+            <body name="right_arm" pos="0.2 0 0.1">
+                <joint name="right_shoulder" type="hinge" axis="0 1 0" range="-1.5 1.5" limited="true"/>
+                <!-- Upper Arm: From shoulder to elbow -->
+                <geom type="capsule" size="0.04" fromto="0 0 0 0 0 -0.3" rgba="0 0.8 0 1"/>
+                
+                <!-- Right Forearm -->
+                <body name="right_forearm" pos="0 0 -0.3">
+                    <joint name="right_elbow" type="hinge" axis="0 1 0" range="0 2.5" limited="true"/>
+                    <geom type="capsule" size="0.035" fromto="0 0 0 0 0 -0.3" rgba="0 0.7 0 1"/>
+                </body>
+            </body>
+
+            <!-- Left Arm -->
+            <body name="left_arm" pos="-0.2 0 0.1">
+                <joint name="left_shoulder" type="hinge" axis="0 1 0" range="-1.5 1.5" limited="true"/>
+                <!-- Upper Arm: From shoulder to elbow -->
+                <geom type="capsule" size="0.04" fromto="0 0 0 0 0 -0.3" rgba="0 0.8 0 1"/>
+                
+                <!-- Left Forearm -->
+                <body name="left_forearm" pos="0 0 -0.3">
+                    <joint name="left_elbow" type="hinge" axis="0 1 0" range="0 2.5" limited="true"/>
+                    <geom type="capsule" size="0.035" fromto="0 0 0 0 0 -0.3" rgba="0 0.7 0 1"/>
+                </body>
+            </body>
+        </body>
+    </worldbody>
+
+    <actuator>
+        <!-- Shoulder actuators -->
+        <motor name="right_shoulder_motor" joint="right_shoulder" gear="50"/>
+        <motor name="left_shoulder_motor" joint="left_shoulder" gear="50"/>
+        <!-- Elbow actuators -->
+        <motor name="right_elbow_motor" joint="right_elbow" gear="25"/>
+        <motor name="left_elbow_motor" joint="left_elbow" gear="25"/>
+    </actuator>
+</mujoco>
