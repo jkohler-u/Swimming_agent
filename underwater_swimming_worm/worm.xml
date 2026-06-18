@@ -1,5 +1,5 @@
 <mujoco model="worm_swimmer">
-    <option gravity="0 0 -0.1" timestep="0.01" viscosity="1.0" density="1000">
+    <option gravity="0 0 -0.1" timestep="0.01" viscosity="1.0" density="1000" integrator="implicitfast">
         <flag energy="enable"/>
     </option>
 
@@ -33,12 +33,16 @@
             <geom type="capsule"
                   size="0.05"
                   fromto="0 0 0 0.5 0 0"
+                  fluidshape="ellipsoid"
+                  fluidcoef="0.5 0.25 1.5 1.0 1.0"
                   rgba="0 1 0 1"/>
 
             <body name="segment2" pos="0.5 0 0">
                 <joint name="joint1" type="hinge" axis="0 1 0" pos="0 0 0"/>
                 <geom type="capsule"
                       size="0.05"
+                      fluidshape="ellipsoid"
+                      fluidcoef="0.5 0.25 1.5 1.0 1.0"
                       fromto="0 0 0 0.5 0 0"
                       rgba="0 0.8 0 1"/>
 
@@ -46,6 +50,8 @@
                     <joint name="joint2" type="hinge" axis="0 1 0" pos="0 0 0"/>
                     <geom type="capsule"
                           size="0.05"
+                          fluidshape="ellipsoid"
+                          fluidcoef="0.5 0.25 1.5 1.0 1.0"
                           fromto="0 0 0 0.5 0 0"
                           rgba="0 0.6 0 1"/>
                 </body>
