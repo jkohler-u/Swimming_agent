@@ -10,7 +10,7 @@
 
     <default>
         <joint damping="0.5"/>
-        <geom friction="0.001 0.001 0.001"/>
+        <geom friction="0.01 0.01 0.01"/>
     </default>
 
     <worldbody>
@@ -28,7 +28,7 @@
                 
         <body name="torso" pos="0 0 1.2">
             <freejoint name="root"/>
-            <geom name="chest" type="capsule" size="0.15 0.1 0.2" rgba="0.7 0.7 0.7 1"/>
+            <geom name="chest" type="capsule" size="0.15 0.1 0.2" rgba="0.7 0.7 0.7 1" />
             
             <!-- Head -->
             <body name="head" pos="0 0 0.3">
@@ -37,7 +37,7 @@
 
             <!-- Right Arm -->
             <body name="right_arm" pos="0.2 0 0.1">
-                <joint name="right_shoulder" type="hinge" axis="0 1 0" range="-1.5 1.5" limited="true"/>
+                <joint name="right_shoulder" type="ball"/>
                 <!-- Upper Arm: From shoulder to elbow -->
                 <geom type="capsule" size="0.04" fromto="0 0 0 0 0 -0.3" rgba="0 0.8 0 1"/>
                 
@@ -50,7 +50,7 @@
 
             <!-- Left Arm -->
             <body name="left_arm" pos="-0.2 0 0.1">
-                <joint name="left_shoulder" type="hinge" axis="0 1 0" range="-1.5 1.5" limited="true"/>
+                <joint name="left_shoulder" type="ball"/>
                 <!-- Upper Arm: From shoulder to elbow -->
                 <geom type="capsule" size="0.04" fromto="0 0 0 0 0 -0.3" rgba="0 0.8 0 1"/>
                 
@@ -60,15 +60,17 @@
                     <geom type="capsule" size="0.035" fromto="0 0 0 0 0 -0.3" rgba="0 0.7 0 1"/>
                 </body>
             </body>
+
+            
         </body>
     </worldbody>
 
     <actuator>
         <!-- Shoulder actuators -->
-        <motor name="right_shoulder_motor" joint="right_shoulder" gear="50"/>
-        <motor name="left_shoulder_motor" joint="left_shoulder" gear="50"/>
+        <motor name="right_shoulder_motor" joint="right_shoulder" gear="25"/>
+        <motor name="left_shoulder_motor" joint="left_shoulder" gear="25"/>
         <!-- Elbow actuators -->
-        <motor name="right_elbow_motor" joint="right_elbow" gear="25"/>
-        <motor name="left_elbow_motor" joint="left_elbow" gear="25"/>
+        <motor name="right_elbow_motor" joint="right_elbow" gear="10"/>
+        <motor name="left_elbow_motor" joint="left_elbow" gear="10"/>
     </actuator>
 </mujoco>

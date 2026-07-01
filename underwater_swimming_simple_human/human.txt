@@ -1,0 +1,20 @@
+fish - reference for viscosity https://github.com/srl-ethz/fishsim/blob/main/Geometry/auto_tendonFish.py
+
+development humanoid: 
+* training with only arms 
+ => add non linear movement reward -> vibrating forward movement (vibrating_non_lin..)
+ => convert shoulder joints to ball joints (arms_ball_joints)
+    * solves sticking to floor issue - rotates above floor
+=> add legs (swimmer in circles)
+    * moves in circles 
+=> change back to linear forward reward (lin-foreward_smoothness_depth)
+    * foreward movement, sticks to ground 
+=> add proprotional -reward for depth (proprotional_depth)
+
+=> move to realistic human model (complicated)
+    * dedpth punishment, 0.4 smoothness, spinning punishment, lin forward velocity 
+
+=> for less realistic human test higher viscosity + non-lin reward + 0 gravety
+    * ppo_human_swimmer_visc
+
+=> realistic human -0.1 gravity, 1 viscosity - ppo_swimming_humanoid_realistic_dancing 

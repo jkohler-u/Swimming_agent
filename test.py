@@ -42,13 +42,13 @@ class MyCustomHumanoidEnv(MujocoEnv):
         
         # Your reward logic
         forward_vel = self.data.qvel[0] 
-        reward = forward_vel * 2.0 if forward_vel > 0 else -1.0
+        reward = forward_vel * 2.0 if forward_vel > 0 else -0.05
             
         # Check for falling (adjust index [2] to your model's Z-axis)
         terminated = False
         if self.data.qpos[2] < 0.5: 
             terminated = True
-            reward -= 10.0
+            reward -= 10.0        
 
         truncated = False
         info = {}
@@ -72,6 +72,6 @@ if __name__ == "__main__":
 
     model = PPO("MlpPolicy", train_env, verbose=1)
     print("Training on Custom XML Humanoid...")
-    model.learn(total_timesteps=100000)
+    model.learn(total_timesteps=1000000)
     model.save("ppo_custom_humanoid_xml")
     train_env.close()
