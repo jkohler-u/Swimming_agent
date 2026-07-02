@@ -5,11 +5,19 @@ from stable_baselines3 import PPO
 from stable_baselines3.common.env_util import make_vec_env
 import numpy as np
 import mujoco
+from stable_baselines3.common.vec_env import SubprocVecEnv
+from gymnasium.wrappers import TimeLimit
+
+import os
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["MKL_NUM_THREADS"] = "1"
+os.environ["OPENBLAS_NUM_THREADS"] = "1"
+os.environ["NUMEXPR_NUM_THREADS"] = "1"
 
 class WormSwimmingEnv(MujocoEnv):
     def __init__(self, render_mode=None):
-        self._model_path = r"C:\Users\malin\Documents\Uni\Master\neuromorphic control\Swimming_agent\underwater_swimming_worm\worm_with_surface.xml"
-
+        #self._model_path = r"C:\Users\malin\Documents\Uni\Master\neuromorphic control\Swimming_agent\underwater_swimming_worm\worm_with_surface.xml"
+        self._model_path = "/home/student/m/mbraatz/share/Swimming_agent/underwater_swimming_worm/worm_with_surface.xml"
         # Water settings
         self.water_level = 10
 
@@ -20,6 +28,8 @@ class WormSwimmingEnv(MujocoEnv):
         self.water_drag = 20.0
         self.air_drag = 0.05
         self.buoyancy_strength = 0.5
+        self.counter = 0
+
 
         super().__init__(
             self._model_path,
@@ -28,7 +38,8 @@ class WormSwimmingEnv(MujocoEnv):
             render_mode=render_mode
         )
 
-        self.segment_body_names = ["segment1", "segment2", "segment3"]
+
+        self.segment_body_names = ["segment1", "segment2", "segment3", "head"]
         self.segment_body_ids = [
             self.model.body(name).id for name in self.segment_body_names
         ]
@@ -93,42 +104,114 @@ class WormSwimmingEnv(MujocoEnv):
                 "lin_vel": lin_vel.copy(),
                 "force": force.copy(),
             })
+
+    def check_unstable(self, action):
+        checks = {
+            "qpos": self.data.qpos,
+            "qvel": self.data.qvel,
+            "qacc": self.data.qacc,
+            "ctrl": self.data.ctrl,
+            "xfrc_applied": self.data.xfrc_applied,
+        }
+
+        for name, arr in checks.items():
+            if not np.isfinite(arr).all() or np.max(np.abs(arr)) > 1e6:
+                print("\nUNSTABLE DETECTED:", name)
+                print("time:", self.data.time)
+                print("action:", action)
+                print("qpos:", self.data.qpos)
+                print("qvel:", self.data.qvel)
+                print("qacc:", self.data.qacc)
+                print("ctrl:", self.data.ctrl)
+
+                for item in self.debug_water_info:
+                    print(item)
+
+                return True
+
+        return False
+
+        
     def step(self, action):
         for _ in range(self.frame_skip):
             self.apply_water_forces()
             self.data.ctrl[:] = action
             mujoco.mj_step(self.model, self.data)
 
+            if self.check_unstable(action):
+                obs = np.nan_to_num(self._get_obs(), nan=0.0, posinf=0.0, neginf=0.0)
+                return obs, -20.0, True, False, {"unstable": True}
+
         obs = self._get_obs()
 
         forward_vel = self.data.qvel[0]
 
-        head_id = self.segment_body_ids[0]
+        head_id = self.model.body("head").id
         head_z = self.data.xpos[head_id, 2]
 
-        target_head_z = self.water_level + 0.05
-        head_error = abs(head_z - target_head_z)
+        head_radius = 0.05
+        target_head_z = self.water_level + head_radius
 
-        reward = 3.0 * forward_vel
-        reward -= 10.0 * head_error
-        reward += 0.5
+        head_error = target_head_z - head_z
+        head_depth = head_error
 
-        ctrl_cost = 0.05 * np.square(action).sum()
+        ctrl_cost = 0.005 * np.square(action).sum()
+
+        #surface_bonus = np.exp(-10.0 * max(0.0, head_error))
+
+        #reward = (
+        #    2.0 * forward_vel
+        #    + 0.5 * surface_bonus
+        #    + 0.1
+        #    - ctrl_cost
+        #)
+
+        reward = 1.0 * forward_vel
+
+        if head_error > 0:
+            reward -= 1 * head_error
+        else:
+            reward += 2.0
+            #print(head_depth)
+            #print("above water!")
+
         reward -= ctrl_cost
 
-        truncated = False
-        terminated = False
+        reward += 0.5
 
-        head_depth = max(0.0, self.water_level - head_z - 0.05)
+        terminated = False
+        truncated = False
+
 
         if head_depth > self.termination_depth:
+            terminated = True
+            reward -= 20.0
+
+        if np.max(np.abs(forward_vel)) > 20.0:
+            print(f"I was toooooo fast!!! vel: {forward_vel}")
             terminated = True
             reward -= 20.0
 
         info = {
             "head_z": head_z,
             "head_depth": head_depth,
+            "forward_vel": forward_vel,
+            "head_error": head_error,
+            "ctrl_cost": ctrl_cost,
+            "reward": reward,
         }
+        if self.counter % 1000 == 0:
+            print(
+                f"head_z={head_z:.3f}, "
+                f"depth={head_depth:.3f}, "
+                f"vel={forward_vel:.3f}, "
+                f"reward={reward:.3f}",
+                flush=True,
+            )
+
+        self.counter += 1
+
+
 
         return obs, reward, terminated, truncated, info
 
@@ -137,8 +220,8 @@ class WormSwimmingEnv(MujocoEnv):
             -0.05, 0.05, size=self.init_qpos.shape
         )
 
-        # start close to the surface
-        qpos[2] = self.water_level - 0.1
+        # start close to but above the surface
+        qpos[2] = self.water_level + 0.05
 
         qvel = np.zeros_like(self.init_qvel)
         self.set_state(qpos, qvel)
@@ -152,7 +235,8 @@ class WormSwimmingEnv(MujocoEnv):
 
 
 def make_worm_env(render_mode=None):
-    return WormSwimmingEnv(render_mode=render_mode)
+    env = WormSwimmingEnv(render_mode=render_mode)
+    return TimeLimit(env, max_episode_steps=500)
 
 
 
@@ -181,31 +265,51 @@ def make_worm_env(render_mode=None):
 
 #    env.close()
 
-
 if __name__ == "__main__":
-    train_env = make_vec_env(lambda: make_worm_env(), n_envs=8)
+
+
+    n_envs = 16
+
+
+    train_env = make_vec_env(
+        make_worm_env,
+        n_envs=n_envs,
+    )
 
     model = PPO(
         "MlpPolicy",
         train_env,
         verbose=1,
-        learning_rate=3e-4,
+        learning_rate=1e-4,
+        n_steps=1024,
+        batch_size=1024,
+        n_epochs=5,
+        device="cpu",
     )
 
-    print("Stage 1: high buoyancy, at 0.8 terminating")
-    train_env.env_method("set_buoyancy_factor", 1.05)
-    train_env.env_method("set_termination_depth", 0.8)
-    model.learn(total_timesteps=300_000)
+    stages = [
+        ("Stage 1: high buoyancy", 1.05, 0.8, 300_000),
+        ("Stage 2: medium buoyancy", 1.02, 1.5, 300_000),
+        ("Stage 3: near-neutral buoyancy", 0.98, 3.0, 400_000),
+    ]
 
-    print("Stage 2: medium buoyancy, at 1.5 terminating")
-    train_env.env_method("set_buoyancy_factor", 1.02)
-    train_env.env_method("termination_depth", 1.5)
-    model.learn(total_timesteps=300_000, reset_num_timesteps=False)
+    for i, (name, buoyancy, term_depth, steps) in enumerate(stages):
+        print(name)
+        train_env.env_method("set_buoyancy_factor", buoyancy)
+        train_env.env_method("set_termination_depth", term_depth)
 
-    print("Stage 3: near-neutral buoyancy, at 3.0 terminating")
-    train_env.env_method("set_buoyancy_factor", 1.00)
-    train_env.env_method("termination_depth", 3.0)
-    model.learn(total_timesteps=400_000, reset_num_timesteps=False)
+        #checkpoint_callback = CheckpointCallback(
+        #    save_freq=50000,        # every 50k timesteps
+        #    save_path="./checkpoints/",
+        #    name_prefix="surface_worm"
+        #)
+
+        model.learn(
+            total_timesteps=steps,
+            reset_num_timesteps=(i == 0),
+            #callback=checkpoint_callback,
+            progress_bar=False,
+        )
 
     model.save("ppo_worm_swimmer_with_surface")
     train_env.close()

@@ -28,7 +28,7 @@
         <geom name="water_surface"
               type="plane"
               size="10 10 0.01"
-              pos="0 0 3.0"
+              pos="0 0 10.0"
               rgba="0 0.5 1 0.3"
               contype="0"
               conaffinity="0"/>
@@ -48,28 +48,45 @@
             <geom type="capsule"
                   size="0.05"
                   fromto="0 0 0 0.5 0 0"
-                  rgba="0 1 0 1"/>
+                  rgba="0 1 0 1"
+                  contype="0"
+                  conaffinity="0"/>
 
             <body name="segment2" pos="0.5 0 0">
-                <joint name="joint1" type="hinge" axis="0 1 0" pos="0 0 0"/>
+                <joint name="joint1" type="hinge" axis="0 1 0" pos="0 0 0" limited="true" range="-60 60"/>
                 <geom type="capsule"
                       size="0.05"
                       fromto="0 0 0 0.5 0 0"
-                      rgba="0 0.8 0 1"/>
+                      rgba="0 0.8 0 1"
+                      contype="0"
+                      conaffinity="0"/>
 
                 <body name="segment3" pos="0.5 0 0">
-                    <joint name="joint2" type="hinge" axis="0 1 0" pos="0 0 0"/>
+                    <joint name="joint2" type="hinge" axis="0 1 0" pos="0 0 0" limited="true" range="-60 60"/>
                     <geom type="capsule"
                           size="0.05"
                           fromto="0 0 0 0.5 0 0"
-                          rgba="0 0.6 0 1"/>
+                          rgba="0 0.6 0 1"
+                          contype="0"
+                          conaffinity="0"/>
+
+                    <body name="head" pos="0.5 0 0">
+                        <joint name="joint3" type="hinge" axis="0 1 0" pos="0 0 0" limited="true" range="-30 30"/>
+                        <geom type="capsule"
+                            size="0.05"
+                            fromto="0 0 0 0.2 0 0"
+                            rgba="1 0.3 0.1 1"
+                            contype="0"
+                            conaffinity="0"/>
+                    </body>
                 </body>
             </body>
         </body>
     </worldbody>
 
     <actuator>
-        <motor name="muscle1" joint="joint1" gear="3"/>
-        <motor name="muscle2" joint="joint2" gear="3"/>
+        <motor name="muscle1" joint="joint1" gear="0.1"/>
+        <motor name="muscle2" joint="joint2" gear="0.1"/>
+        <motor name="muscle3" joint="joint3" gear="0.1"/>
     </actuator>
 </mujoco>
