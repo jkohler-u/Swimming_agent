@@ -69,6 +69,8 @@ class WormSwimmingEnv(MujocoEnv):
     def step(self, action):
         action = np.clip(action, self.action_space.low, self.action_space.high)
 
+        x_before = self.data.qpos[0]
+
         for _ in range(self.frame_skip):
             self.data.ctrl[:] = action
             mujoco.mj_step(self.model, self.data)
@@ -77,18 +79,11 @@ class WormSwimmingEnv(MujocoEnv):
                 obs = self._get_obs()
                 return obs, -20.0, True, False, {"unstable": True}
 
+        x_after = self.data.qpos[0]
         obs = self._get_obs()
 
-        x_before = self.data.qpos[0]
-
-        for _ in range(self.frame_skip):
-            self.data.ctrl[:] = action
-            mujoco.mj_step(self.model, self.data)
-
-        x_after = self.data.qpos[0]
-
         forward_progress = x_after - x_before
-        forward_vel = (x_after - x_before) / (self.dt * self.frame_skip)
+        forward_vel = forward_progress / (self.dt * self.frame_skip)
         vertical_vel = self.data.qvel[2]
 
         head_id = self.model.body("head").id
@@ -98,42 +93,18 @@ class WormSwimmingEnv(MujocoEnv):
         target_head_z = self.water_level + head_radius
         head_error = head_z - target_head_z
 
-        # Reward being close to the water surface
-        surface_quality = np.exp(-12.0 * head_error**2)
+        surface_quality = np.exp(-8.0 * head_error**2)
 
-        # Forward reward only counts when the head is close to the surface
-        forward_reward = 4 * np.clip(forward_vel, 0.0, 1.5) * surface_quality
-
-        # Small living reward only if it is near the surface
-        surface_reward = 0.3 * surface_quality
-
-        # Stronger penalty for sinking below target
-        too_deep = max(0.0, target_head_z - head_z)
-        depth_penalty = 1.5 * too_deep**2
-
-        # Penalize moving backward
-        backward_penalty = 2.0 * max(0.0, -forward_vel)
-
-        # Penalize being almost stationary
-        stall_penalty = 0.1 if forward_vel < 0.05 else 0.0
-
-        # Penalize vertical bouncing/sinking
-        #vertical_penalty = 0.2 * vertical_vel**2
-
-        sink_vel = max(0.0, -vertical_vel)
-        rise_vel = max(0.0, vertical_vel)
-
-        vertical_penalty = 0.6 * sink_vel**2 + 0.1 * rise_vel**2
-
-        # Keep control cost small
+        forward_reward = 4.0 * np.clip(forward_vel, 0.0, 1.5) * surface_quality
+        surface_reward = 0.5 * surface_quality
+        depth_penalty = 3.0 * max(0.0, target_head_z - head_z) ** 2
+        vertical_penalty = 0.3 * max(0.0, -vertical_vel) ** 2
         ctrl_cost = 0.002 * np.square(action).sum()
 
         reward = (
             forward_reward
             + surface_reward
             - depth_penalty
-            - backward_penalty
-            - stall_penalty
             - vertical_penalty
             - ctrl_cost
         )
@@ -163,7 +134,6 @@ class WormSwimmingEnv(MujocoEnv):
             "forward_reward": forward_reward,
             "surface_reward": surface_reward,
             "depth_penalty": depth_penalty,
-            "backward_penalty": backward_penalty,
             "vertical_penalty": vertical_penalty,
             "ctrl_cost": ctrl_cost,
             "reward": reward,
@@ -178,7 +148,6 @@ class WormSwimmingEnv(MujocoEnv):
                 f"forward={forward_progress:.3f}, "
                 f"depth_penalty={depth_penalty:.3f}, "
                 f"ctrl_cost={ctrl_cost:.3f}",
-                f"stall_penalty={stall_penalty:.3f}",
                 flush=True,
             )
 
