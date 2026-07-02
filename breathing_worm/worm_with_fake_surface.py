@@ -80,31 +80,33 @@ class WormSwimmingEnv(MujocoEnv):
         obs = self._get_obs()
 
         forward_vel = self.data.qvel[0]
+        vertical_vel = self.data.qvel[2]
 
         head_id = self.model.body("head").id
         head_z = self.data.xpos[head_id, 2]
 
         head_radius = 0.05
         target_head_z = self.water_level + head_radius
-
         head_error = head_z - target_head_z
 
-        # reward being close to the surface, not simply above it
-        surface_reward = np.exp(-20.0 * head_error**2)
+        forward_reward = 2.0 * np.clip(forward_vel, -0.5, 1.5)
 
-        # discourage shooting upward/downward
-        vertical_vel = self.data.qvel[2]
-        vertical_penalty = 0.5 * vertical_vel**2
+        surface_reward = 0.8 * np.exp(-10.0 * head_error**2)
 
-        # discourage too much control
-        ctrl_cost = 0.01 * np.square(action).sum()
+        too_deep = max(0.0, target_head_z - head_z)
+        depth_penalty = 0.8 * too_deep
 
-        # cap forward velocity reward so it cannot exploit unrealistic speed
-        forward_reward = np.clip(forward_vel, -1.0, 2.0)
+        backward_penalty = 1.0 * max(0.0, -forward_vel)
+
+        vertical_penalty = 0.1 * vertical_vel**2
+
+        ctrl_cost = 0.005 * np.square(action).sum()
 
         reward = (
-            2.0 * forward_reward
-            + 0.4 * surface_reward
+            forward_reward
+            + surface_reward
+            - depth_penalty
+            - backward_penalty
             - vertical_penalty
             - ctrl_cost
         )
@@ -112,25 +114,30 @@ class WormSwimmingEnv(MujocoEnv):
         terminated = False
         truncated = False
 
-
-        if head_z > self.water_level + 0.4:
+        if head_z < target_head_z - self.termination_depth:
             terminated = True
             reward -= 20.0
 
-        if head_z < self.water_level - self.termination_depth:
+        if head_z > target_head_z + 0.5:
             terminated = True
             reward -= 20.0
 
-        if np.max(np.abs(forward_vel)) > 20.0:
+        if abs(forward_vel) > self.max_forward_vel:
             print(f"I was toooooo fast!!! vel: {forward_vel}")
             terminated = True
             reward -= 20.0
 
         info = {
             "head_z": head_z,
-            #"head_depth": head_depth,
-            "forward_vel": forward_vel,
+            "target_head_z": target_head_z,
             "head_error": head_error,
+            "forward_vel": forward_vel,
+            "vertical_vel": vertical_vel,
+            "forward_reward": forward_reward,
+            "surface_reward": surface_reward,
+            "depth_penalty": depth_penalty,
+            "backward_penalty": backward_penalty,
+            "vertical_penalty": vertical_penalty,
             "ctrl_cost": ctrl_cost,
             "reward": reward,
         }
@@ -138,15 +145,19 @@ class WormSwimmingEnv(MujocoEnv):
         if self.counter % 1000 == 0:
             print(
                 f"head_z={head_z:.3f}, "
-                #f"depth={head_depth:.3f}, "
                 f"vel={forward_vel:.3f}, "
-                f"reward={reward:.3f}",
+                f"reward={reward:.3f}, "
+                f"surface={surface_reward:.3f}, "
+                f"depth_penalty={depth_penalty:.3f}, "
+                f"ctrl_cost={ctrl_cost:.3f}",
                 flush=True,
             )
 
         self.counter += 1
 
         return obs, reward, terminated, truncated, info
+
+
 
     def reset_model(self):
         qpos = self.init_qpos + np.random.uniform(
@@ -189,8 +200,8 @@ if __name__ == "__main__":
 
     stages = [
         ("Stage 1: high buoyancy", 0.8, 300_000),
-        ("Stage 2: medium buoyancy", 1.5, 300_000),
-        ("Stage 3: near-neutral buoyancy", 3.0, 400_000),
+        ("Stage 2: medium buoyancy", 0.6, 300_000),
+        ("Stage 3: near-neutral buoyancy", 0.5, 400_000),
     ]
 
     for i, (name, term_depth, steps) in enumerate(stages):
