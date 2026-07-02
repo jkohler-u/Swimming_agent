@@ -124,16 +124,16 @@ class WormSwimmingEnv(MujocoEnv):
 
         info = {
             "head_z": head_z,
-            "target_head_z": target_head_z,
-            "head_error": head_error,
-            "forward_vel": forward_vel,
-            "vertical_vel": vertical_vel,
-            "forward_reward": forward_reward,
-            "surface_reward": surface_reward,
-            "depth_penalty": depth_penalty,
-            "vertical_penalty": vertical_penalty,
-            "ctrl_cost": ctrl_cost,
-            "reward": reward,
+        #    "target_head_z": target_head_z,
+        #    "head_error": head_error,
+        #    "forward_vel": forward_vel,
+        #    "vertical_vel": vertical_vel,
+        #    #"forward_reward": forward_reward,
+        #    "surface_reward": surface_reward,
+        #    "depth_penalty": depth_penalty,
+        #    "vertical_penalty": vertical_penalty,
+        #    "ctrl_cost": ctrl_cost,
+        #    "reward": reward,
         }
 
         if self.counter % 1000 == 0:
@@ -141,9 +141,9 @@ class WormSwimmingEnv(MujocoEnv):
                 f"head_z={head_z:.3f}, "
                 f"vel={forward_vel:.3f}, "
                 f"reward={reward:.3f}, "
-                f"surface={surface_reward:.3f}, "
+                #f"surface={surface_reward:.3f}, "
                 f"forward={forward_progress:.3f}, "
-                f"depth_penalty={depth_penalty:.3f}, "
+                #f"depth_penalty={depth_penalty:.3f}, "
                 f"ctrl_cost={ctrl_cost:.3f}",
                 flush=True,
             )
