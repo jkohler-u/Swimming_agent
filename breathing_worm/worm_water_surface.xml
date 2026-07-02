@@ -27,13 +27,13 @@
         <geom name="water_surface" type="plane" size="10 10 0.01" pos="0 0 10.0" rgba="0 0.5 1 0.3" contype="0" conaffinity="0"/>
 
         <camera name="main_camera"
-                pos="-3 -3 10"
+                pos="-4 -4 13"
                 xyaxes="1 0 0 0 0 1"/>
 
         <camera name="top_follow" pos="0 0 10" xyaxes="1 0 0 0 0 1" mode="trackcom"/>        
 
         
-        <body name="segment1" pos="0 0 1">
+        <body name="segment1" pos="0 0 10">
             <freejoint name="root"/>
             <geom type="capsule"
                 size="0.05"
