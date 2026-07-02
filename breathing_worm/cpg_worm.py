@@ -6,13 +6,6 @@ from gymnasium import spaces
 from stable_baselines3 import PPO
 from stable_baselines3.common.env_util import make_vec_env
 import numpy as np
-
-import gymnasium as gym
-from gymnasium.envs.mujoco import MujocoEnv
-from gymnasium import spaces
-from stable_baselines3 import PPO
-from stable_baselines3.common.env_util import make_vec_env
-import numpy as np
 from gymnasium.wrappers import TimeLimit
 import mujoco
 
@@ -36,10 +29,11 @@ class WormSwimmingEnv(MujocoEnv):
             dtype=np.float32,
         )
 
+        # PPO now controls CPG parameters, not raw torques:
+        # [amplitude, frequency, phase_lag, bias]
         self.action_space = spaces.Box(
-            low=-1.0,
-            high=1.0,
-            shape=(self.model.nu,),
+            low=np.array([0.0, 0.2, -np.pi, -0.5], dtype=np.float32),
+            high=np.array([1.0, 3.0, np.pi, 0.5], dtype=np.float32),
             dtype=np.float32,
         )
 
@@ -49,6 +43,8 @@ class WormSwimmingEnv(MujocoEnv):
 
         self.max_forward_vel = 20.0
         self.max_qvel = 50.0
+
+        self.cpg_phase = 0.0
 
     def _get_obs(self):
         obs = np.concatenate([self.data.qpos, self.data.qvel])
@@ -66,29 +62,39 @@ class WormSwimmingEnv(MujocoEnv):
             return True
         return False
 
+    def cpg_to_motor_action(self, cpg_action):
+        amplitude, frequency, phase_lag, bias = cpg_action
+
+        # Advance internal oscillator phase
+        self.cpg_phase += 2.0 * np.pi * frequency * self.dt
+
+        motor_action = np.zeros(self.model.nu, dtype=np.float32)
+
+        for i in range(self.model.nu):
+            phase = self.cpg_phase + i * phase_lag
+            motor_action[i] = amplitude * np.sin(phase) + bias
+
+        return np.clip(motor_action, -1.0, 1.0)
+
     def step(self, action):
         action = np.clip(action, self.action_space.low, self.action_space.high)
 
+        x_before = self.data.qpos[0]
+
         for _ in range(self.frame_skip):
-            self.data.ctrl[:] = action
+            motor_action = self.cpg_to_motor_action(action)
+            self.data.ctrl[:] = motor_action
             mujoco.mj_step(self.model, self.data)
 
             if self.check_unstable():
                 obs = self._get_obs()
                 return obs, -20.0, True, False, {"unstable": True}
 
+        x_after = self.data.qpos[0]
         obs = self._get_obs()
 
-        x_before = self.data.qpos[0]
-
-        for _ in range(self.frame_skip):
-            self.data.ctrl[:] = action
-            mujoco.mj_step(self.model, self.data)
-
-        x_after = self.data.qpos[0]
-
         forward_progress = x_after - x_before
-        forward_vel = (x_after - x_before) / (self.dt * self.frame_skip)
+        forward_vel = forward_progress / (self.dt * self.frame_skip)
         vertical_vel = self.data.qvel[2]
 
         head_id = self.model.body("head").id
@@ -98,34 +104,22 @@ class WormSwimmingEnv(MujocoEnv):
         target_head_z = self.water_level + head_radius
         head_error = head_z - target_head_z
 
-        # Reward being close to the water surface
         surface_quality = np.exp(-12.0 * head_error**2)
 
-        # Forward reward only counts when the head is close to the surface
         forward_reward = 4 * np.clip(forward_vel, 0.0, 1.5) * surface_quality
-
-        # Small living reward only if it is near the surface
         surface_reward = 0.3 * surface_quality
 
-        # Stronger penalty for sinking below target
         too_deep = max(0.0, target_head_z - head_z)
         depth_penalty = 1.5 * too_deep**2
 
-        # Penalize moving backward
         backward_penalty = 2.0 * max(0.0, -forward_vel)
-
-        # Penalize being almost stationary
         stall_penalty = 0.1 if forward_vel < 0.05 else 0.0
-
-        # Penalize vertical bouncing/sinking
-        #vertical_penalty = 0.2 * vertical_vel**2
 
         sink_vel = max(0.0, -vertical_vel)
         rise_vel = max(0.0, vertical_vel)
-
         vertical_penalty = 0.6 * sink_vel**2 + 0.1 * rise_vel**2
 
-        # Keep control cost small
+        # Penalize CPG parameter size mildly
         ctrl_cost = 0.002 * np.square(action).sum()
 
         reward = (
@@ -167,6 +161,10 @@ class WormSwimmingEnv(MujocoEnv):
             "vertical_penalty": vertical_penalty,
             "ctrl_cost": ctrl_cost,
             "reward": reward,
+            "cpg_amplitude": action[0],
+            "cpg_frequency": action[1],
+            "cpg_phase_lag": action[2],
+            "cpg_bias": action[3],
         }
 
         if self.counter % 1000 == 0:
@@ -177,8 +175,11 @@ class WormSwimmingEnv(MujocoEnv):
                 f"surface={surface_reward:.3f}, "
                 f"forward={forward_progress:.3f}, "
                 f"depth_penalty={depth_penalty:.3f}, "
-                f"ctrl_cost={ctrl_cost:.3f}",
-                f"stall_penalty={stall_penalty:.3f}",
+                f"ctrl_cost={ctrl_cost:.3f}, "
+                f"amp={action[0]:.3f}, "
+                f"freq={action[1]:.3f}, "
+                f"phase={action[2]:.3f}, "
+                f"bias={action[3]:.3f}",
                 flush=True,
             )
 
@@ -186,18 +187,18 @@ class WormSwimmingEnv(MujocoEnv):
 
         return obs, reward, terminated, truncated, info
 
-
-
     def reset_model(self):
         qpos = self.init_qpos + np.random.uniform(
             -0.05, 0.05, size=self.init_qpos.shape
         )
 
-        # start close to but above the surface
         qpos[2] = self.water_level + 0.05
 
         qvel = np.zeros_like(self.init_qvel)
         self.set_state(qpos, qvel)
+
+        self.cpg_phase = 0.0
+
         return self._get_obs()
 
 
@@ -205,11 +206,10 @@ def make_worm_env(render_mode=None):
     env = WormSwimmingEnv(render_mode=render_mode)
     return TimeLimit(env, max_episode_steps=500)
 
+
 if __name__ == "__main__":
 
-
     n_envs = 16
-
 
     train_env = make_vec_env(
         make_worm_env,
@@ -234,44 +234,16 @@ if __name__ == "__main__":
     ]
 
     for i, (name, term_depth, steps) in enumerate(stages):
-        #print(name)
-        #train_env.env_method("set_buoyancy_factor", buoyancy)
-        train_env.env_method("set_termination_depth", term_depth)
+        print(name)
 
-        #checkpoint_callback = CheckpointCallback(
-        #    save_freq=50000,        # every 50k timesteps
-        #    save_path="./checkpoints/",
-        #    name_prefix="surface_worm"
-        #)
+        train_env.env_method("set_termination_depth", term_depth)
 
         model.learn(
             total_timesteps=steps,
             reset_num_timesteps=(i == 0),
-            #callback=checkpoint_callback,
             progress_bar=False,
         )
 
-    model.save("breathing_worm/ppo_worm_swimmer_with_surface")
-    print(f"Model saved as ppo_worm_swimmer_with_surface.zip")
+    model.save("breathing_worm/ppo_worm_swimmer_with_surface_cpg")
+    print("Model saved as ppo_worm_swimmer_with_surface_cpg.zip")
     train_env.close()
-
-
-#if __name__ == "__main__":
-#    import time
-
- #   env = WormSwimmingEnv(render_mode="human")
-
-  #  obs, info = env.reset()
-
-   # while True:
-        # Random actions
-    #    action = env.action_space.sample()
-
-     #   obs, reward, terminated, truncated, info = env.step(action)
-
-      #  env.render()
-       # time.sleep(0.02)
-
-        #if terminated or truncated:
-         #   print("Resetting environment...")
-          #  obs, info = env.reset()
