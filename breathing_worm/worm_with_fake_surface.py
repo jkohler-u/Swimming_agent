@@ -87,38 +87,37 @@ class WormSwimmingEnv(MujocoEnv):
         head_radius = 0.05
         target_head_z = self.water_level + head_radius
 
-        head_error = target_head_z - head_z
-        head_depth = head_error
+        head_error = head_z - target_head_z
 
-        ctrl_cost = 0.005 * np.square(action).sum()
+        # reward being close to the surface, not simply above it
+        surface_reward = np.exp(-20.0 * head_error**2)
 
-        #surface_bonus = np.exp(-10.0 * max(0.0, head_error))
+        # discourage shooting upward/downward
+        vertical_vel = self.data.qvel[2]
+        vertical_penalty = 0.5 * vertical_vel**2
 
-        #reward = (
-        #    2.0 * forward_vel
-        #    + 0.5 * surface_bonus
-        #    + 0.1
-        #    - ctrl_cost
-        #)
+        # discourage too much control
+        ctrl_cost = 0.01 * np.square(action).sum()
 
-        reward = 1.0 * forward_vel
+        # cap forward velocity reward so it cannot exploit unrealistic speed
+        forward_reward = np.clip(forward_vel, -1.0, 2.0)
 
-        if head_error > 0:
-            reward -= 1 * head_error
-        else:
-            reward += 2.0
-            #print(head_depth)
-            #print("above water!")
-
-        reward -= ctrl_cost
-
-        reward += 0.5
+        reward = (
+            2.0 * forward_reward
+            + 0.4 * surface_reward
+            - vertical_penalty
+            - ctrl_cost
+        )
 
         terminated = False
         truncated = False
 
 
-        if head_depth > self.termination_depth:
+        if head_z > self.water_level + 0.4:
+            terminated = True
+            reward -= 20.0
+
+        if head_z < self.water_level - self.termination_depth:
             terminated = True
             reward -= 20.0
 
@@ -129,7 +128,7 @@ class WormSwimmingEnv(MujocoEnv):
 
         info = {
             "head_z": head_z,
-            "head_depth": head_depth,
+            #"head_depth": head_depth,
             "forward_vel": forward_vel,
             "head_error": head_error,
             "ctrl_cost": ctrl_cost,
@@ -139,7 +138,7 @@ class WormSwimmingEnv(MujocoEnv):
         if self.counter % 1000 == 0:
             print(
                 f"head_z={head_z:.3f}, "
-                f"depth={head_depth:.3f}, "
+                #f"depth={head_depth:.3f}, "
                 f"vel={forward_vel:.3f}, "
                 f"reward={reward:.3f}",
                 flush=True,
@@ -166,7 +165,7 @@ def make_worm_env(render_mode=None):
     env = WormSwimmingEnv(render_mode=render_mode)
     return TimeLimit(env, max_episode_steps=500)
 
-#if __name__ == "__main__":
+if __name__ == "__main__":
 
 
     n_envs = 16
@@ -217,22 +216,22 @@ def make_worm_env(render_mode=None):
     train_env.close()
 
 
-if __name__ == "__main__":
-    import time
+#if __name__ == "__main__":
+#    import time
 
-    env = WormSwimmingEnv(render_mode="human")
+ #   env = WormSwimmingEnv(render_mode="human")
 
-    obs, info = env.reset()
+  #  obs, info = env.reset()
 
-    while True:
+   # while True:
         # Random actions
-        action = env.action_space.sample()
+    #    action = env.action_space.sample()
 
-        obs, reward, terminated, truncated, info = env.step(action)
+     #   obs, reward, terminated, truncated, info = env.step(action)
 
-        env.render()
-        time.sleep(0.02)
+      #  env.render()
+       # time.sleep(0.02)
 
-        if terminated or truncated:
-            print("Resetting environment...")
-            obs, info = env.reset()
+        #if terminated or truncated:
+         #   print("Resetting environment...")
+          #  obs, info = env.reset()
