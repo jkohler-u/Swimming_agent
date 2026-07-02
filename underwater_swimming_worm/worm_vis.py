@@ -6,7 +6,7 @@ from stable_baselines3 import PPO
 # IMPORTANT: Import the class you actually used to train!
 # If MyCustomHumanoidEnv is in training_script.py, use:
 # from training_script import MyCustomHumanoidEnv 
-from worm_training import WormSwimmingEnv 
+from worm_with_fake_surface import WormSwimmingEnv 
 
 def make_custom_env(render_mode="human"):
     return WormSwimmingEnv(
@@ -18,7 +18,7 @@ env = make_custom_env(render_mode="human")
 
 print("Loading model...")
 # The model expects an observation space of 47 (float32)
-model = PPO.load("underwater_swimming_worm/worm_with_fake_surface.zip", env=env)
+model = PPO.load("underwater_swimming_worm/ppo_worm_swimmer_with_surface", env=env)
 print("Model loaded")
 
 obs, info = env.reset()

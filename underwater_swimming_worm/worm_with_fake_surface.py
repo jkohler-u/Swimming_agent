@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import gymnasium as gym
 from gymnasium.envs.mujoco import MujocoEnv
 from gymnasium import spaces
@@ -17,10 +19,10 @@ import mujoco
 
 class WormSwimmingEnv(MujocoEnv):
     def __init__(self, render_mode=None):
-        self._model_path = "/home/student/m/mbraatz/share/Swimming_agent/underwater_swimming_worm/worm_water_surface.xml"
+        xml_path = Path(__file__).parent / "worm_water_surface.xml"
 
         super().__init__(
-            self._model_path,
+            str(xml_path),
             frame_skip=5,
             observation_space=None,
             render_mode=render_mode,
