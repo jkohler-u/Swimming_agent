@@ -43,7 +43,7 @@ class WormSwimmingEnv(MujocoEnv):
             dtype=np.float32,
         )
 
-        self.water_level = 10.0
+        self.water_level = 3.0
         self.termination_depth = 0.8
         self.counter = 0
 
@@ -166,7 +166,7 @@ def make_worm_env(render_mode=None):
     env = WormSwimmingEnv(render_mode=render_mode)
     return TimeLimit(env, max_episode_steps=500)
 
-if __name__ == "__main__":
+#if __name__ == "__main__":
 
 
     n_envs = 16
@@ -215,3 +215,24 @@ if __name__ == "__main__":
     model.save("breathing_worm/ppo_worm_swimmer_with_surface")
     print(f"Model saved as ppo_worm_swimmer_with_surface.zip")
     train_env.close()
+
+
+if __name__ == "__main__":
+    import time
+
+    env = WormSwimmingEnv(render_mode="human")
+
+    obs, info = env.reset()
+
+    while True:
+        # Random actions
+        action = env.action_space.sample()
+
+        obs, reward, terminated, truncated, info = env.step(action)
+
+        env.render()
+        time.sleep(0.02)
+
+        if terminated or truncated:
+            print("Resetting environment...")
+            obs, info = env.reset()
