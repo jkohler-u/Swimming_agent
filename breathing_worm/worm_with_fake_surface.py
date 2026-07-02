@@ -79,7 +79,14 @@ class WormSwimmingEnv(MujocoEnv):
 
         obs = self._get_obs()
 
-        forward_vel = self.data.qvel[0]
+        x_before = self.data.qpos[0]
+
+        for _ in range(self.frame_skip):
+            self.data.ctrl[:] = action
+            mujoco.mj_step(self.model, self.data)
+
+        x_after = self.data.qpos[0]
+        forward_vel = (x_after - x_before) / self.dt
         vertical_vel = self.data.qvel[2]
 
         head_id = self.model.body("head").id
@@ -93,7 +100,7 @@ class WormSwimmingEnv(MujocoEnv):
         surface_quality = np.exp(-12.0 * head_error**2)
 
         # Forward reward only counts when the head is close to the surface
-        forward_reward = 3.0 * np.clip(forward_vel, 0.0, 1.5) * surface_quality
+        forward_reward = 3.5 * np.clip(forward_vel, 0.0, 1.5) * surface_quality
 
         # Small living reward only if it is near the surface
         surface_reward = 0.3 * surface_quality
