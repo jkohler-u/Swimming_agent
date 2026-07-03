@@ -67,8 +67,26 @@ class WormSwimmingEnv(MujocoEnv):
         return False
 
     def step(self, action):
+
+        ### probably not needed
+        # PPO can only send actions within the allowed actuator range
         action = np.clip(action, self.action_space.low, self.action_space.high)
 
+        # =========================
+        # Tunable reward parameters
+        # =========================
+        reward_cfg = {
+            "surface_sharpness": 8.0, # how quickly the surface reward drops off as the head moves away from the target height
+            "forward_weight": 4.0, # how much reward for forward progress
+            "max_rewarded_forward_vel": 1.5,
+            "surface_weight": 0.5,
+            "depth_weight": 3.0,
+            "ctrl_weight": 0.001,
+            "termination_penalty": 20.0,
+            "max_height_above_target": 0.5,
+        }
+
+        # x position before the step
         x_before = self.data.qpos[0]
 
         for _ in range(self.frame_skip):
@@ -77,35 +95,55 @@ class WormSwimmingEnv(MujocoEnv):
 
             if self.check_unstable():
                 obs = self._get_obs()
-                return obs, -20.0, True, False, {"unstable": True}
+                print("Unstable state detected! Terminating episode.")
+                return obs, -reward_cfg["termination_penalty"], True, False, {"unstable": True}
 
+        # x position after the step
         x_after = self.data.qpos[0]
+
+        # returns state that PPO sees (qpos and qvel)
         obs = self._get_obs()
 
+        # actual distance moved in x direction during this step
         forward_progress = x_after - x_before
+
+        # converts forward progress into velocity
         forward_vel = forward_progress / (self.dt * self.frame_skip)
+        
         vertical_vel = self.data.qvel[2]
 
         head_id = self.model.body("head").id
+
+        # get the z position of the head
         head_z = self.data.xpos[head_id, 2]
 
         head_radius = 0.05
         target_head_z = self.water_level + head_radius
+        #how far the head is from the target height <0 --> heas is too low, >0 --> head is too high
         head_error = head_z - target_head_z
 
-        surface_quality = np.exp(-8.0 * head_error**2)
+        # smooth score for being close to the target height
+        surface_quality = np.exp(
+            -reward_cfg["surface_sharpness"] * head_error**2
+        )
+        surface_reward = reward_cfg["surface_weight"] * surface_quality
 
-        forward_reward = 4.0 * np.clip(forward_vel, 0.0, 1.5) * surface_quality
-        surface_reward = 0.5 * surface_quality
-        depth_penalty = 3.0 * max(0.0, target_head_z - head_z) ** 2
-        vertical_penalty = 0.3 * max(0.0, -vertical_vel) ** 2
-        ctrl_cost = 0.002 * np.square(action).sum()
+
+        #maybe this is better *surface_quality to reward forward velocity only when the worm is breathing
+        forward_reward = reward_cfg["forward_weight"] * forward_vel
+
+        # penalty for beeing too deep, quadratic penalty for being below the target height
+        depth_penalty = (
+            reward_cfg["depth_weight"]
+            * max(0.0, target_head_z - head_z) ** 2
+        )
+
+        ctrl_cost = reward_cfg["ctrl_weight"] * np.square(action).sum()
 
         reward = (
             forward_reward
             + surface_reward
             - depth_penalty
-            - vertical_penalty
             - ctrl_cost
         )
 
@@ -114,38 +152,29 @@ class WormSwimmingEnv(MujocoEnv):
 
         if head_z < target_head_z - self.termination_depth:
             terminated = True
-            reward -= 20.0
+            reward -= reward_cfg["termination_penalty"]
 
-        if head_z > target_head_z + 0.5:
+        if head_z > target_head_z + reward_cfg["max_height_above_target"]:
+            print("Apperently I was flying!!!")
             terminated = True
-            reward -= 20.0
+            reward -= reward_cfg["termination_penalty"]
 
         if abs(forward_vel) > self.max_forward_vel:
-            print(f"I was toooooo fast!!! vel: {forward_vel}")
+            print(f"I was tooo fast!!! vel: {forward_vel}")
             terminated = True
-            reward -= 20.0
+            reward -= reward_cfg["termination_penalty"]
 
         info = {
             "head_z": head_z,
-            "target_head_z": target_head_z,
-            "head_error": head_error,
-            "forward_vel": forward_vel,
-            "vertical_vel": vertical_vel,
-            "forward_reward": forward_reward,
-            "surface_reward": surface_reward,
-            "depth_penalty": depth_penalty,
-            "vertical_penalty": vertical_penalty,
-            "ctrl_cost": ctrl_cost,
             "reward": reward,
         }
 
         if self.counter % 1000 == 0:
             print(
                 f"head_z={head_z:.3f}, "
-                f"vel={forward_vel:.3f}, "
+                f"breathing_reward={surface_reward:.3f}, "
+                f"forward_vel={forward_vel:.3f}, "
                 f"reward={reward:.3f}, "
-                f"surface={surface_reward:.3f}, "
-                f"forward={forward_progress:.3f}, "
                 f"depth_penalty={depth_penalty:.3f}, "
                 f"ctrl_cost={ctrl_cost:.3f}",
                 flush=True,
@@ -154,7 +183,6 @@ class WormSwimmingEnv(MujocoEnv):
         self.counter += 1
 
         return obs, reward, terminated, truncated, info
-
 
 
     def reset_model(self):
