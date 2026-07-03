@@ -1,5 +1,8 @@
 from pathlib import Path
 
+import json
+from datetime import datetime
+
 import gymnasium as gym
 from gymnasium.envs.mujoco import MujocoEnv
 from gymnasium import spaces
@@ -10,6 +13,7 @@ import numpy as np
 import gymnasium as gym
 from gymnasium.envs.mujoco import MujocoEnv
 from gymnasium import spaces
+from stable_baselines3.common.vec_env import SubprocVecEnv
 from stable_baselines3 import PPO
 from stable_baselines3.common.env_util import make_vec_env
 import numpy as np
@@ -20,6 +24,19 @@ import mujoco
 class WormSwimmingEnv(MujocoEnv):
     def __init__(self, render_mode=None):
         xml_path = Path(__file__).parent / "worm_water_surface.xml"
+
+        self.log_interval = 1000
+        self.log_buffer = {
+            "reward": [],
+            "forward_reward": [],
+            "forward_vel": [],
+            "head_error": [],
+            "surface_reward": [],
+            "depth_penalty": [],
+            "ctrl_cost": [],
+            "terminated": [],
+            "successful_breathing": [],
+        }
 
         super().__init__(
             str(xml_path),
@@ -50,6 +67,17 @@ class WormSwimmingEnv(MujocoEnv):
         self.max_forward_vel = 20.0
         self.max_qvel = 50.0
 
+        self.reward_cfg = {
+            "surface_sharpness": 8.0, # how quickly the surface reward drops off as the head moves away from the target height
+            "forward_weight": 8.0, # how much reward for forward progress
+            #"max_rewarded_forward_vel": 1.5,
+            "surface_weight": 0.5,
+            "depth_weight": 3.0,
+            "ctrl_weight": 0.001,
+            "termination_penalty": 20.0,
+            "max_height_above_target": 0.5,
+        }
+
     def _get_obs(self):
         obs = np.concatenate([self.data.qpos, self.data.qvel])
         return np.nan_to_num(obs, nan=0.0, posinf=0.0, neginf=0.0).astype(np.float32)
@@ -75,16 +103,7 @@ class WormSwimmingEnv(MujocoEnv):
         # =========================
         # Tunable reward parameters
         # =========================
-        reward_cfg = {
-            "surface_sharpness": 8.0, # how quickly the surface reward drops off as the head moves away from the target height
-            "forward_weight": 4.0, # how much reward for forward progress
-            "max_rewarded_forward_vel": 1.5,
-            "surface_weight": 0.5,
-            "depth_weight": 3.0,
-            "ctrl_weight": 0.001,
-            "termination_penalty": 20.0,
-            "max_height_above_target": 0.5,
-        }
+        reward_cfg = self.reward_cfg
 
         # x position before the step
         x_before = self.data.qpos[0]
@@ -96,7 +115,7 @@ class WormSwimmingEnv(MujocoEnv):
             if self.check_unstable():
                 obs = self._get_obs()
                 print("Unstable state detected! Terminating episode.")
-                return obs, -reward_cfg["termination_penalty"], True, False, {"unstable": True}
+                return obs, -self.reward_cfg["termination_penalty"], True, False, {"unstable": True}
 
         # x position after the step
         x_after = self.data.qpos[0]
@@ -150,6 +169,7 @@ class WormSwimmingEnv(MujocoEnv):
         terminated = False
         truncated = False
 
+
         if head_z < target_head_z - self.termination_depth:
             terminated = True
             reward -= reward_cfg["termination_penalty"]
@@ -164,21 +184,57 @@ class WormSwimmingEnv(MujocoEnv):
             terminated = True
             reward -= reward_cfg["termination_penalty"]
 
+        successful_breathing = head_z >= target_head_z
+
+        self.log_buffer["reward"].append(reward)
+        self.log_buffer["forward_reward"].append(forward_reward)
+        self.log_buffer["successful_breathing"].append(float(successful_breathing))
+        self.log_buffer["head_error"].append(head_error)
+        self.log_buffer["forward_vel"].append(forward_vel)
+        self.log_buffer["surface_reward"].append(surface_reward)
+        self.log_buffer["depth_penalty"].append(depth_penalty)
+        self.log_buffer["ctrl_cost"].append(ctrl_cost)
+        self.log_buffer["terminated"].append(float(terminated))
+
         info = {
             "head_z": head_z,
             "reward": reward,
         }
 
-        if self.counter % 1000 == 0:
+        if self.counter % self.log_interval == 0 and self.counter > 0:
+            reward_arr = np.array(self.log_buffer["reward"])
+            forward_reward_arr = np.array(self.log_buffer["forward_reward"])
+            forward_vel_arr = np.array(self.log_buffer["forward_vel"])
+            head_error_arr = np.array(self.log_buffer["head_error"])
+            surface_arr = np.array(self.log_buffer["surface_reward"])
+            depth_arr = np.array(self.log_buffer["depth_penalty"])
+            ctrl_arr = np.array(self.log_buffer["ctrl_cost"])
+            term_arr = np.array(self.log_buffer["terminated"])
+
             print(
-                f"head_z={head_z:.3f}, "
-                f"breathing_reward={surface_reward:.3f}, "
-                f"forward_vel={forward_vel:.3f}, "
-                f"reward={reward:.3f}, "
-                f"depth_penalty={depth_penalty:.3f}, "
-                f"ctrl_cost={ctrl_cost:.3f}",
+                "\n" + "-" * 50 +
+                f"\nTraining diagnostics "
+                f"(last {len(reward_arr)} env steps)"
+                "\n\nReward:"
+                f"\n  mean reward           : {reward_arr.mean():8.3f}"
+                f"\n  mean breathing reward : {surface_arr.mean():8.3f}"
+                f"\n  mean swimming reward  : {forward_reward_arr.mean():8.3f}"
+                "\n\nSwimming values:"
+                f"\n  mean forward velocity : {forward_vel_arr.mean():8.3f}"
+                f"\n  mean head height error          : {head_error_arr.mean():8.3f}"
+                f"\n  mean successful breathing : {successful_breathing_arr.mean():8.3f}"
+
+                "\n\nPenalties:"
+                f"\n  mean depth penalty    : {depth_arr.mean():8.3f}"
+                f"\n  mean ctrl cost        : {ctrl_arr.mean():8.4f}"
+                "\n\nEpisodes:"
+                f"\n  terminations          : {int(term_arr.sum())}"
+                "\n" + "-" * 50,
                 flush=True,
             )
+
+            for key in self.log_buffer:
+                self.log_buffer[key].clear()
 
         self.counter += 1
 
@@ -211,6 +267,7 @@ if __name__ == "__main__":
     train_env = make_vec_env(
         make_worm_env,
         n_envs=n_envs,
+        vec_env_cls=SubprocVecEnv,
     )
 
     model = PPO(
@@ -248,8 +305,26 @@ if __name__ == "__main__":
             progress_bar=False,
         )
 
-    model.save("breathing_worm/ppo_worm_swimmer_with_surface")
-    print(f"Model saved as ppo_worm_swimmer_with_surface.zip")
+
+    save_dir = Path("models")
+    save_dir.mkdir(parents=True, exist_ok=True)
+
+    model_path = save_dir / "ppo_worm_swimmer_with_surface"
+    model.save(model_path)
+
+    metadata = {
+        "model_path": str(model_path) + ".zip",
+        "saved_at": datetime.now().isoformat(timespec="seconds"),
+        "reward_cfg": train_env.get_attr("reward_cfg")[0],
+        "water_level": train_env.get_attr("water_level")[0],
+        "max_forward_vel": train_env.get_attr("max_forward_vel")[0],
+        "max_qvel": train_env.get_attr("max_qvel")[0],
+        "stages": stages,
+    }
+
+    with open(save_dir / "ppo_worm_swimmer_with_surface_metadata.json", "w") as f:
+        json.dump(metadata, f, indent=4)
+
     train_env.close()
 
 
