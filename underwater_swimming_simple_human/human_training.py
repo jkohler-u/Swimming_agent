@@ -12,7 +12,7 @@ WATER_SURFACE_HEIGHT = 3.0  # Define the water surface height as a constant
 class HumanSwimmingEnv(MujocoEnv):
     def __init__(self, render_mode=None):
         # Update this path to where you saved the worm XML
-        self._model_path = '/home/judith/swimming/Swimming_agent/underwater_swimming_worm/humanoid.xml' 
+        self._model_path = '/home/judith/swimming/Swimming_agent/underwater_swimming_simple_human/humanoid.xml' 
         
         super().__init__(
             self._model_path, 
@@ -78,8 +78,7 @@ class HumanSwimmingEnv(MujocoEnv):
         reward = forward_vel * 40.0  
 
        
-
-        # try rewarding the head being above water
+        ## Manage in/out of water
         body_height = self.data.qpos[2]
         head_height = self.data.body('head').xpos[2]
         foot_height_1 =  self.data.body('foot_left').xpos[2]
@@ -95,7 +94,7 @@ class HumanSwimmingEnv(MujocoEnv):
         
 
         # Penalize if the head is too low or feet/hands are too high
-        reward -= 5.0 * (WATER_SURFACE_HEIGHT - head_height)**2 if head_height < WATER_SURFACE_HEIGHT else 0
+        # reward -= 5.0 * (WATER_SURFACE_HEIGHT - head_height)**2 if head_height < WATER_SURFACE_HEIGHT else 0
         reward -= 1.0 * (foot_height_1 - WATER_SURFACE_HEIGHT - 0.5) **2 if foot_height_1 > WATER_SURFACE_HEIGHT + 0.5 else 0
         reward -= 1.0 * (foot_height_2 - WATER_SURFACE_HEIGHT - 0.5) **2 if foot_height_2 > WATER_SURFACE_HEIGHT + 0.5 else 0
         reward -= 1.0 * (hand_height_1 - WATER_SURFACE_HEIGHT - 0.5) **2 if hand_height_1 > WATER_SURFACE_HEIGHT + 0.5 else 0
@@ -125,7 +124,7 @@ class HumanSwimmingEnv(MujocoEnv):
        
         # Depth check: Terminate and punish If the worm sinks too low or floats too high (outside the "water")
         self.hard_termination = self.total_timesteps_trained > 1_000_000
-        if  (body_height < WATER_SURFACE_HEIGHT or body_height > WATER_SURFACE_HEIGHT):
+        if  (body_height < 0 or body_height > WATER_SURFACE_HEIGHT):
             reward -= 5
             if self.hard_termination:
                 terminated = True
@@ -136,7 +135,7 @@ class HumanSwimmingEnv(MujocoEnv):
         else:
             self.min_vel_counter = 0
 
-        if self.min_vel_counter > 300: # If moving too slowly for 200 steps
+        if self.min_vel_counter > 200: # If moving too slowly for 200 steps
             terminated = True
             reward -= 5
 
@@ -146,7 +145,7 @@ class HumanSwimmingEnv(MujocoEnv):
         else:
             self.hight_counter = 0
         
-        if self.hight_counter > 300: # If head is too low for 200 steps
+        if self.hight_counter > 200: # If head is too low for 200 steps
             terminated = True
             reward -= 5
 

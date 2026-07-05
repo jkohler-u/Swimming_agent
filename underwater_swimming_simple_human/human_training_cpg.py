@@ -4,13 +4,15 @@ from gymnasium import spaces
 from stable_baselines3 import PPO
 from stable_baselines3.common.env_util import make_vec_env
 import numpy as np
+from stable_baselines3.common.vec_env import VecNormalize
 from scipy.spatial.transform import Rotation as R  # <--- Add this import
+WATER_SURFACE_HEIGHT = 3.0  # Define the water surface height as a constant
 
 
 class HumanSwimmingEnv(MujocoEnv):
     def __init__(self, render_mode=None):
         # Update this path to where you saved the worm XML
-        self._model_path = '/home/judith/swimming/Swimming_agent/underwater_swimming_worm/humanoid.xml' 
+        self._model_path = '/home/judith/swimming/Swimming_agent/underwater_swimming_simple_human/humanoid.xml' 
         
         super().__init__(
             self._model_path, 
@@ -20,10 +22,15 @@ class HumanSwimmingEnv(MujocoEnv):
         )
         self.prev_action = np.zeros(self.model.nu)
 
+        # important for rewards later
+        self.current_step = 0
+        self.min_vel_counter = 0
+        self.hight_counter = 0
+        self.total_timesteps_trained = 0
 
-        # We subtract 2 from nq because we are removing the global X, Y, Z position
+
         obs_size = (self.model.nq) + self.model.nv 
-        obs_size += 3  # Add 3 for roll, pitch, yaw
+        obs_size += 3 + 2 # Add 3 for roll, pitch, yaw 
         self.observation_space = spaces.Box(
             low=-np.inf, high=np.inf, shape=(obs_size,), dtype=np.float32
         )
@@ -50,15 +57,18 @@ class HumanSwimmingEnv(MujocoEnv):
     def _get_obs(self):
         relative_qpos = self.data.qpos
         euler = self.get_euler_angles()
+        body_below_surface = False if  self.data.qpos[2] - WATER_SURFACE_HEIGHT < 0 else True
+        head_above_surface = False if  self.data.body('head').xpos[2] - WATER_SURFACE_HEIGHT < 0 else True
+        
         # Concatenate qpos, qvel, AND the euler angles
-        return np.concatenate([relative_qpos, self.data.qvel, euler]).astype(np.float32)
+        return np.concatenate([relative_qpos, self.data.qvel, euler, [body_below_surface], [head_above_surface]]).astype(np.float32)
    
     def step(self, action):
         # 1. Define a basic CPG rhythm (e.g., simple sine wave)
         # Use self.np_random.uniform or a global timer
         t = self.data.time 
         obs = self._get_obs()
-        
+
         # Example: Alternating arms (one is sin, other is -sin)
         cpg_rhythm = np.sin(2 * np.pi * 1.0 * t) # 1Hz frequency
         
@@ -69,14 +79,17 @@ class HumanSwimmingEnv(MujocoEnv):
         left_size = self.model.nu // 2
         right_size = self.model.nu - left_size  # Takes the remainder if nu is odd
         
+        cpg_weight = 0.2 # Adjust this value (0.1 to 0.5)
         cpg_action = np.concatenate([
-            np.full(left_size, cpg_rhythm), 
-            np.full(right_size, -cpg_rhythm)
+            np.full(left_size, cpg_rhythm * cpg_weight), 
+            np.full(right_size, -cpg_rhythm * cpg_weight)
         ])
 
         # 2. Combine CPG with RL action (Residual)
         # RL agent now 'fine-tunes' the basic rhythm
         final_action = cpg_action + action 
+
+       
         
         # Clip to ensure we stay within actuator limits
         final_action = np.clip(final_action, -1.0, 1.0)
@@ -84,36 +97,40 @@ class HumanSwimmingEnv(MujocoEnv):
         self.do_simulation(final_action, self.frame_skip)
         
        # --- REWARD LOGIC ---
-        roll, pitch, yaw = self.get_euler_angles()
+        roll, pitch, _ = self.get_euler_angles()
+        self.current_step +=1
+        self.total_timesteps_trained += 1
         
         # # Reward movement, higher reward for higher speed
         forward_vel = self.data.qvel[0] 
-        reward = forward_vel ** 2 * 100 * forward_vel/np.abs(forward_vel)
+        reward = forward_vel ** 2 * 40 * forward_vel/np.abs(forward_vel)
 
         # try rewarding the head being above water
+        body_height = self.data.qpos[2]
         head_height = self.data.body('head').xpos[2]
         foot_height_1 =  self.data.body('foot_left').xpos[2]
         foot_height_2 =  self.data.body('foot_right').xpos[2]
         hand_height_1 =  self.data.body('hand_right').xpos[2]
         hand_height_2 =  self.data.body('hand_left').xpos[2]
 
-        if head_height > 3  and head_height < 3.3 and foot_height_1 < 3.1 and foot_height_2 < 3.1: 
-            if forward_vel > 0.1:
-                reward += 5.0
-            reward += 3
+        # reward the head being above water, but not too high
+        reward += 5.0 * (head_height - WATER_SURFACE_HEIGHT)**2 if head_height > WATER_SURFACE_HEIGHT and head_height < WATER_SURFACE_HEIGHT + 0.3 else 0
+        
+        # reward the body being close too, but not above, the water surface
+        reward += 5.0 * (WATER_SURFACE_HEIGHT - body_height)**2 if body_height < WATER_SURFACE_HEIGHT else 0
+        
 
-        reward -= 1.0 * np.exp(3.0 - head_height)
-        reward -= 1.0 * np.exp(foot_height_1 - 3.5)
-        reward -= 1.0 * np.exp(foot_height_2 - 3.5)
-        reward -= 1.0 * np.exp(hand_height_1 - 3.5)
-        reward -= 1.0 * np.exp(hand_height_2 - 3.5)
+        reward -= 1.0 * (foot_height_1 - WATER_SURFACE_HEIGHT - 0.5) **2 if foot_height_1 > WATER_SURFACE_HEIGHT + 0.5 else 0
+        reward -= 1.0 * (foot_height_2 - WATER_SURFACE_HEIGHT - 0.5) **2 if foot_height_2 > WATER_SURFACE_HEIGHT + 0.5 else 0
+        reward -= 1.0 * (hand_height_1 - WATER_SURFACE_HEIGHT - 0.5) **2 if hand_height_1 > WATER_SURFACE_HEIGHT + 0.5 else 0
+        reward -= 1.0 * (hand_height_2 - WATER_SURFACE_HEIGHT - 0.5) **2 if hand_height_2 > WATER_SURFACE_HEIGHT + 0.5 else 0
 
         
         # Reward movement, linear reward 
         # reward = forward_vel * 20.0  
 
         # survival reward
-        reward += 0.005
+        reward += 0.05
 
         # Punish spinning (Angular velocity)
         # We use absolute value or square to punish both clockwise and counter-clockwise spin
@@ -134,9 +151,37 @@ class HumanSwimmingEnv(MujocoEnv):
         terminated = False
        
         # Depth check: Terminate and punish If the worm sinks too low or floats too high (outside the "water")
-        if self.data.qpos[2] < 0 or self.data.qpos[2] > 3.2:
+        self.hard_termination = self.total_timesteps_trained > 1_000_000
+        if  (body_height < 0 or body_height > WATER_SURFACE_HEIGHT):
+            reward -= 5
+            if self.hard_termination:
+                terminated = True
+
+        # terminate training is there is no forward movement
+        if forward_vel < 0.05:
+            self.min_vel_counter += 1
+        else:
+            self.min_vel_counter = 0
+
+        if self.min_vel_counter > 200: # If moving too slowly for 200 steps
             terminated = True
-            reward -= 10  
+            reward -= 5
+
+        # terminate training if the head is too low for too long
+        if head_height < WATER_SURFACE_HEIGHT or head_height > WATER_SURFACE_HEIGHT + 1:
+            self.hight_counter += 1
+        else:
+            self.hight_counter = 0
+        
+        if self.hight_counter > 200: # If head is too low for 200 steps
+            terminated = True
+            reward -= 5
+
+
+        # Bonus for moving in harmony with the CPG rhythm
+        harmony_reward = np.sum(action * cpg_action) * 0.01
+        reward += harmony_reward
+
 
         # if self.current_step > 1000 and forward_vel < 0.05:
         #     terminated = True 
@@ -144,16 +189,25 @@ class HumanSwimmingEnv(MujocoEnv):
         
         truncated = False
         info = {}
+        
         info['head_height'] = head_height
         info['forward_vel'] = forward_vel
+        info['step'] = self.current_step
+        info['body'] = self.data.qpos[2]
         # return obs, reward, terminated, truncated, info, head_height, forward_vel
         return obs,reward , terminated, truncated, info
 
     def reset_model(self):
         # Reset position to 1m height with slight randomness
-        qpos = self.init_qpos + np.random.uniform(-0.05, 0.05, size=self.init_qpos.shape)
+        qpos = self.init_qpos.copy()
+        qpos[2] = WATER_SURFACE_HEIGHT - 0.1 + self.np_random.uniform(-0.05, 0.05)
+       
         qvel = np.zeros_like(self.init_qvel)
         self.set_state(qpos, qvel)
+
+        self.current_step = 0
+        self.min_vel_counter = 0
+        self.hight_counter = 0
         return self._get_obs()
 
 def make_human_env(render_mode=None):
@@ -162,7 +216,12 @@ def make_human_env(render_mode=None):
 if __name__ == "__main__":
     # Use more envs if your CPU allows for faster training
     train_env = make_vec_env(lambda: make_human_env(), n_envs=8)
-
+    train_env = VecNormalize(
+        train_env,
+        norm_obs=True,          # normalise observations
+        norm_reward=True,       # normalise rewards (set False if you don’t want it)
+        
+    )  
     # PPO hyperparameters can be tuned, but these are a good start
     model = model = PPO(
     "MlpPolicy", 
@@ -178,7 +237,7 @@ if __name__ == "__main__":
     
     print("Training HUman Swimming Agent...")
     # Swimming is harder to learn than walking; you might need 2M+ timesteps
-    model.learn(total_timesteps=1000000) 
+    model.learn(total_timesteps=2000000) 
     
     model.save("ppo_human_swimmer")
     train_env.close()
