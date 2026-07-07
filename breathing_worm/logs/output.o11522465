@@ -1,0 +1,58 @@
+Running on node: hpc3-32
+Start time: Tue Jul  7 17:03:34 CEST 2026
+Working directory: /share/users/student/m/mbraatz/Swimming_agent/breathing_worm
+Using cpu device
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 486      |
+|    ep_rew_mean     | 1.13e+03 |
+| time/              |          |
+|    fps             | 8705     |
+|    iterations      | 1        |
+|    time_elapsed    | 1        |
+|    total_timesteps | 16384    |
+---------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 486          |
+|    ep_rew_mean          | 1.16e+03     |
+| time/                   |              |
+|    fps                  | 6959         |
+|    iterations           | 2            |
+|    time_elapsed         | 4            |
+|    total_timesteps      | 32768        |
+| train/                  |              |
+|    approx_kl            | 0.0020635761 |
+|    clip_fraction        | 0.002        |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.26        |
+|    explained_variance   | 0.00128      |
+|    learning_rate        | 0.0001       |
+|    loss                 | 1.61e+03     |
+|    n_updates            | 5            |
+|    policy_gradient_loss | -0.00276     |
+|    std                  | 1            |
+|    value_loss           | 3.43e+03     |
+------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 474          |
+|    ep_rew_mean          | 1.07e+03     |
+| time/                   |              |
+|    fps                  | 6476         |
+|    iterations           | 3            |
+|    time_elapsed         | 7            |
+|    total_timesteps      | 49152        |
+| train/                  |              |
+|    approx_kl            | 0.0011066059 |
+|    clip_fraction        | 0.000281     |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.26        |
+|    explained_variance   | 0.00563      |
+|    learning_rate        | 0.0001       |
+|    loss                 | 1.73e+03     |
+|    n_updates            | 10           |
+|    policy_gradient_loss | -0.00185     |
+|    std                  | 1            |
+|    value_loss           | 3.54e+03     |
+------------------------------------------

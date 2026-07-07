@@ -1,0 +1,4 @@
+  File "/share/users/student/m/mbraatz/Swimming_agent/breathing_worm/worm_with_fake_surface.py", line 167
+srun: error: hpc3-32: task 0: Exited with exit code 1
+    depth_penalty = (
+IndentationError: unexpected indent

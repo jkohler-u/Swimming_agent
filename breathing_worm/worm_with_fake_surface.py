@@ -68,13 +68,13 @@ class WormSwimmingEnv(MujocoEnv):
         self.max_qvel = 50.0
 
         self.reward_cfg = {
-            "surface_sharpness": 8.0, # how quickly the surface reward drops off as the head moves away from the target height
-            "forward_weight": 16.0, # how much reward for forward progress
+            "surface_sharpness": 4.0, # how quickly the surface reward drops off as the head moves away from the target height
+            "forward_weight": 12.0, # how much reward for forward progress
             #"max_rewarded_forward_vel": 1.5,
-            "surface_weight": 0.5,
+            "surface_weight": 2.0,
             "depth_weight": 3.0,
             "ctrl_weight": 0.001,
-            "termination_penalty": 20.0,
+            "termination_penalty": 1.0,
             "max_height_above_target": 0.5,
         }
 
@@ -156,7 +156,12 @@ class WormSwimmingEnv(MujocoEnv):
 
 
         #maybe this is better *surface_quality to reward forward velocity only when the worm is breathing
-        forward_reward = reward_cfg["forward_weight"] * forward_vel
+        target_vel = 0.1
+
+        forward_reward = (
+            reward_cfg["forward_weight"]
+            * np.clip(forward_vel / target_vel, 0, 1)
+        )
 
         # penalty for beeing too deep, quadratic penalty for being below the target height
         depth_penalty = (
@@ -191,7 +196,7 @@ class WormSwimmingEnv(MujocoEnv):
             terminated = True
             reward -= reward_cfg["termination_penalty"]
 
-        successful_breathing = distance > 0
+        successful_breathing = distance == 0
 
         self.log_buffer["reward"].append(reward)
         self.log_buffer["forward_reward"].append(forward_reward)
@@ -290,9 +295,9 @@ if __name__ == "__main__":
     )
 
     stages = [
-        ("Stage 1: high buoyancy", 0.8, 300_000),
-        ("Stage 2: medium buoyancy", 0.6, 300_000),
-        ("Stage 3: near-neutral buoyancy", 0.5, 400_000),
+        ("Stage 1: high buoyancy", 1.5, 300_000),
+        ("Stage 2: medium buoyancy", 1.0, 300_000),
+        ("Stage 3: near-neutral buoyancy", 0.8, 400_000),
     ]
 
     for i, (name, term_depth, steps) in enumerate(stages):
@@ -314,7 +319,7 @@ if __name__ == "__main__":
         )
 
 
-    save_dir = Path("models/higher_vel_reward")
+    save_dir = Path("models/new_try")
     save_dir.mkdir(parents=True, exist_ok=True)
 
     model_path = save_dir / "ppo_worm_swimmer_with_surface"

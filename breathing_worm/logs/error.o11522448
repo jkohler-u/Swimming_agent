@@ -1,0 +1,5 @@
+  File "/share/users/student/m/mbraatz/Swimming_agent/breathing_worm/worm_with_fake_surface.py", line 322
+    save_dir = Path("models/target_vel)
+                    ^
+srun: error: hpc3-32: task 0: Exited with exit code 1
+SyntaxError: unterminated string literal (detected at line 322)
