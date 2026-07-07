@@ -25,7 +25,7 @@ class WormSwimmingEnv(MujocoEnv):
     def __init__(self, render_mode=None):
         xml_path = Path(__file__).parent / "worm_water_surface.xml"
 
-        self.log_interval = 1000
+        self.log_interval = 10000
         self.log_buffer = {
             "reward": [],
             "forward_reward": [],
@@ -69,7 +69,7 @@ class WormSwimmingEnv(MujocoEnv):
 
         self.reward_cfg = {
             "surface_sharpness": 8.0, # how quickly the surface reward drops off as the head moves away from the target height
-            "forward_weight": 8.0, # how much reward for forward progress
+            "forward_weight": 16.0, # how much reward for forward progress
             #"max_rewarded_forward_vel": 1.5,
             "surface_weight": 0.5,
             "depth_weight": 3.0,
@@ -306,7 +306,7 @@ if __name__ == "__main__":
         )
 
 
-    save_dir = Path("models")
+    save_dir = Path("models/higher_vel_reward")
     save_dir.mkdir(parents=True, exist_ok=True)
 
     model_path = save_dir / "ppo_worm_swimmer_with_surface"
