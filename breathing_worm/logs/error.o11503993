@@ -1,0 +1,263 @@
+Process ForkServerProcess-7:
+Process ForkServerProcess-4:
+Process ForkServerProcess-5:
+Process ForkServerProcess-3:
+Process ForkServerProcess-2:
+Process ForkServerProcess-9:
+Process ForkServerProcess-6:
+Process ForkServerProcess-8:
+Process ForkServerProcess-10:
+Process ForkServerProcess-13:
+Process ForkServerProcess-12:
+Process ForkServerProcess-16:
+Process ForkServerProcess-14:
+Process ForkServerProcess-1:
+Process ForkServerProcess-11:
+Process ForkServerProcess-15:
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 35, in _worker
+    observation, reward, terminated, truncated, info = env.step(data)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/monitor.py", line 94, in step
+    observation, reward, terminated, truncated, info = self.env.step(action)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 35, in _worker
+    observation, reward, terminated, truncated, info = env.step(data)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 35, in _worker
+    observation, reward, terminated, truncated, info = env.step(data)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/gymnasium/wrappers/common.py", line 125, in step
+    observation, reward, terminated, truncated, info = self.env.step(action)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/monitor.py", line 94, in step
+    observation, reward, terminated, truncated, info = self.env.step(action)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 35, in _worker
+    observation, reward, terminated, truncated, info = env.step(data)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 35, in _worker
+    observation, reward, terminated, truncated, info = env.step(data)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/monitor.py", line 94, in step
+    observation, reward, terminated, truncated, info = self.env.step(action)
+  File "/share/users/student/m/mbraatz/Swimming_agent/breathing_worm/worm_with_fake_surface.py", line 225, in step
+    f"\n  mean successful breathing : {successful_breathing_arr.mean():8.3f}"
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 35, in _worker
+    observation, reward, terminated, truncated, info = env.step(data)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/gymnasium/wrappers/common.py", line 125, in step
+    observation, reward, terminated, truncated, info = self.env.step(action)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/monitor.py", line 94, in step
+    observation, reward, terminated, truncated, info = self.env.step(action)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/share/users/student/m/mbraatz/Swimming_agent/breathing_worm/worm_with_fake_surface.py", line 225, in step
+    f"\n  mean successful breathing : {successful_breathing_arr.mean():8.3f}"
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+NameError: name 'successful_breathing_arr' is not defined
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/monitor.py", line 94, in step
+    observation, reward, terminated, truncated, info = self.env.step(action)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/gymnasium/wrappers/common.py", line 125, in step
+    observation, reward, terminated, truncated, info = self.env.step(action)
+Traceback (most recent call last):
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/monitor.py", line 94, in step
+    observation, reward, terminated, truncated, info = self.env.step(action)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/gymnasium/wrappers/common.py", line 125, in step
+    observation, reward, terminated, truncated, info = self.env.step(action)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 35, in _worker
+    observation, reward, terminated, truncated, info = env.step(data)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 35, in _worker
+    observation, reward, terminated, truncated, info = env.step(data)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/gymnasium/wrappers/common.py", line 125, in step
+    observation, reward, terminated, truncated, info = self.env.step(action)
+  File "/share/users/student/m/mbraatz/Swimming_agent/breathing_worm/worm_with_fake_surface.py", line 225, in step
+    f"\n  mean successful breathing : {successful_breathing_arr.mean():8.3f}"
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+NameError: name 'successful_breathing_arr' is not defined
+  File "/share/users/student/m/mbraatz/Swimming_agent/breathing_worm/worm_with_fake_surface.py", line 225, in step
+    f"\n  mean successful breathing : {successful_breathing_arr.mean():8.3f}"
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/gymnasium/wrappers/common.py", line 125, in step
+    observation, reward, terminated, truncated, info = self.env.step(action)
+  File "/share/users/student/m/mbraatz/Swimming_agent/breathing_worm/worm_with_fake_surface.py", line 225, in step
+    f"\n  mean successful breathing : {successful_breathing_arr.mean():8.3f}"
+  File "/share/users/student/m/mbraatz/Swimming_agent/breathing_worm/worm_with_fake_surface.py", line 225, in step
+    f"\n  mean successful breathing : {successful_breathing_arr.mean():8.3f}"
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/monitor.py", line 94, in step
+    observation, reward, terminated, truncated, info = self.env.step(action)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 35, in _worker
+    observation, reward, terminated, truncated, info = env.step(data)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 35, in _worker
+    observation, reward, terminated, truncated, info = env.step(data)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/monitor.py", line 94, in step
+    observation, reward, terminated, truncated, info = self.env.step(action)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/monitor.py", line 94, in step
+    observation, reward, terminated, truncated, info = self.env.step(action)
+NameError: name 'successful_breathing_arr' is not defined
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/gymnasium/wrappers/common.py", line 125, in step
+    observation, reward, terminated, truncated, info = self.env.step(action)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 35, in _worker
+    observation, reward, terminated, truncated, info = env.step(data)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 35, in _worker
+    observation, reward, terminated, truncated, info = env.step(data)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+NameError: name 'successful_breathing_arr' is not defined
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/gymnasium/wrappers/common.py", line 125, in step
+    observation, reward, terminated, truncated, info = self.env.step(action)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/monitor.py", line 94, in step
+    observation, reward, terminated, truncated, info = self.env.step(action)
+NameError: name 'successful_breathing_arr' is not defined
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/monitor.py", line 94, in step
+    observation, reward, terminated, truncated, info = self.env.step(action)
+  File "/share/users/student/m/mbraatz/Swimming_agent/breathing_worm/worm_with_fake_surface.py", line 225, in step
+    f"\n  mean successful breathing : {successful_breathing_arr.mean():8.3f}"
+NameError: name 'successful_breathing_arr' is not defined
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/gymnasium/wrappers/common.py", line 125, in step
+    observation, reward, terminated, truncated, info = self.env.step(action)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/monitor.py", line 94, in step
+    observation, reward, terminated, truncated, info = self.env.step(action)
+  File "/share/users/student/m/mbraatz/Swimming_agent/breathing_worm/worm_with_fake_surface.py", line 225, in step
+    f"\n  mean successful breathing : {successful_breathing_arr.mean():8.3f}"
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 35, in _worker
+    observation, reward, terminated, truncated, info = env.step(data)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/gymnasium/wrappers/common.py", line 125, in step
+    observation, reward, terminated, truncated, info = self.env.step(action)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/gymnasium/wrappers/common.py", line 125, in step
+    observation, reward, terminated, truncated, info = self.env.step(action)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/gymnasium/wrappers/common.py", line 125, in step
+    observation, reward, terminated, truncated, info = self.env.step(action)
+  File "/share/users/student/m/mbraatz/Swimming_agent/breathing_worm/worm_with_fake_surface.py", line 225, in step
+    f"\n  mean successful breathing : {successful_breathing_arr.mean():8.3f}"
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 35, in _worker
+    observation, reward, terminated, truncated, info = env.step(data)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/monitor.py", line 94, in step
+    observation, reward, terminated, truncated, info = self.env.step(action)
+NameError: name 'successful_breathing_arr' is not defined
+  File "/share/users/student/m/mbraatz/Swimming_agent/breathing_worm/worm_with_fake_surface.py", line 225, in step
+    f"\n  mean successful breathing : {successful_breathing_arr.mean():8.3f}"
+  File "/share/users/student/m/mbraatz/Swimming_agent/breathing_worm/worm_with_fake_surface.py", line 225, in step
+    f"\n  mean successful breathing : {successful_breathing_arr.mean():8.3f}"
+NameError: name 'successful_breathing_arr' is not defined
+  File "/share/users/student/m/mbraatz/Swimming_agent/breathing_worm/worm_with_fake_surface.py", line 225, in step
+    f"\n  mean successful breathing : {successful_breathing_arr.mean():8.3f}"
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/monitor.py", line 94, in step
+    observation, reward, terminated, truncated, info = self.env.step(action)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/gymnasium/wrappers/common.py", line 125, in step
+    observation, reward, terminated, truncated, info = self.env.step(action)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/gymnasium/wrappers/common.py", line 125, in step
+    observation, reward, terminated, truncated, info = self.env.step(action)
+NameError: name 'successful_breathing_arr' is not defined
+NameError: name 'successful_breathing_arr' is not defined
+  File "/share/users/student/m/mbraatz/Swimming_agent/breathing_worm/worm_with_fake_surface.py", line 225, in step
+    f"\n  mean successful breathing : {successful_breathing_arr.mean():8.3f}"
+NameError: name 'successful_breathing_arr' is not defined
+NameError: name 'successful_breathing_arr' is not defined
+  File "/share/users/student/m/mbraatz/Swimming_agent/breathing_worm/worm_with_fake_surface.py", line 225, in step
+    f"\n  mean successful breathing : {successful_breathing_arr.mean():8.3f}"
+NameError: name 'successful_breathing_arr' is not defined
+NameError: name 'successful_breathing_arr' is not defined
+Traceback (most recent call last):
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 35, in _worker
+    observation, reward, terminated, truncated, info = env.step(data)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/monitor.py", line 94, in step
+    observation, reward, terminated, truncated, info = self.env.step(action)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/gymnasium/wrappers/common.py", line 125, in step
+    observation, reward, terminated, truncated, info = self.env.step(action)
+  File "/share/users/student/m/mbraatz/Swimming_agent/breathing_worm/worm_with_fake_surface.py", line 225, in step
+    f"\n  mean successful breathing : {successful_breathing_arr.mean():8.3f}"
+NameError: name 'successful_breathing_arr' is not defined
+Traceback (most recent call last):
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 35, in _worker
+    observation, reward, terminated, truncated, info = env.step(data)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/monitor.py", line 94, in step
+    observation, reward, terminated, truncated, info = self.env.step(action)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/gymnasium/wrappers/common.py", line 125, in step
+    observation, reward, terminated, truncated, info = self.env.step(action)
+  File "/share/users/student/m/mbraatz/Swimming_agent/breathing_worm/worm_with_fake_surface.py", line 225, in step
+    f"\n  mean successful breathing : {successful_breathing_arr.mean():8.3f}"
+NameError: name 'successful_breathing_arr' is not defined
+Traceback (most recent call last):
+  File "/share/users/student/m/mbraatz/Swimming_agent/breathing_worm/worm_with_fake_surface.py", line 301, in <module>
+    model.learn(
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/ppo/ppo.py", line 311, in learn
+    return super().learn(
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/on_policy_algorithm.py", line 324, in learn
+    continue_training = self.collect_rollouts(self.env, callback, self.rollout_buffer, n_rollout_steps=self.n_steps)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/on_policy_algorithm.py", line 218, in collect_rollouts
+    new_obs, rewards, dones, infos = env.step(clipped_actions)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/vec_env/base_vec_env.py", line 222, in step
+    return self.step_wait()
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 137, in step_wait
+    results = [remote.recv() for remote in self.remotes]
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/vec_env/subproc_vec_env.py", line 137, in <listcomp>
+    results = [remote.recv() for remote in self.remotes]
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/multiprocessing/connection.py", line 250, in recv
+    buf = self._recv_bytes()
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/multiprocessing/connection.py", line 414, in _recv_bytes
+    buf = self._recv(4)
+  File "/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/multiprocessing/connection.py", line 383, in _recv
+    raise EOFError
+EOFError
+srun: error: hpc3-30: task 0: Exited with exit code 1

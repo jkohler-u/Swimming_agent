@@ -141,9 +141,16 @@ class WormSwimmingEnv(MujocoEnv):
         #how far the head is from the target height <0 --> heas is too low, >0 --> head is too high
         head_error = head_z - target_head_z
 
+        breathing_tolerance = 0.03   
+        distance = max(
+            0.0,
+            abs(head_error) - breathing_tolerance
+        )
+
+
         # smooth score for being close to the target height
         surface_quality = np.exp(
-            -reward_cfg["surface_sharpness"] * head_error**2
+            -reward_cfg["surface_sharpness"] * distance**2
         )
         surface_reward = reward_cfg["surface_weight"] * surface_quality
 
@@ -184,7 +191,7 @@ class WormSwimmingEnv(MujocoEnv):
             terminated = True
             reward -= reward_cfg["termination_penalty"]
 
-        successful_breathing = head_z >= target_head_z
+        successful_breathing = distance > 0
 
         self.log_buffer["reward"].append(reward)
         self.log_buffer["forward_reward"].append(forward_reward)
@@ -210,6 +217,7 @@ class WormSwimmingEnv(MujocoEnv):
             depth_arr = np.array(self.log_buffer["depth_penalty"])
             ctrl_arr = np.array(self.log_buffer["ctrl_cost"])
             term_arr = np.array(self.log_buffer["terminated"])
+            successful_breathing_arr = np.array(self.log_buffer["successful_breathing"])
 
             print(
                 "\n" + "-" * 50 +
@@ -222,7 +230,7 @@ class WormSwimmingEnv(MujocoEnv):
                 "\n\nSwimming values:"
                 f"\n  mean forward velocity : {forward_vel_arr.mean():8.3f}"
                 f"\n  mean head height error          : {head_error_arr.mean():8.3f}"
-                f"\n  mean successful breathing : {successful_breathing.mean():8.3f}"
+                f"\n  mean successful breathing : {successful_breathing_arr.mean():8.3f}"
 
                 "\n\nPenalties:"
                 f"\n  mean depth penalty    : {depth_arr.mean():8.3f}"
