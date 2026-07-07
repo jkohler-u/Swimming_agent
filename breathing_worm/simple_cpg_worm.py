@@ -21,6 +21,31 @@ from gymnasium.wrappers import TimeLimit
 import mujoco
 
 
+class CPG:
+    def __init__(self, n_joints, dt):
+        self.n = n_joints
+        self.dt = dt
+        self.phase = 0.0
+
+    def reset(self):
+        self.phase = 0.0
+
+    def step(self, action):
+        # PPO action is in [-1, 1]
+        frequency = 1.0 + 2.0 * ((action[0] + 1.0) / 2.0)
+        amplitude = 0.1 + 0.6 * ((action[1] + 1.0) / 2.0)
+        phase_lag = np.pi * ((action[2] + 1.0) / 2.0)
+
+        self.phase += 2 * np.pi * frequency * self.dt
+
+        joint_ids = np.arange(self.n)
+
+        ctrl = amplitude * np.sin(
+            self.phase - joint_ids * phase_lag
+        )
+
+        return np.clip(ctrl, -1.0, 1.0)
+
 class WormSwimmingEnv(MujocoEnv):
     def __init__(self, render_mode=None):
         xml_path = Path(__file__).parent / "worm_water_surface.xml"
@@ -56,8 +81,12 @@ class WormSwimmingEnv(MujocoEnv):
         self.action_space = spaces.Box(
             low=-1.0,
             high=1.0,
-            shape=(self.model.nu,),
+            shape=(3,),
             dtype=np.float32,
+        )
+        self.cpg = CPG(
+            n_joints=self.model.nu,
+            dt=self.dt,
         )
 
         self.water_level = 3.0
@@ -109,7 +138,8 @@ class WormSwimmingEnv(MujocoEnv):
         x_before = self.data.qpos[0]
 
         for _ in range(self.frame_skip):
-            self.data.ctrl[:] = action
+            ctrl = self.cpg.step(action)
+            self.data.ctrl[:] = ctrl
             mujoco.mj_step(self.model, self.data)
 
             if self.check_unstable():
@@ -251,6 +281,7 @@ class WormSwimmingEnv(MujocoEnv):
 
         qvel = np.zeros_like(self.init_qvel)
         self.set_state(qpos, qvel)
+        self.cpg.reset()
         return self._get_obs()
 
 

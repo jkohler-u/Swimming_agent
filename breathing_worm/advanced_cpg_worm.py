@@ -21,6 +21,44 @@ from gymnasium.wrappers import TimeLimit
 import mujoco
 
 
+class CoupledCPG:
+    def __init__(self, n_joints, dt):
+        self.n = n_joints
+        self.dt = dt
+        self.phases = np.zeros(n_joints)
+
+        self.coupling_strength = 4.0
+
+    def reset(self):
+        self.phases[:] = 0.0
+
+    def step(self, action):
+        # PPO action is in [-1, 1]
+        frequency = 1.0 + 2.0 * ((action[0] + 1.0) / 2.0)
+        amplitude = 0.1 + 0.6 * ((action[1] + 1.0) / 2.0)
+        desired_phase_lag = np.pi * ((action[2] + 1.0) / 2.0)
+
+        natural_frequency = 2 * np.pi * frequency
+
+        phase_dot = np.ones(self.n) * natural_frequency
+
+        for i in range(self.n):
+            if i > 0:
+                phase_dot[i] += self.coupling_strength * np.sin(
+                    self.phases[i - 1] - self.phases[i] - desired_phase_lag
+                )
+
+            if i < self.n - 1:
+                phase_dot[i] += self.coupling_strength * np.sin(
+                    self.phases[i + 1] - self.phases[i] + desired_phase_lag
+                )
+
+        self.phases += phase_dot * self.dt
+
+        ctrl = amplitude * np.sin(self.phases)
+
+        return np.clip(ctrl, -1.0, 1.0)
+
 class WormSwimmingEnv(MujocoEnv):
     def __init__(self, render_mode=None):
         xml_path = Path(__file__).parent / "worm_water_surface.xml"
@@ -56,8 +94,12 @@ class WormSwimmingEnv(MujocoEnv):
         self.action_space = spaces.Box(
             low=-1.0,
             high=1.0,
-            shape=(self.model.nu,),
+            shape=(3,),
             dtype=np.float32,
+        )
+        self.cpg = CoupledCPG(
+            n_joints=self.model.nu,
+            dt=self.dt,
         )
 
         self.water_level = 3.0
@@ -109,7 +151,8 @@ class WormSwimmingEnv(MujocoEnv):
         x_before = self.data.qpos[0]
 
         for _ in range(self.frame_skip):
-            self.data.ctrl[:] = action
+            ctrl = self.cpg.step(action)
+            self.data.ctrl[:] = ctrl
             mujoco.mj_step(self.model, self.data)
 
             if self.check_unstable():
@@ -251,6 +294,7 @@ class WormSwimmingEnv(MujocoEnv):
 
         qvel = np.zeros_like(self.init_qvel)
         self.set_state(qpos, qvel)
+        self.cpg.reset()
         return self._get_obs()
 
 
