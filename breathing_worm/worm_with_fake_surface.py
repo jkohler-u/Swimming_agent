@@ -61,21 +61,21 @@ class WormSwimmingEnv(MujocoEnv):
         )
 
         self.water_level = 3.0
-        self.termination_depth = 0.8
+        self.termination_depth = 3
         self.counter = 0
 
         self.max_forward_vel = 20.0
         self.max_qvel = 50.0
 
         self.reward_cfg = {
-            "surface_sharpness": 4.0, # how quickly the surface reward drops off as the head moves away from the target height
+            "surface_sharpness": 6.0, # how quickly the surface reward drops off as the head moves away from the target height
             "forward_weight": 12.0, # how much reward for forward progress
             #"max_rewarded_forward_vel": 1.5,
             "surface_weight": 2.0,
             "depth_weight": 3.0,
-            "ctrl_weight": 0.001,
+            "ctrl_weight": 0.0001,
             "termination_penalty": 1.0,
-            "max_height_above_target": 0.5,
+            "max_height_above_target": 0.8,
         }
 
     def _get_obs(self):
@@ -319,7 +319,7 @@ if __name__ == "__main__":
         )
 
 
-    save_dir = Path("models/new_try")
+    save_dir = Path("models/higher_gear")
     save_dir.mkdir(parents=True, exist_ok=True)
 
     model_path = save_dir / "ppo_worm_swimmer_with_surface"
