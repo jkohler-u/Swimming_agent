@@ -1,0 +1,3472 @@
+Running on node: hpc3-50
+Start time: Wed Jul  8 10:06:55 CEST 2026
+Working directory: /share/users/student/m/mbraatz/Swimming_agent/breathing_worm
+Using cpu device
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 465      |
+|    ep_rew_mean     | 2.36e+03 |
+| time/              |          |
+|    fps             | 8776     |
+|    iterations      | 1        |
+|    time_elapsed    | 1        |
+|    total_timesteps | 16384    |
+---------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 460          |
+|    ep_rew_mean          | 2.37e+03     |
+| time/                   |              |
+|    fps                  | 9170         |
+|    iterations           | 2            |
+|    time_elapsed         | 3            |
+|    total_timesteps      | 32768        |
+| train/                  |              |
+|    approx_kl            | 0.0014908717 |
+|    clip_fraction        | 0.00101      |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.26        |
+|    explained_variance   | -0.00238     |
+|    learning_rate        | 0.0001       |
+|    loss                 | 3.89e+03     |
+|    n_updates            | 5            |
+|    policy_gradient_loss | -0.0011      |
+|    std                  | 1            |
+|    value_loss           | 7.86e+03     |
+------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 456          |
+|    ep_rew_mean          | 2.33e+03     |
+| time/                   |              |
+|    fps                  | 9336         |
+|    iterations           | 3            |
+|    time_elapsed         | 5            |
+|    total_timesteps      | 49152        |
+| train/                  |              |
+|    approx_kl            | 0.0008072085 |
+|    clip_fraction        | 2.44e-05     |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.26        |
+|    explained_variance   | 0.000153     |
+|    learning_rate        | 0.0001       |
+|    loss                 | 4.03e+03     |
+|    n_updates            | 10           |
+|    policy_gradient_loss | -0.000677    |
+|    std                  | 1            |
+|    value_loss           | 8.01e+03     |
+------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 451          |
+|    ep_rew_mean          | 2.3e+03      |
+| time/                   |              |
+|    fps                  | 9397         |
+|    iterations           | 4            |
+|    time_elapsed         | 6            |
+|    total_timesteps      | 65536        |
+| train/                  |              |
+|    approx_kl            | 0.0016911849 |
+|    clip_fraction        | 0.00118      |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.26        |
+|    explained_variance   | 0.00128      |
+|    learning_rate        | 0.0001       |
+|    loss                 | 3.57e+03     |
+|    n_updates            | 15           |
+|    policy_gradient_loss | -0.00109     |
+|    std                  | 1            |
+|    value_loss           | 7.22e+03     |
+------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 457          |
+|    ep_rew_mean          | 2.32e+03     |
+| time/                   |              |
+|    fps                  | 8557         |
+|    iterations           | 5            |
+|    time_elapsed         | 9            |
+|    total_timesteps      | 81920        |
+| train/                  |              |
+|    approx_kl            | 0.0009685342 |
+|    clip_fraction        | 3.66e-05     |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.26        |
+|    explained_variance   | 0.00568      |
+|    learning_rate        | 0.0001       |
+|    loss                 | 3.82e+03     |
+|    n_updates            | 20           |
+|    policy_gradient_loss | -0.000735    |
+|    std                  | 0.999        |
+|    value_loss           | 7.69e+03     |
+------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 460          |
+|    ep_rew_mean          | 2.41e+03     |
+| time/                   |              |
+|    fps                  | 7596         |
+|    iterations           | 6            |
+|    time_elapsed         | 12           |
+|    total_timesteps      | 98304        |
+| train/                  |              |
+|    approx_kl            | 0.0003661263 |
+|    clip_fraction        | 0            |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.25        |
+|    explained_variance   | 0.00701      |
+|    learning_rate        | 0.0001       |
+|    loss                 | 3.97e+03     |
+|    n_updates            | 25           |
+|    policy_gradient_loss | -0.000389    |
+|    std                  | 0.999        |
+|    value_loss           | 7.97e+03     |
+------------------------------------------
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 468         |
+|    ep_rew_mean          | 2.47e+03    |
+| time/                   |             |
+|    fps                  | 7004        |
+|    iterations           | 7           |
+|    time_elapsed         | 16          |
+|    total_timesteps      | 114688      |
+| train/                  |             |
+|    approx_kl            | 0.000771648 |
+|    clip_fraction        | 2.44e-05    |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.25       |
+|    explained_variance   | 0.00791     |
+|    learning_rate        | 0.0001      |
+|    loss                 | 3.75e+03    |
+|    n_updates            | 30          |
+|    policy_gradient_loss | -0.000799   |
+|    std                  | 1           |
+|    value_loss           | 7.98e+03    |
+-----------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 476          |
+|    ep_rew_mean          | 2.47e+03     |
+| time/                   |              |
+|    fps                  | 6542         |
+|    iterations           | 8            |
+|    time_elapsed         | 20           |
+|    total_timesteps      | 131072       |
+| train/                  |              |
+|    approx_kl            | 0.0001532984 |
+|    clip_fraction        | 0            |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.26        |
+|    explained_variance   | 0.0112       |
+|    learning_rate        | 0.0001       |
+|    loss                 | 3.7e+03      |
+|    n_updates            | 35           |
+|    policy_gradient_loss | -0.000285    |
+|    std                  | 1            |
+|    value_loss           | 7.48e+03     |
+------------------------------------------
+-------------------------------------------
+| rollout/                |               |
+|    ep_len_mean          | 488           |
+|    ep_rew_mean          | 2.53e+03      |
+| time/                   |               |
+|    fps                  | 6182          |
+|    iterations           | 9             |
+|    time_elapsed         | 23            |
+|    total_timesteps      | 147456        |
+| train/                  |               |
+|    approx_kl            | 0.00039086788 |
+|    clip_fraction        | 0             |
+|    clip_range           | 0.2           |
+|    entropy_loss         | -4.26         |
+|    explained_variance   | 0.015         |
+|    learning_rate        | 0.0001        |
+|    loss                 | 3.78e+03      |
+|    n_updates            | 40            |
+|    policy_gradient_loss | -0.000493     |
+|    std                  | 1             |
+|    value_loss           | 7.54e+03      |
+-------------------------------------------
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10001 env steps)
+
+Reward:
+  mean reward           :    5.161
+  mean breathing reward :    1.150
+  mean swimming reward  :    4.615
+
+Swimming values:
+  mean forward velocity :   -0.007
+  mean head height error          :   -0.239
+  mean successful breathing :    0.060
+
+Penalties:
+  mean depth penalty    :    0.603
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 6
+--------------------------------------------------
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10001 env steps)
+
+Reward:
+  mean reward           :    5.291
+  mean breathing reward :    1.223
+  mean swimming reward  :    4.692
+
+Swimming values:
+  mean forward velocity :   -0.007
+  mean head height error          :   -0.227
+  mean successful breathing :    0.058
+
+Penalties:
+  mean depth penalty    :    0.623
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 4
+--------------------------------------------------
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10001 env steps)
+
+Reward:
+  mean reward           :    5.300
+  mean breathing reward :    1.224
+  mean swimming reward  :    4.648
+
+Swimming values:
+  mean forward velocity :   -0.008
+  mean head height error          :   -0.201
+  mean successful breathing :    0.065
+
+Penalties:
+  mean depth penalty    :    0.571
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 6
+--------------------------------------------------
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10001 env steps)
+
+Reward:
+  mean reward           :    5.233
+  mean breathing reward :    1.195
+  mean swimming reward  :    4.641
+
+Swimming values:
+  mean forward velocity :   -0.008
+  mean head height error          :   -0.250
+  mean successful breathing :    0.068
+
+Penalties:
+  mean depth penalty    :    0.603
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 3
+--------------------------------------------------
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10001 env steps)
+
+Reward:
+  mean reward           :    5.191
+  mean breathing reward :    1.207
+  mean swimming reward  :    4.661
+
+Swimming values:
+  mean forward velocity :   -0.007
+  mean head height error          :   -0.258
+  mean successful breathing :    0.064
+
+Penalties:
+  mean depth penalty    :    0.676
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 5
+--------------------------------------------------
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10001 env steps)
+
+Reward:
+  mean reward           :    5.318
+  mean breathing reward :    1.213
+  mean swimming reward  :    4.724
+
+Swimming values:
+  mean forward velocity :   -0.006
+  mean head height error          :   -0.238
+  mean successful breathing :    0.057
+
+Penalties:
+  mean depth penalty    :    0.618
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 5
+--------------------------------------------------
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10001 env steps)
+
+Reward:
+  mean reward           :    5.196
+  mean breathing reward :    1.191
+  mean swimming reward  :    4.619
+
+Swimming values:
+  mean forward velocity :   -0.007
+  mean head height error          :   -0.233
+  mean successful breathing :    0.060
+
+Penalties:
+  mean depth penalty    :    0.613
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 6
+--------------------------------------------------
+Apperently I was flying!!!
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10001 env steps)
+
+Reward:
+  mean reward           :    5.413
+  mean breathing reward :    1.299
+  mean swimming reward  :    4.550
+
+Swimming values:
+  mean forward velocity :   -0.010
+  mean head height error          :   -0.129
+  mean successful breathing :    0.067
+
+Penalties:
+  mean depth penalty    :    0.435
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 6
+--------------------------------------------------
+Apperently I was flying!!!
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10001 env steps)
+
+Reward:
+  mean reward           :    4.867
+  mean breathing reward :    1.031
+  mean swimming reward  :    4.690
+
+Swimming values:
+  mean forward velocity :   -0.008
+  mean head height error          :   -0.331
+  mean successful breathing :    0.047
+
+Penalties:
+  mean depth penalty    :    0.853
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 7
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10001 env steps)
+
+Reward:
+  mean reward           :    4.979
+  mean breathing reward :    1.110
+  mean swimming reward  :    4.681
+
+Swimming values:
+  mean forward velocity :   -0.008
+  mean head height error          :   -0.284
+  mean successful breathing :    0.055
+
+Penalties:
+  mean depth penalty    :    0.811
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 7
+--------------------------------------------------
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10001 env steps)
+
+Reward:
+  mean reward           :    4.622
+  mean breathing reward :    0.999
+  mean swimming reward  :    4.595
+
+Swimming values:
+  mean forward velocity :   -0.010
+  mean head height error          :   -0.365
+  mean successful breathing :    0.046
+
+Penalties:
+  mean depth penalty    :    0.971
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 12
+--------------------------------------------------
+Apperently I was flying!!!
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10001 env steps)
+
+Reward:
+  mean reward           :    5.313
+  mean breathing reward :    1.190
+  mean swimming reward  :    4.656
+
+Swimming values:
+  mean forward velocity :   -0.007
+  mean head height error          :   -0.220
+  mean successful breathing :    0.067
+
+Penalties:
+  mean depth penalty    :    0.532
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 4
+--------------------------------------------------
+Apperently I was flying!!!
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10001 env steps)
+
+Reward:
+  mean reward           :    5.159
+  mean breathing reward :    1.095
+  mean swimming reward  :    4.719
+
+Swimming values:
+  mean forward velocity :   -0.008
+  mean head height error          :   -0.289
+  mean successful breathing :    0.051
+
+Penalties:
+  mean depth penalty    :    0.654
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 8
+--------------------------------------------------
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10001 env steps)
+
+Reward:
+  mean reward           :    5.162
+  mean breathing reward :    1.209
+  mean swimming reward  :    4.560
+
+Swimming values:
+  mean forward velocity :   -0.008
+  mean head height error          :   -0.187
+  mean successful breathing :    0.063
+
+Penalties:
+  mean depth penalty    :    0.606
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 5
+--------------------------------------------------
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10001 env steps)
+
+Reward:
+  mean reward           :    5.227
+  mean breathing reward :    1.189
+  mean swimming reward  :    4.661
+
+Swimming values:
+  mean forward velocity :   -0.009
+  mean head height error          :   -0.232
+  mean successful breathing :    0.063
+
+Penalties:
+  mean depth penalty    :    0.621
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 7
+--------------------------------------------------
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10001 env steps)
+
+Reward:
+  mean reward           :    5.260
+  mean breathing reward :    1.183
+  mean swimming reward  :    4.691
+
+Swimming values:
+  mean forward velocity :   -0.005
+  mean head height error          :   -0.275
+  mean successful breathing :    0.061
+
+Penalties:
+  mean depth penalty    :    0.612
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 7
+--------------------------------------------------
+-------------------------------------------
+| rollout/                |               |
+|    ep_len_mean          | 487           |
+|    ep_rew_mean          | 2.5e+03       |
+| time/                   |               |
+|    fps                  | 5920          |
+|    iterations           | 10            |
+|    time_elapsed         | 27            |
+|    total_timesteps      | 163840        |
+| train/                  |               |
+|    approx_kl            | 0.00014332728 |
+|    clip_fraction        | 0             |
+|    clip_range           | 0.2           |
+|    entropy_loss         | -4.26         |
+|    explained_variance   | 0.0134        |
+|    learning_rate        | 0.0001        |
+|    loss                 | 3.97e+03      |
+|    n_updates            | 45            |
+|    policy_gradient_loss | -0.000314     |
+|    std                  | 1             |
+|    value_loss           | 8.06e+03      |
+-------------------------------------------
+-------------------------------------------
+| rollout/                |               |
+|    ep_len_mean          | 476           |
+|    ep_rew_mean          | 2.44e+03      |
+| time/                   |               |
+|    fps                  | 5721          |
+|    iterations           | 11            |
+|    time_elapsed         | 31            |
+|    total_timesteps      | 180224        |
+| train/                  |               |
+|    approx_kl            | 0.00022745051 |
+|    clip_fraction        | 0             |
+|    clip_range           | 0.2           |
+|    entropy_loss         | -4.26         |
+|    explained_variance   | 0.0215        |
+|    learning_rate        | 0.0001        |
+|    loss                 | 3.58e+03      |
+|    n_updates            | 50            |
+|    policy_gradient_loss | -0.000361     |
+|    std                  | 0.999         |
+|    value_loss           | 7.23e+03      |
+-------------------------------------------
+-------------------------------------------
+| rollout/                |               |
+|    ep_len_mean          | 463           |
+|    ep_rew_mean          | 2.36e+03      |
+| time/                   |               |
+|    fps                  | 5568          |
+|    iterations           | 12            |
+|    time_elapsed         | 35            |
+|    total_timesteps      | 196608        |
+| train/                  |               |
+|    approx_kl            | 0.00016302773 |
+|    clip_fraction        | 0             |
+|    clip_range           | 0.2           |
+|    entropy_loss         | -4.26         |
+|    explained_variance   | 0.0143        |
+|    learning_rate        | 0.0001        |
+|    loss                 | 3.73e+03      |
+|    n_updates            | 55            |
+|    policy_gradient_loss | -0.000332     |
+|    std                  | 1             |
+|    value_loss           | 7.37e+03      |
+-------------------------------------------
+-------------------------------------------
+| rollout/                |               |
+|    ep_len_mean          | 468           |
+|    ep_rew_mean          | 2.42e+03      |
+| time/                   |               |
+|    fps                  | 5442          |
+|    iterations           | 13            |
+|    time_elapsed         | 39            |
+|    total_timesteps      | 212992        |
+| train/                  |               |
+|    approx_kl            | 0.00039826107 |
+|    clip_fraction        | 0             |
+|    clip_range           | 0.2           |
+|    entropy_loss         | -4.26         |
+|    explained_variance   | 0.0145        |
+|    learning_rate        | 0.0001        |
+|    loss                 | 3.89e+03      |
+|    n_updates            | 60            |
+|    policy_gradient_loss | -0.00054      |
+|    std                  | 1             |
+|    value_loss           | 7.81e+03      |
+-------------------------------------------
+-------------------------------------------
+| rollout/                |               |
+|    ep_len_mean          | 469           |
+|    ep_rew_mean          | 2.47e+03      |
+| time/                   |               |
+|    fps                  | 5347          |
+|    iterations           | 14            |
+|    time_elapsed         | 42            |
+|    total_timesteps      | 229376        |
+| train/                  |               |
+|    approx_kl            | 0.00030057668 |
+|    clip_fraction        | 0             |
+|    clip_range           | 0.2           |
+|    entropy_loss         | -4.26         |
+|    explained_variance   | 0.0142        |
+|    learning_rate        | 0.0001        |
+|    loss                 | 3.78e+03      |
+|    n_updates            | 65            |
+|    policy_gradient_loss | -0.00046      |
+|    std                  | 0.999         |
+|    value_loss           | 7.3e+03       |
+-------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 478          |
+|    ep_rew_mean          | 2.54e+03     |
+| time/                   |              |
+|    fps                  | 5259         |
+|    iterations           | 15           |
+|    time_elapsed         | 46           |
+|    total_timesteps      | 245760       |
+| train/                  |              |
+|    approx_kl            | 0.0007686553 |
+|    clip_fraction        | 1.22e-05     |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.25        |
+|    explained_variance   | 0.015        |
+|    learning_rate        | 0.0001       |
+|    loss                 | 3.99e+03     |
+|    n_updates            | 70           |
+|    policy_gradient_loss | -0.000764    |
+|    std                  | 0.999        |
+|    value_loss           | 8.1e+03      |
+------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 472          |
+|    ep_rew_mean          | 2.55e+03     |
+| time/                   |              |
+|    fps                  | 5193         |
+|    iterations           | 16           |
+|    time_elapsed         | 50           |
+|    total_timesteps      | 262144       |
+| train/                  |              |
+|    approx_kl            | 0.0006811881 |
+|    clip_fraction        | 0            |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.25        |
+|    explained_variance   | 0.012        |
+|    learning_rate        | 0.0001       |
+|    loss                 | 3.96e+03     |
+|    n_updates            | 75           |
+|    policy_gradient_loss | -0.000739    |
+|    std                  | 0.999        |
+|    value_loss           | 7.99e+03     |
+------------------------------------------
+-------------------------------------------
+| rollout/                |               |
+|    ep_len_mean          | 474           |
+|    ep_rew_mean          | 2.54e+03      |
+| time/                   |               |
+|    fps                  | 5130          |
+|    iterations           | 17            |
+|    time_elapsed         | 54            |
+|    total_timesteps      | 278528        |
+| train/                  |               |
+|    approx_kl            | 0.00038480904 |
+|    clip_fraction        | 0             |
+|    clip_range           | 0.2           |
+|    entropy_loss         | -4.25         |
+|    explained_variance   | 0.00715       |
+|    learning_rate        | 0.0001        |
+|    loss                 | 3.62e+03      |
+|    n_updates            | 80            |
+|    policy_gradient_loss | -0.000426     |
+|    std                  | 0.999         |
+|    value_loss           | 7.61e+03      |
+-------------------------------------------
+-------------------------------------------
+| rollout/                |               |
+|    ep_len_mean          | 472           |
+|    ep_rew_mean          | 2.49e+03      |
+| time/                   |               |
+|    fps                  | 5080          |
+|    iterations           | 18            |
+|    time_elapsed         | 58            |
+|    total_timesteps      | 294912        |
+| train/                  |               |
+|    approx_kl            | 0.00051305746 |
+|    clip_fraction        | 0             |
+|    clip_range           | 0.2           |
+|    entropy_loss         | -4.25         |
+|    explained_variance   | 0.0126        |
+|    learning_rate        | 0.0001        |
+|    loss                 | 3.97e+03      |
+|    n_updates            | 85            |
+|    policy_gradient_loss | -0.000672     |
+|    std                  | 0.998         |
+|    value_loss           | 8.15e+03      |
+-------------------------------------------
+-------------------------------------------
+| rollout/                |               |
+|    ep_len_mean          | 481           |
+|    ep_rew_mean          | 2.59e+03      |
+| time/                   |               |
+|    fps                  | 5035          |
+|    iterations           | 19            |
+|    time_elapsed         | 61            |
+|    total_timesteps      | 311296        |
+| train/                  |               |
+|    approx_kl            | 0.00017668883 |
+|    clip_fraction        | 0             |
+|    clip_range           | 0.2           |
+|    entropy_loss         | -4.25         |
+|    explained_variance   | 0.0101        |
+|    learning_rate        | 0.0001        |
+|    loss                 | 3.69e+03      |
+|    n_updates            | 90            |
+|    policy_gradient_loss | -0.000202     |
+|    std                  | 0.998         |
+|    value_loss           | 7.52e+03      |
+-------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.368
+  mean breathing reward :    1.167
+  mean swimming reward  :    4.802
+
+Swimming values:
+  mean forward velocity :   -0.008
+  mean head height error          :   -0.213
+  mean successful breathing :    0.058
+
+Penalties:
+  mean depth penalty    :    0.601
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 3
+--------------------------------------------------
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.434
+  mean breathing reward :    1.217
+  mean swimming reward  :    4.783
+
+Swimming values:
+  mean forward velocity :   -0.007
+  mean head height error          :   -0.199
+  mean successful breathing :    0.068
+
+Penalties:
+  mean depth penalty    :    0.565
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 10
+--------------------------------------------------
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.321
+  mean breathing reward :    1.204
+  mean swimming reward  :    4.717
+
+Swimming values:
+  mean forward velocity :   -0.006
+  mean head height error          :   -0.235
+  mean successful breathing :    0.066
+
+Penalties:
+  mean depth penalty    :    0.600
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 6
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    4.831
+  mean breathing reward :    1.045
+  mean swimming reward  :    4.672
+
+Swimming values:
+  mean forward velocity :   -0.008
+  mean head height error          :   -0.358
+  mean successful breathing :    0.057
+
+Penalties:
+  mean depth penalty    :    0.886
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 7
+--------------------------------------------------
+Apperently I was flying!!!
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.442
+  mean breathing reward :    1.265
+  mean swimming reward  :    4.669
+
+Swimming values:
+  mean forward velocity :   -0.009
+  mean head height error          :   -0.205
+  mean successful breathing :    0.064
+
+Penalties:
+  mean depth penalty    :    0.492
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 2
+--------------------------------------------------
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.256
+  mean breathing reward :    1.199
+  mean swimming reward  :    4.733
+
+Swimming values:
+  mean forward velocity :   -0.006
+  mean head height error          :   -0.270
+  mean successful breathing :    0.060
+
+Penalties:
+  mean depth penalty    :    0.675
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 6
+--------------------------------------------------
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.271
+  mean breathing reward :    1.171
+  mean swimming reward  :    4.726
+
+Swimming values:
+  mean forward velocity :   -0.006
+  mean head height error          :   -0.246
+  mean successful breathing :    0.055
+
+Penalties:
+  mean depth penalty    :    0.625
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 11
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.007
+  mean breathing reward :    1.111
+  mean swimming reward  :    4.709
+
+Swimming values:
+  mean forward velocity :   -0.007
+  mean head height error          :   -0.336
+  mean successful breathing :    0.056
+
+Penalties:
+  mean depth penalty    :    0.812
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 3
+--------------------------------------------------
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.405
+  mean breathing reward :    1.220
+  mean swimming reward  :    4.684
+
+Swimming values:
+  mean forward velocity :   -0.008
+  mean head height error          :   -0.185
+  mean successful breathing :    0.067
+
+Penalties:
+  mean depth penalty    :    0.498
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 5
+--------------------------------------------------
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.126
+  mean breathing reward :    1.161
+  mean swimming reward  :    4.649
+
+Swimming values:
+  mean forward velocity :   -0.010
+  mean head height error          :   -0.285
+  mean successful breathing :    0.062
+
+Penalties:
+  mean depth penalty    :    0.683
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 5
+--------------------------------------------------
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.586
+  mean breathing reward :    1.256
+  mean swimming reward  :    4.865
+
+Swimming values:
+  mean forward velocity :   -0.005
+  mean head height error          :   -0.206
+  mean successful breathing :    0.069
+
+Penalties:
+  mean depth penalty    :    0.534
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 5
+--------------------------------------------------
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.337
+  mean breathing reward :    1.196
+  mean swimming reward  :    4.791
+
+Swimming values:
+  mean forward velocity :   -0.006
+  mean head height error          :   -0.275
+  mean successful breathing :    0.070
+
+Penalties:
+  mean depth penalty    :    0.650
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 4
+--------------------------------------------------
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.609
+  mean breathing reward :    1.309
+  mean swimming reward  :    4.746
+
+Swimming values:
+  mean forward velocity :   -0.007
+  mean head height error          :   -0.173
+  mean successful breathing :    0.079
+
+Penalties:
+  mean depth penalty    :    0.445
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 9
+--------------------------------------------------
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.547
+  mean breathing reward :    1.273
+  mean swimming reward  :    4.811
+
+Swimming values:
+  mean forward velocity :   -0.006
+  mean head height error          :   -0.229
+  mean successful breathing :    0.079
+
+Penalties:
+  mean depth penalty    :    0.536
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 5
+--------------------------------------------------
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.421
+  mean breathing reward :    1.224
+  mean swimming reward  :    4.777
+
+Swimming values:
+  mean forward velocity :   -0.006
+  mean head height error          :   -0.224
+  mean successful breathing :    0.080
+
+Penalties:
+  mean depth penalty    :    0.579
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 8
+--------------------------------------------------
+Apperently I was flying!!!
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.529
+  mean breathing reward :    1.264
+  mean swimming reward  :    4.792
+
+Swimming values:
+  mean forward velocity :   -0.006
+  mean head height error          :   -0.209
+  mean successful breathing :    0.081
+
+Penalties:
+  mean depth penalty    :    0.526
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 6
+--------------------------------------------------
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 455      |
+|    ep_rew_mean     | 2.52e+03 |
+| time/              |          |
+|    fps             | 4788     |
+|    iterations      | 1        |
+|    time_elapsed    | 3        |
+|    total_timesteps | 327680   |
+---------------------------------
+-------------------------------------------
+| rollout/                |               |
+|    ep_len_mean          | 446           |
+|    ep_rew_mean          | 2.57e+03      |
+| time/                   |               |
+|    fps                  | 4552          |
+|    iterations           | 2             |
+|    time_elapsed         | 7             |
+|    total_timesteps      | 344064        |
+| train/                  |               |
+|    approx_kl            | 0.00088062696 |
+|    clip_fraction        | 9.77e-05      |
+|    clip_range           | 0.2           |
+|    entropy_loss         | -4.25         |
+|    explained_variance   | 0.0048        |
+|    learning_rate        | 0.0001        |
+|    loss                 | 4.3e+03       |
+|    n_updates            | 100           |
+|    policy_gradient_loss | -0.0009       |
+|    std                  | 0.999         |
+|    value_loss           | 8.66e+03      |
+-------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 417          |
+|    ep_rew_mean          | 2.41e+03     |
+| time/                   |              |
+|    fps                  | 4469         |
+|    iterations           | 3            |
+|    time_elapsed         | 10           |
+|    total_timesteps      | 360448       |
+| train/                  |              |
+|    approx_kl            | 0.0004125039 |
+|    clip_fraction        | 0            |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.25        |
+|    explained_variance   | 0.00407      |
+|    learning_rate        | 0.0001       |
+|    loss                 | 4.32e+03     |
+|    n_updates            | 105          |
+|    policy_gradient_loss | -0.000597    |
+|    std                  | 0.998        |
+|    value_loss           | 8.62e+03     |
+------------------------------------------
+-------------------------------------------
+| rollout/                |               |
+|    ep_len_mean          | 418           |
+|    ep_rew_mean          | 2.41e+03      |
+| time/                   |               |
+|    fps                  | 4437          |
+|    iterations           | 4             |
+|    time_elapsed         | 14            |
+|    total_timesteps      | 376832        |
+| train/                  |               |
+|    approx_kl            | 0.00019786172 |
+|    clip_fraction        | 0             |
+|    clip_range           | 0.2           |
+|    entropy_loss         | -4.25         |
+|    explained_variance   | 0.0047        |
+|    learning_rate        | 0.0001        |
+|    loss                 | 4e+03         |
+|    n_updates            | 110           |
+|    policy_gradient_loss | -0.000406     |
+|    std                  | 0.997         |
+|    value_loss           | 8.12e+03      |
+-------------------------------------------
+-------------------------------------------
+| rollout/                |               |
+|    ep_len_mean          | 418           |
+|    ep_rew_mean          | 2.42e+03      |
+| time/                   |               |
+|    fps                  | 4415          |
+|    iterations           | 5             |
+|    time_elapsed         | 18            |
+|    total_timesteps      | 393216        |
+| train/                  |               |
+|    approx_kl            | 0.00025534717 |
+|    clip_fraction        | 0             |
+|    clip_range           | 0.2           |
+|    entropy_loss         | -4.25         |
+|    explained_variance   | 0.00427       |
+|    learning_rate        | 0.0001        |
+|    loss                 | 4.49e+03      |
+|    n_updates            | 115           |
+|    policy_gradient_loss | -0.000402     |
+|    std                  | 0.998         |
+|    value_loss           | 8.64e+03      |
+-------------------------------------------
+-------------------------------------------
+| rollout/                |               |
+|    ep_len_mean          | 423           |
+|    ep_rew_mean          | 2.45e+03      |
+| time/                   |               |
+|    fps                  | 4395          |
+|    iterations           | 6             |
+|    time_elapsed         | 22            |
+|    total_timesteps      | 409600        |
+| train/                  |               |
+|    approx_kl            | 0.00047921087 |
+|    clip_fraction        | 0             |
+|    clip_range           | 0.2           |
+|    entropy_loss         | -4.25         |
+|    explained_variance   | 0.00328       |
+|    learning_rate        | 0.0001        |
+|    loss                 | 4.33e+03      |
+|    n_updates            | 120           |
+|    policy_gradient_loss | -0.000615     |
+|    std                  | 0.997         |
+|    value_loss           | 8.79e+03      |
+-------------------------------------------
+-------------------------------------------
+| rollout/                |               |
+|    ep_len_mean          | 431           |
+|    ep_rew_mean          | 2.49e+03      |
+| time/                   |               |
+|    fps                  | 4388          |
+|    iterations           | 7             |
+|    time_elapsed         | 26            |
+|    total_timesteps      | 425984        |
+| train/                  |               |
+|    approx_kl            | 0.00026008725 |
+|    clip_fraction        | 0             |
+|    clip_range           | 0.2           |
+|    entropy_loss         | -4.25         |
+|    explained_variance   | 0.00379       |
+|    learning_rate        | 0.0001        |
+|    loss                 | 4.09e+03      |
+|    n_updates            | 125           |
+|    policy_gradient_loss | -0.000401     |
+|    std                  | 0.997         |
+|    value_loss           | 8.2e+03       |
+-------------------------------------------
+-------------------------------------------
+| rollout/                |               |
+|    ep_len_mean          | 430           |
+|    ep_rew_mean          | 2.46e+03      |
+| time/                   |               |
+|    fps                  | 4389          |
+|    iterations           | 8             |
+|    time_elapsed         | 29            |
+|    total_timesteps      | 442368        |
+| train/                  |               |
+|    approx_kl            | 0.00059424946 |
+|    clip_fraction        | 2.44e-05      |
+|    clip_range           | 0.2           |
+|    entropy_loss         | -4.25         |
+|    explained_variance   | 0.0034        |
+|    learning_rate        | 0.0001        |
+|    loss                 | 4.16e+03      |
+|    n_updates            | 130           |
+|    policy_gradient_loss | -0.000652     |
+|    std                  | 0.998         |
+|    value_loss           | 8.33e+03      |
+-------------------------------------------
+-------------------------------------------
+| rollout/                |               |
+|    ep_len_mean          | 422           |
+|    ep_rew_mean          | 2.42e+03      |
+| time/                   |               |
+|    fps                  | 4385          |
+|    iterations           | 9             |
+|    time_elapsed         | 33            |
+|    total_timesteps      | 458752        |
+| train/                  |               |
+|    approx_kl            | 0.00045280918 |
+|    clip_fraction        | 0             |
+|    clip_range           | 0.2           |
+|    entropy_loss         | -4.25         |
+|    explained_variance   | 0.00321       |
+|    learning_rate        | 0.0001        |
+|    loss                 | 4.25e+03      |
+|    n_updates            | 135           |
+|    policy_gradient_loss | -0.000799     |
+|    std                  | 0.998         |
+|    value_loss           | 8.46e+03      |
+-------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 425          |
+|    ep_rew_mean          | 2.47e+03     |
+| time/                   |              |
+|    fps                  | 4375         |
+|    iterations           | 10           |
+|    time_elapsed         | 37           |
+|    total_timesteps      | 475136       |
+| train/                  |              |
+|    approx_kl            | 0.0007181432 |
+|    clip_fraction        | 0.00011      |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.25        |
+|    explained_variance   | 0.00186      |
+|    learning_rate        | 0.0001       |
+|    loss                 | 4.14e+03     |
+|    n_updates            | 140          |
+|    policy_gradient_loss | -0.000928    |
+|    std                  | 0.999        |
+|    value_loss           | 8.33e+03     |
+------------------------------------------
+Apperently I was flying!!!
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.691
+  mean breathing reward :    1.282
+  mean swimming reward  :    4.793
+
+Swimming values:
+  mean forward velocity :   -0.007
+  mean head height error          :   -0.179
+  mean successful breathing :    0.073
+
+Penalties:
+  mean depth penalty    :    0.382
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 16
+--------------------------------------------------
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.724
+  mean breathing reward :    1.282
+  mean swimming reward  :    4.804
+
+Swimming values:
+  mean forward velocity :   -0.008
+  mean head height error          :   -0.172
+  mean successful breathing :    0.062
+
+Penalties:
+  mean depth penalty    :    0.361
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 12
+--------------------------------------------------
+Apperently I was flying!!!
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.682
+  mean breathing reward :    1.252
+  mean swimming reward  :    4.849
+
+Swimming values:
+  mean forward velocity :   -0.007
+  mean head height error          :   -0.186
+  mean successful breathing :    0.063
+
+Penalties:
+  mean depth penalty    :    0.417
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 14
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.596
+  mean breathing reward :    1.254
+  mean swimming reward  :    4.771
+
+Swimming values:
+  mean forward velocity :   -0.008
+  mean head height error          :   -0.250
+  mean successful breathing :    0.069
+
+Penalties:
+  mean depth penalty    :    0.428
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 12
+--------------------------------------------------
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.619
+  mean breathing reward :    1.247
+  mean swimming reward  :    4.785
+
+Swimming values:
+  mean forward velocity :   -0.006
+  mean head height error          :   -0.192
+  mean successful breathing :    0.061
+
+Penalties:
+  mean depth penalty    :    0.412
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 16
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.886
+  mean breathing reward :    1.365
+  mean swimming reward  :    4.776
+
+Swimming values:
+  mean forward velocity :   -0.006
+  mean head height error          :   -0.108
+  mean successful breathing :    0.071
+
+Penalties:
+  mean depth penalty    :    0.255
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 2
+--------------------------------------------------
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.830
+  mean breathing reward :    1.340
+  mean swimming reward  :    4.848
+
+Swimming values:
+  mean forward velocity :   -0.008
+  mean head height error          :   -0.170
+  mean successful breathing :    0.061
+
+Penalties:
+  mean depth penalty    :    0.356
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 14
+--------------------------------------------------
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.694
+  mean breathing reward :    1.280
+  mean swimming reward  :    4.757
+
+Swimming values:
+  mean forward velocity :   -0.007
+  mean head height error          :   -0.152
+  mean successful breathing :    0.066
+
+Penalties:
+  mean depth penalty    :    0.341
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 11
+--------------------------------------------------
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.744
+  mean breathing reward :    1.310
+  mean swimming reward  :    4.800
+
+Swimming values:
+  mean forward velocity :   -0.005
+  mean head height error          :   -0.196
+  mean successful breathing :    0.062
+
+Penalties:
+  mean depth penalty    :    0.365
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 13
+--------------------------------------------------
+Apperently I was flying!!!
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.824
+  mean breathing reward :    1.386
+  mean swimming reward  :    4.744
+
+Swimming values:
+  mean forward velocity :   -0.007
+  mean head height error          :   -0.153
+  mean successful breathing :    0.081
+
+Penalties:
+  mean depth penalty    :    0.305
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 10
+--------------------------------------------------
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.809
+  mean breathing reward :    1.332
+  mean swimming reward  :    4.773
+
+Swimming values:
+  mean forward velocity :   -0.007
+  mean head height error          :   -0.122
+  mean successful breathing :    0.075
+
+Penalties:
+  mean depth penalty    :    0.295
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 11
+--------------------------------------------------
+Apperently I was flying!!!
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.589
+  mean breathing reward :    1.227
+  mean swimming reward  :    4.764
+
+Swimming values:
+  mean forward velocity :   -0.008
+  mean head height error          :   -0.193
+  mean successful breathing :    0.061
+
+Penalties:
+  mean depth penalty    :    0.400
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 12
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    6.080
+  mean breathing reward :    1.473
+  mean swimming reward  :    4.845
+
+Swimming values:
+  mean forward velocity :   -0.006
+  mean head height error          :   -0.101
+  mean successful breathing :    0.090
+
+Penalties:
+  mean depth penalty    :    0.237
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 7
+--------------------------------------------------
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.853
+  mean breathing reward :    1.324
+  mean swimming reward  :    4.815
+
+Swimming values:
+  mean forward velocity :   -0.007
+  mean head height error          :   -0.114
+  mean successful breathing :    0.068
+
+Penalties:
+  mean depth penalty    :    0.285
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 14
+--------------------------------------------------
+Apperently I was flying!!!
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.961
+  mean breathing reward :    1.400
+  mean swimming reward  :    4.830
+
+Swimming values:
+  mean forward velocity :   -0.006
+  mean head height error          :   -0.123
+  mean successful breathing :    0.076
+
+Penalties:
+  mean depth penalty    :    0.268
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 13
+--------------------------------------------------
+Apperently I was flying!!!
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.847
+  mean breathing reward :    1.336
+  mean swimming reward  :    4.831
+
+Swimming values:
+  mean forward velocity :   -0.006
+  mean head height error          :   -0.137
+  mean successful breathing :    0.071
+
+Penalties:
+  mean depth penalty    :    0.319
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 10
+--------------------------------------------------
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 424         |
+|    ep_rew_mean          | 2.45e+03    |
+| time/                   |             |
+|    fps                  | 4370        |
+|    iterations           | 11          |
+|    time_elapsed         | 41          |
+|    total_timesteps      | 491520      |
+| train/                  |             |
+|    approx_kl            | 0.001075431 |
+|    clip_fraction        | 0.00022     |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.25       |
+|    explained_variance   | 0.00264     |
+|    learning_rate        | 0.0001      |
+|    loss                 | 4.29e+03    |
+|    n_updates            | 145         |
+|    policy_gradient_loss | -0.00106    |
+|    std                  | 0.999       |
+|    value_loss           | 8.68e+03    |
+-----------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 415          |
+|    ep_rew_mean          | 2.42e+03     |
+| time/                   |              |
+|    fps                  | 4363         |
+|    iterations           | 12           |
+|    time_elapsed         | 45           |
+|    total_timesteps      | 507904       |
+| train/                  |              |
+|    approx_kl            | 0.0004309917 |
+|    clip_fraction        | 0            |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.26        |
+|    explained_variance   | 0.00179      |
+|    learning_rate        | 0.0001       |
+|    loss                 | 4.11e+03     |
+|    n_updates            | 150          |
+|    policy_gradient_loss | -0.000668    |
+|    std                  | 1            |
+|    value_loss           | 8.43e+03     |
+------------------------------------------
+-------------------------------------------
+| rollout/                |               |
+|    ep_len_mean          | 412           |
+|    ep_rew_mean          | 2.41e+03      |
+| time/                   |               |
+|    fps                  | 4351          |
+|    iterations           | 13            |
+|    time_elapsed         | 48            |
+|    total_timesteps      | 524288        |
+| train/                  |               |
+|    approx_kl            | 0.00061021466 |
+|    clip_fraction        | 0             |
+|    clip_range           | 0.2           |
+|    entropy_loss         | -4.26         |
+|    explained_variance   | 0.00178       |
+|    learning_rate        | 0.0001        |
+|    loss                 | 4.16e+03      |
+|    n_updates            | 155           |
+|    policy_gradient_loss | -0.000747     |
+|    std                  | 1             |
+|    value_loss           | 8.52e+03      |
+-------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 414          |
+|    ep_rew_mean          | 2.39e+03     |
+| time/                   |              |
+|    fps                  | 4352         |
+|    iterations           | 14           |
+|    time_elapsed         | 52           |
+|    total_timesteps      | 540672       |
+| train/                  |              |
+|    approx_kl            | 0.0002682348 |
+|    clip_fraction        | 0            |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.26        |
+|    explained_variance   | 0.00188      |
+|    learning_rate        | 0.0001       |
+|    loss                 | 4.35e+03     |
+|    n_updates            | 160          |
+|    policy_gradient_loss | -0.00051     |
+|    std                  | 1            |
+|    value_loss           | 8.69e+03     |
+------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 409          |
+|    ep_rew_mean          | 2.35e+03     |
+| time/                   |              |
+|    fps                  | 4351         |
+|    iterations           | 15           |
+|    time_elapsed         | 56           |
+|    total_timesteps      | 557056       |
+| train/                  |              |
+|    approx_kl            | 0.0009135229 |
+|    clip_fraction        | 3.66e-05     |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.26        |
+|    explained_variance   | 0.00128      |
+|    learning_rate        | 0.0001       |
+|    loss                 | 4.03e+03     |
+|    n_updates            | 165          |
+|    policy_gradient_loss | -0.000933    |
+|    std                  | 1            |
+|    value_loss           | 8.18e+03     |
+------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 402          |
+|    ep_rew_mean          | 2.31e+03     |
+| time/                   |              |
+|    fps                  | 4350         |
+|    iterations           | 16           |
+|    time_elapsed         | 60           |
+|    total_timesteps      | 573440       |
+| train/                  |              |
+|    approx_kl            | 0.0003097577 |
+|    clip_fraction        | 0            |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.26        |
+|    explained_variance   | 0.00162      |
+|    learning_rate        | 0.0001       |
+|    loss                 | 3.95e+03     |
+|    n_updates            | 170          |
+|    policy_gradient_loss | -0.000568    |
+|    std                  | 1            |
+|    value_loss           | 8.08e+03     |
+------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 395          |
+|    ep_rew_mean          | 2.27e+03     |
+| time/                   |              |
+|    fps                  | 4347         |
+|    iterations           | 17           |
+|    time_elapsed         | 64           |
+|    total_timesteps      | 589824       |
+| train/                  |              |
+|    approx_kl            | 0.0005225127 |
+|    clip_fraction        | 0            |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.26        |
+|    explained_variance   | 0.0014       |
+|    learning_rate        | 0.0001       |
+|    loss                 | 4.09e+03     |
+|    n_updates            | 175          |
+|    policy_gradient_loss | -0.000644    |
+|    std                  | 1            |
+|    value_loss           | 8.34e+03     |
+------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 402          |
+|    ep_rew_mean          | 2.33e+03     |
+| time/                   |              |
+|    fps                  | 4346         |
+|    iterations           | 18           |
+|    time_elapsed         | 67           |
+|    total_timesteps      | 606208       |
+| train/                  |              |
+|    approx_kl            | 0.0008856597 |
+|    clip_fraction        | 0.000122     |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.26        |
+|    explained_variance   | 0.000981     |
+|    learning_rate        | 0.0001       |
+|    loss                 | 4.1e+03      |
+|    n_updates            | 180          |
+|    policy_gradient_loss | -0.00112     |
+|    std                  | 1            |
+|    value_loss           | 8.19e+03     |
+------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 410          |
+|    ep_rew_mean          | 2.36e+03     |
+| time/                   |              |
+|    fps                  | 4342         |
+|    iterations           | 19           |
+|    time_elapsed         | 71           |
+|    total_timesteps      | 622592       |
+| train/                  |              |
+|    approx_kl            | 0.0012384856 |
+|    clip_fraction        | 0.000293     |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.26        |
+|    explained_variance   | 0.00167      |
+|    learning_rate        | 0.0001       |
+|    loss                 | 4.4e+03      |
+|    n_updates            | 185          |
+|    policy_gradient_loss | -0.00109     |
+|    std                  | 1            |
+|    value_loss           | 8.59e+03     |
+------------------------------------------
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 393      |
+|    ep_rew_mean     | 2.31e+03 |
+| time/              |          |
+|    fps             | 4769     |
+|    iterations      | 1        |
+|    time_elapsed    | 3        |
+|    total_timesteps | 638976   |
+---------------------------------
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.841
+  mean breathing reward :    1.310
+  mean swimming reward  :    4.875
+
+Swimming values:
+  mean forward velocity :   -0.004
+  mean head height error          :   -0.161
+  mean successful breathing :    0.068
+
+Penalties:
+  mean depth penalty    :    0.342
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 16
+--------------------------------------------------
+Apperently I was flying!!!
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.802
+  mean breathing reward :    1.275
+  mean swimming reward  :    4.915
+
+Swimming values:
+  mean forward velocity :   -0.006
+  mean head height error          :   -0.192
+  mean successful breathing :    0.063
+
+Penalties:
+  mean depth penalty    :    0.387
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 16
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.830
+  mean breathing reward :    1.331
+  mean swimming reward  :    4.871
+
+Swimming values:
+  mean forward velocity :   -0.004
+  mean head height error          :   -0.207
+  mean successful breathing :    0.075
+
+Penalties:
+  mean depth penalty    :    0.370
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 18
+--------------------------------------------------
+Apperently I was flying!!!
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.812
+  mean breathing reward :    1.301
+  mean swimming reward  :    4.902
+
+Swimming values:
+  mean forward velocity :   -0.003
+  mean head height error          :   -0.215
+  mean successful breathing :    0.066
+
+Penalties:
+  mean depth penalty    :    0.389
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 17
+--------------------------------------------------
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.957
+  mean breathing reward :    1.339
+  mean swimming reward  :    4.951
+
+Swimming values:
+  mean forward velocity :   -0.005
+  mean head height error          :   -0.194
+  mean successful breathing :    0.071
+
+Penalties:
+  mean depth penalty    :    0.332
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 14
+--------------------------------------------------
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.888
+  mean breathing reward :    1.357
+  mean swimming reward  :    4.881
+
+Swimming values:
+  mean forward velocity :   -0.004
+  mean head height error          :   -0.195
+  mean successful breathing :    0.074
+
+Penalties:
+  mean depth penalty    :    0.349
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 15
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.780
+  mean breathing reward :    1.280
+  mean swimming reward  :    4.880
+
+Swimming values:
+  mean forward velocity :   -0.005
+  mean head height error          :   -0.186
+  mean successful breathing :    0.068
+
+Penalties:
+  mean depth penalty    :    0.379
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 14
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.791
+  mean breathing reward :    1.233
+  mean swimming reward  :    4.981
+
+Swimming values:
+  mean forward velocity :   -0.003
+  mean head height error          :   -0.234
+  mean successful breathing :    0.061
+
+Penalties:
+  mean depth penalty    :    0.422
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 14
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.773
+  mean breathing reward :    1.286
+  mean swimming reward  :    4.892
+
+Swimming values:
+  mean forward velocity :   -0.005
+  mean head height error          :   -0.234
+  mean successful breathing :    0.062
+
+Penalties:
+  mean depth penalty    :    0.404
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 17
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.709
+  mean breathing reward :    1.246
+  mean swimming reward  :    4.885
+
+Swimming values:
+  mean forward velocity :   -0.007
+  mean head height error          :   -0.229
+  mean successful breathing :    0.059
+
+Penalties:
+  mean depth penalty    :    0.420
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 18
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.589
+  mean breathing reward :    1.188
+  mean swimming reward  :    4.897
+
+Swimming values:
+  mean forward velocity :   -0.005
+  mean head height error          :   -0.270
+  mean successful breathing :    0.056
+
+Penalties:
+  mean depth penalty    :    0.495
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 17
+--------------------------------------------------
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.992
+  mean breathing reward :    1.375
+  mean swimming reward  :    4.921
+
+Swimming values:
+  mean forward velocity :   -0.005
+  mean head height error          :   -0.159
+  mean successful breathing :    0.070
+
+Penalties:
+  mean depth penalty    :    0.303
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 9
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.919
+  mean breathing reward :    1.354
+  mean swimming reward  :    4.898
+
+Swimming values:
+  mean forward velocity :   -0.005
+  mean head height error          :   -0.174
+  mean successful breathing :    0.068
+
+Penalties:
+  mean depth penalty    :    0.332
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 14
+--------------------------------------------------
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.744
+  mean breathing reward :    1.299
+  mean swimming reward  :    4.817
+
+Swimming values:
+  mean forward velocity :   -0.006
+  mean head height error          :   -0.195
+  mean successful breathing :    0.070
+
+Penalties:
+  mean depth penalty    :    0.370
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 16
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.757
+  mean breathing reward :    1.228
+  mean swimming reward  :    4.934
+
+Swimming values:
+  mean forward velocity :   -0.004
+  mean head height error          :   -0.193
+  mean successful breathing :    0.058
+
+Penalties:
+  mean depth penalty    :    0.404
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 12
+--------------------------------------------------
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.677
+  mean breathing reward :    1.255
+  mean swimming reward  :    4.826
+
+Swimming values:
+  mean forward velocity :   -0.005
+  mean head height error          :   -0.177
+  mean successful breathing :    0.064
+
+Penalties:
+  mean depth penalty    :    0.401
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 18
+--------------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 344          |
+|    ep_rew_mean          | 2.06e+03     |
+| time/                   |              |
+|    fps                  | 4501         |
+|    iterations           | 2            |
+|    time_elapsed         | 7            |
+|    total_timesteps      | 655360       |
+| train/                  |              |
+|    approx_kl            | 0.0010109049 |
+|    clip_fraction        | 0.000281     |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.25        |
+|    explained_variance   | 0.000649     |
+|    learning_rate        | 0.0001       |
+|    loss                 | 4.35e+03     |
+|    n_updates            | 195          |
+|    policy_gradient_loss | -0.000968    |
+|    std                  | 0.999        |
+|    value_loss           | 8.76e+03     |
+------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 332          |
+|    ep_rew_mean          | 1.99e+03     |
+| time/                   |              |
+|    fps                  | 4430         |
+|    iterations           | 3            |
+|    time_elapsed         | 11           |
+|    total_timesteps      | 671744       |
+| train/                  |              |
+|    approx_kl            | 0.0013945468 |
+|    clip_fraction        | 0.000818     |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.25        |
+|    explained_variance   | 0.000775     |
+|    learning_rate        | 0.0001       |
+|    loss                 | 4.22e+03     |
+|    n_updates            | 200          |
+|    policy_gradient_loss | -0.00102     |
+|    std                  | 0.999        |
+|    value_loss           | 8.43e+03     |
+------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 318          |
+|    ep_rew_mean          | 1.89e+03     |
+| time/                   |              |
+|    fps                  | 4408         |
+|    iterations           | 4            |
+|    time_elapsed         | 14           |
+|    total_timesteps      | 688128       |
+| train/                  |              |
+|    approx_kl            | 0.0007358759 |
+|    clip_fraction        | 3.66e-05     |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.25        |
+|    explained_variance   | 0.000508     |
+|    learning_rate        | 0.0001       |
+|    loss                 | 4.28e+03     |
+|    n_updates            | 205          |
+|    policy_gradient_loss | -0.000751    |
+|    std                  | 0.998        |
+|    value_loss           | 8.65e+03     |
+------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 312          |
+|    ep_rew_mean          | 1.83e+03     |
+| time/                   |              |
+|    fps                  | 4374         |
+|    iterations           | 5            |
+|    time_elapsed         | 18           |
+|    total_timesteps      | 704512       |
+| train/                  |              |
+|    approx_kl            | 0.0012709894 |
+|    clip_fraction        | 0.000452     |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.25        |
+|    explained_variance   | 0.000539     |
+|    learning_rate        | 0.0001       |
+|    loss                 | 3.96e+03     |
+|    n_updates            | 210          |
+|    policy_gradient_loss | -0.00138     |
+|    std                  | 0.997        |
+|    value_loss           | 8.07e+03     |
+------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 328          |
+|    ep_rew_mean          | 1.93e+03     |
+| time/                   |              |
+|    fps                  | 4371         |
+|    iterations           | 6            |
+|    time_elapsed         | 22           |
+|    total_timesteps      | 720896       |
+| train/                  |              |
+|    approx_kl            | 0.0012377038 |
+|    clip_fraction        | 0.000269     |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.25        |
+|    explained_variance   | 0.000359     |
+|    learning_rate        | 0.0001       |
+|    loss                 | 4e+03        |
+|    n_updates            | 215          |
+|    policy_gradient_loss | -0.00113     |
+|    std                  | 0.996        |
+|    value_loss           | 8.16e+03     |
+------------------------------------------
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 343         |
+|    ep_rew_mean          | 2e+03       |
+| time/                   |             |
+|    fps                  | 4363        |
+|    iterations           | 7           |
+|    time_elapsed         | 26          |
+|    total_timesteps      | 737280      |
+| train/                  |             |
+|    approx_kl            | 0.002244726 |
+|    clip_fraction        | 0.00245     |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.24       |
+|    explained_variance   | 0.000375    |
+|    learning_rate        | 0.0001      |
+|    loss                 | 4.14e+03    |
+|    n_updates            | 220         |
+|    policy_gradient_loss | -0.00172    |
+|    std                  | 0.995       |
+|    value_loss           | 8.35e+03    |
+-----------------------------------------
+-------------------------------------------
+| rollout/                |               |
+|    ep_len_mean          | 338           |
+|    ep_rew_mean          | 1.95e+03      |
+| time/                   |               |
+|    fps                  | 4357          |
+|    iterations           | 8             |
+|    time_elapsed         | 30            |
+|    total_timesteps      | 753664        |
+| train/                  |               |
+|    approx_kl            | 0.00048687102 |
+|    clip_fraction        | 0             |
+|    clip_range           | 0.2           |
+|    entropy_loss         | -4.24         |
+|    explained_variance   | 0.000332      |
+|    learning_rate        | 0.0001        |
+|    loss                 | 3.93e+03      |
+|    n_updates            | 225           |
+|    policy_gradient_loss | -0.000539     |
+|    std                  | 0.995         |
+|    value_loss           | 7.75e+03      |
+-------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 318          |
+|    ep_rew_mean          | 1.84e+03     |
+| time/                   |              |
+|    fps                  | 4349         |
+|    iterations           | 9            |
+|    time_elapsed         | 33           |
+|    total_timesteps      | 770048       |
+| train/                  |              |
+|    approx_kl            | 0.0017471064 |
+|    clip_fraction        | 0.00186      |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.24        |
+|    explained_variance   | 0.000332     |
+|    learning_rate        | 0.0001       |
+|    loss                 | 3.95e+03     |
+|    n_updates            | 230          |
+|    policy_gradient_loss | -0.00183     |
+|    std                  | 0.994        |
+|    value_loss           | 7.94e+03     |
+------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 330          |
+|    ep_rew_mean          | 1.88e+03     |
+| time/                   |              |
+|    fps                  | 4343         |
+|    iterations           | 10           |
+|    time_elapsed         | 37           |
+|    total_timesteps      | 786432       |
+| train/                  |              |
+|    approx_kl            | 0.0017725609 |
+|    clip_fraction        | 0.000769     |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.24        |
+|    explained_variance   | 0.000256     |
+|    learning_rate        | 0.0001       |
+|    loss                 | 3.9e+03      |
+|    n_updates            | 235          |
+|    policy_gradient_loss | -0.00173     |
+|    std                  | 0.993        |
+|    value_loss           | 7.7e+03      |
+------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.998
+  mean breathing reward :    1.404
+  mean swimming reward  :    4.875
+
+Swimming values:
+  mean forward velocity :    0.000
+  mean head height error          :   -0.183
+  mean successful breathing :    0.073
+
+Penalties:
+  mean depth penalty    :    0.277
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 27
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.826
+  mean breathing reward :    1.316
+  mean swimming reward  :    4.841
+
+Swimming values:
+  mean forward velocity :   -0.000
+  mean head height error          :   -0.207
+  mean successful breathing :    0.062
+
+Penalties:
+  mean depth penalty    :    0.328
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 26
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.820
+  mean breathing reward :    1.380
+  mean swimming reward  :    4.740
+
+Swimming values:
+  mean forward velocity :   -0.001
+  mean head height error          :   -0.186
+  mean successful breathing :    0.081
+
+Penalties:
+  mean depth penalty    :    0.297
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 26
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.711
+  mean breathing reward :    1.291
+  mean swimming reward  :    4.779
+
+Swimming values:
+  mean forward velocity :   -0.001
+  mean head height error          :   -0.229
+  mean successful breathing :    0.054
+
+Penalties:
+  mean depth penalty    :    0.356
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 29
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.935
+  mean breathing reward :    1.372
+  mean swimming reward  :    4.880
+
+Swimming values:
+  mean forward velocity :   -0.001
+  mean head height error          :   -0.197
+  mean successful breathing :    0.074
+
+Penalties:
+  mean depth penalty    :    0.314
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 30
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.664
+  mean breathing reward :    1.305
+  mean swimming reward  :    4.704
+
+Swimming values:
+  mean forward velocity :   -0.001
+  mean head height error          :   -0.222
+  mean successful breathing :    0.065
+
+Penalties:
+  mean depth penalty    :    0.342
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 27
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.827
+  mean breathing reward :    1.319
+  mean swimming reward  :    4.853
+
+Swimming values:
+  mean forward velocity :   -0.001
+  mean head height error          :   -0.228
+  mean successful breathing :    0.065
+
+Penalties:
+  mean depth penalty    :    0.342
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 26
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.806
+  mean breathing reward :    1.330
+  mean swimming reward  :    4.816
+
+Swimming values:
+  mean forward velocity :   -0.001
+  mean head height error          :   -0.229
+  mean successful breathing :    0.057
+
+Penalties:
+  mean depth penalty    :    0.337
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 27
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.842
+  mean breathing reward :    1.296
+  mean swimming reward  :    4.915
+
+Swimming values:
+  mean forward velocity :    0.001
+  mean head height error          :   -0.234
+  mean successful breathing :    0.062
+
+Penalties:
+  mean depth penalty    :    0.366
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 28
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.664
+  mean breathing reward :    1.265
+  mean swimming reward  :    4.755
+
+Swimming values:
+  mean forward velocity :   -0.001
+  mean head height error          :   -0.194
+  mean successful breathing :    0.074
+
+Penalties:
+  mean depth penalty    :    0.354
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 25
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.851
+  mean breathing reward :    1.312
+  mean swimming reward  :    4.891
+
+Swimming values:
+  mean forward velocity :    0.000
+  mean head height error          :   -0.222
+  mean successful breathing :    0.071
+
+Penalties:
+  mean depth penalty    :    0.349
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 26
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.726
+  mean breathing reward :    1.317
+  mean swimming reward  :    4.761
+
+Swimming values:
+  mean forward velocity :   -0.001
+  mean head height error          :   -0.234
+  mean successful breathing :    0.066
+
+Penalties:
+  mean depth penalty    :    0.350
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 31
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.795
+  mean breathing reward :    1.289
+  mean swimming reward  :    4.870
+
+Swimming values:
+  mean forward velocity :   -0.000
+  mean head height error          :   -0.242
+  mean successful breathing :    0.061
+
+Penalties:
+  mean depth penalty    :    0.361
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 28
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.911
+  mean breathing reward :    1.373
+  mean swimming reward  :    4.809
+
+Swimming values:
+  mean forward velocity :   -0.001
+  mean head height error          :   -0.146
+  mean successful breathing :    0.071
+
+Penalties:
+  mean depth penalty    :    0.269
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 20
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.910
+  mean breathing reward :    1.348
+  mean swimming reward  :    4.880
+
+Swimming values:
+  mean forward velocity :   -0.001
+  mean head height error          :   -0.186
+  mean successful breathing :    0.068
+
+Penalties:
+  mean depth penalty    :    0.315
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 23
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.657
+  mean breathing reward :    1.326
+  mean swimming reward  :    4.675
+
+Swimming values:
+  mean forward velocity :   -0.001
+  mean head height error          :   -0.226
+  mean successful breathing :    0.069
+
+Penalties:
+  mean depth penalty    :    0.341
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 25
+--------------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 339          |
+|    ep_rew_mean          | 1.9e+03      |
+| time/                   |              |
+|    fps                  | 4335         |
+|    iterations           | 11           |
+|    time_elapsed         | 41           |
+|    total_timesteps      | 802816       |
+| train/                  |              |
+|    approx_kl            | 0.0007337538 |
+|    clip_fraction        | 4.88e-05     |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.24        |
+|    explained_variance   | 0.000224     |
+|    learning_rate        | 0.0001       |
+|    loss                 | 3.66e+03     |
+|    n_updates            | 240          |
+|    policy_gradient_loss | -0.000789    |
+|    std                  | 0.993        |
+|    value_loss           | 7.41e+03     |
+------------------------------------------
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 334         |
+|    ep_rew_mean          | 1.87e+03    |
+| time/                   |             |
+|    fps                  | 4331        |
+|    iterations           | 12          |
+|    time_elapsed         | 45          |
+|    total_timesteps      | 819200      |
+| train/                  |             |
+|    approx_kl            | 0.001684807 |
+|    clip_fraction        | 0.000708    |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.23       |
+|    explained_variance   | 0.000172    |
+|    learning_rate        | 0.0001      |
+|    loss                 | 3.56e+03    |
+|    n_updates            | 245         |
+|    policy_gradient_loss | -0.00101    |
+|    std                  | 0.991       |
+|    value_loss           | 7.24e+03    |
+-----------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 329          |
+|    ep_rew_mean          | 1.83e+03     |
+| time/                   |              |
+|    fps                  | 4326         |
+|    iterations           | 13           |
+|    time_elapsed         | 49           |
+|    total_timesteps      | 835584       |
+| train/                  |              |
+|    approx_kl            | 0.0019850938 |
+|    clip_fraction        | 0.00127      |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.23        |
+|    explained_variance   | 0.000206     |
+|    learning_rate        | 0.0001       |
+|    loss                 | 3.65e+03     |
+|    n_updates            | 250          |
+|    policy_gradient_loss | -0.00126     |
+|    std                  | 0.99         |
+|    value_loss           | 7.41e+03     |
+------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 314          |
+|    ep_rew_mean          | 1.75e+03     |
+| time/                   |              |
+|    fps                  | 4326         |
+|    iterations           | 14           |
+|    time_elapsed         | 53           |
+|    total_timesteps      | 851968       |
+| train/                  |              |
+|    approx_kl            | 0.0023823143 |
+|    clip_fraction        | 0.00288      |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.23        |
+|    explained_variance   | 0.000162     |
+|    learning_rate        | 0.0001       |
+|    loss                 | 3.49e+03     |
+|    n_updates            | 255          |
+|    policy_gradient_loss | -0.00135     |
+|    std                  | 0.989        |
+|    value_loss           | 7.16e+03     |
+------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 300          |
+|    ep_rew_mean          | 1.67e+03     |
+| time/                   |              |
+|    fps                  | 4325         |
+|    iterations           | 15           |
+|    time_elapsed         | 56           |
+|    total_timesteps      | 868352       |
+| train/                  |              |
+|    approx_kl            | 0.0014679453 |
+|    clip_fraction        | 0.000867     |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.23        |
+|    explained_variance   | 0.00037      |
+|    learning_rate        | 0.0001       |
+|    loss                 | 3.58e+03     |
+|    n_updates            | 260          |
+|    policy_gradient_loss | -0.000995    |
+|    std                  | 0.99         |
+|    value_loss           | 7.15e+03     |
+------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 311          |
+|    ep_rew_mean          | 1.74e+03     |
+| time/                   |              |
+|    fps                  | 4324         |
+|    iterations           | 16           |
+|    time_elapsed         | 60           |
+|    total_timesteps      | 884736       |
+| train/                  |              |
+|    approx_kl            | 0.0009859402 |
+|    clip_fraction        | 0.000354     |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.23        |
+|    explained_variance   | 0.000165     |
+|    learning_rate        | 0.0001       |
+|    loss                 | 3.52e+03     |
+|    n_updates            | 265          |
+|    policy_gradient_loss | -0.000934    |
+|    std                  | 0.989        |
+|    value_loss           | 7.19e+03     |
+------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 319          |
+|    ep_rew_mean          | 1.8e+03      |
+| time/                   |              |
+|    fps                  | 4320         |
+|    iterations           | 17           |
+|    time_elapsed         | 64           |
+|    total_timesteps      | 901120       |
+| train/                  |              |
+|    approx_kl            | 0.0023015388 |
+|    clip_fraction        | 0.00359      |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.22        |
+|    explained_variance   | 0.000271     |
+|    learning_rate        | 0.0001       |
+|    loss                 | 3.59e+03     |
+|    n_updates            | 270          |
+|    policy_gradient_loss | -0.00146     |
+|    std                  | 0.987        |
+|    value_loss           | 7.2e+03      |
+------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 328          |
+|    ep_rew_mean          | 1.84e+03     |
+| time/                   |              |
+|    fps                  | 4319         |
+|    iterations           | 18           |
+|    time_elapsed         | 68           |
+|    total_timesteps      | 917504       |
+| train/                  |              |
+|    approx_kl            | 0.0014366884 |
+|    clip_fraction        | 0.000354     |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.22        |
+|    explained_variance   | 0.000174     |
+|    learning_rate        | 0.0001       |
+|    loss                 | 3.77e+03     |
+|    n_updates            | 275          |
+|    policy_gradient_loss | -0.001       |
+|    std                  | 0.986        |
+|    value_loss           | 7.44e+03     |
+------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 335          |
+|    ep_rew_mean          | 1.88e+03     |
+| time/                   |              |
+|    fps                  | 4319         |
+|    iterations           | 19           |
+|    time_elapsed         | 72           |
+|    total_timesteps      | 933888       |
+| train/                  |              |
+|    approx_kl            | 0.0028504294 |
+|    clip_fraction        | 0.00536      |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.21        |
+|    explained_variance   | 0.00013      |
+|    learning_rate        | 0.0001       |
+|    loss                 | 3.62e+03     |
+|    n_updates            | 280          |
+|    policy_gradient_loss | -0.00155     |
+|    std                  | 0.986        |
+|    value_loss           | 7.14e+03     |
+------------------------------------------
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 336         |
+|    ep_rew_mean          | 1.9e+03     |
+| time/                   |             |
+|    fps                  | 4317        |
+|    iterations           | 20          |
+|    time_elapsed         | 75          |
+|    total_timesteps      | 950272      |
+| train/                  |             |
+|    approx_kl            | 0.002023315 |
+|    clip_fraction        | 0.00229     |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.21       |
+|    explained_variance   | 0.000119    |
+|    learning_rate        | 0.0001      |
+|    loss                 | 3.85e+03    |
+|    n_updates            | 285         |
+|    policy_gradient_loss | -0.0011     |
+|    std                  | 0.986       |
+|    value_loss           | 7.44e+03    |
+-----------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.785
+  mean breathing reward :    1.359
+  mean swimming reward  :    4.738
+
+Swimming values:
+  mean forward velocity :    0.005
+  mean head height error          :   -0.205
+  mean successful breathing :    0.067
+
+Penalties:
+  mean depth penalty    :    0.308
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 24
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.556
+  mean breathing reward :    1.244
+  mean swimming reward  :    4.710
+
+Swimming values:
+  mean forward velocity :    0.007
+  mean head height error          :   -0.261
+  mean successful breathing :    0.072
+
+Penalties:
+  mean depth penalty    :    0.394
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 28
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.505
+  mean breathing reward :    1.251
+  mean swimming reward  :    4.653
+
+Swimming values:
+  mean forward velocity :    0.005
+  mean head height error          :   -0.245
+  mean successful breathing :    0.064
+
+Penalties:
+  mean depth penalty    :    0.396
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 27
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.654
+  mean breathing reward :    1.348
+  mean swimming reward  :    4.647
+
+Swimming values:
+  mean forward velocity :    0.005
+  mean head height error          :   -0.209
+  mean successful breathing :    0.083
+
+Penalties:
+  mean depth penalty    :    0.337
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 27
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.719
+  mean breathing reward :    1.304
+  mean swimming reward  :    4.767
+
+Swimming values:
+  mean forward velocity :    0.006
+  mean head height error          :   -0.226
+  mean successful breathing :    0.078
+
+Penalties:
+  mean depth penalty    :    0.349
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 26
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.551
+  mean breathing reward :    1.272
+  mean swimming reward  :    4.664
+
+Swimming values:
+  mean forward velocity :    0.006
+  mean head height error          :   -0.251
+  mean successful breathing :    0.071
+
+Penalties:
+  mean depth penalty    :    0.382
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 28
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.648
+  mean breathing reward :    1.296
+  mean swimming reward  :    4.722
+
+Swimming values:
+  mean forward velocity :    0.007
+  mean head height error          :   -0.223
+  mean successful breathing :    0.070
+
+Penalties:
+  mean depth penalty    :    0.367
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 29
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.502
+  mean breathing reward :    1.251
+  mean swimming reward  :    4.643
+
+Swimming values:
+  mean forward velocity :    0.007
+  mean head height error          :   -0.250
+  mean successful breathing :    0.065
+
+Penalties:
+  mean depth penalty    :    0.389
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 30
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.564
+  mean breathing reward :    1.297
+  mean swimming reward  :    4.647
+
+Swimming values:
+  mean forward velocity :    0.005
+  mean head height error          :   -0.242
+  mean successful breathing :    0.071
+
+Penalties:
+  mean depth penalty    :    0.377
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 27
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.782
+  mean breathing reward :    1.335
+  mean swimming reward  :    4.800
+
+Swimming values:
+  mean forward velocity :    0.008
+  mean head height error          :   -0.226
+  mean successful breathing :    0.084
+
+Penalties:
+  mean depth penalty    :    0.349
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 32
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.602
+  mean breathing reward :    1.269
+  mean swimming reward  :    4.713
+
+Swimming values:
+  mean forward velocity :    0.006
+  mean head height error          :   -0.240
+  mean successful breathing :    0.060
+
+Penalties:
+  mean depth penalty    :    0.378
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 26
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.553
+  mean breathing reward :    1.277
+  mean swimming reward  :    4.661
+
+Swimming values:
+  mean forward velocity :    0.006
+  mean head height error          :   -0.256
+  mean successful breathing :    0.069
+
+Penalties:
+  mean depth penalty    :    0.382
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 29
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.561
+  mean breathing reward :    1.261
+  mean swimming reward  :    4.668
+
+Swimming values:
+  mean forward velocity :    0.007
+  mean head height error          :   -0.227
+  mean successful breathing :    0.057
+
+Penalties:
+  mean depth penalty    :    0.365
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 29
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.571
+  mean breathing reward :    1.242
+  mean swimming reward  :    4.735
+
+Swimming values:
+  mean forward velocity :    0.006
+  mean head height error          :   -0.254
+  mean successful breathing :    0.058
+
+Penalties:
+  mean depth penalty    :    0.403
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 29
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.669
+  mean breathing reward :    1.334
+  mean swimming reward  :    4.678
+
+Swimming values:
+  mean forward velocity :    0.007
+  mean head height error          :   -0.226
+  mean successful breathing :    0.067
+
+Penalties:
+  mean depth penalty    :    0.340
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 27
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :    5.692
+  mean breathing reward :    1.326
+  mean swimming reward  :    4.723
+
+Swimming values:
+  mean forward velocity :    0.007
+  mean head height error          :   -0.232
+  mean successful breathing :    0.080
+
+Penalties:
+  mean depth penalty    :    0.354
+  mean ctrl cost        :   0.0002
+
+Episodes:
+  terminations          : 33
+--------------------------------------------------
+-------------------------------------------
+| rollout/                |               |
+|    ep_len_mean          | 337           |
+|    ep_rew_mean          | 1.91e+03      |
+| time/                   |               |
+|    fps                  | 4315          |
+|    iterations           | 21            |
+|    time_elapsed         | 79            |
+|    total_timesteps      | 966656        |
+| train/                  |               |
+|    approx_kl            | 0.00032810992 |
+|    clip_fraction        | 0             |
+|    clip_range           | 0.2           |
+|    entropy_loss         | -4.21         |
+|    explained_variance   | 0.000119      |
+|    learning_rate        | 0.0001        |
+|    loss                 | 3.89e+03      |
+|    n_updates            | 290           |
+|    policy_gradient_loss | -0.000408     |
+|    std                  | 0.985         |
+|    value_loss           | 7.54e+03      |
+-------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 344          |
+|    ep_rew_mean          | 1.95e+03     |
+| time/                   |              |
+|    fps                  | 4314         |
+|    iterations           | 22           |
+|    time_elapsed         | 83           |
+|    total_timesteps      | 983040       |
+| train/                  |              |
+|    approx_kl            | 0.0018077594 |
+|    clip_fraction        | 0.00143      |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.21        |
+|    explained_variance   | 0.00011      |
+|    learning_rate        | 0.0001       |
+|    loss                 | 3.61e+03     |
+|    n_updates            | 295          |
+|    policy_gradient_loss | -0.000847    |
+|    std                  | 0.984        |
+|    value_loss           | 7.12e+03     |
+------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 333          |
+|    ep_rew_mean          | 1.91e+03     |
+| time/                   |              |
+|    fps                  | 4313         |
+|    iterations           | 23           |
+|    time_elapsed         | 87           |
+|    total_timesteps      | 999424       |
+| train/                  |              |
+|    approx_kl            | 0.0009983537 |
+|    clip_fraction        | 6.1e-05      |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.21        |
+|    explained_variance   | 0.000114     |
+|    learning_rate        | 0.0001       |
+|    loss                 | 3.79e+03     |
+|    n_updates            | 300          |
+|    policy_gradient_loss | -0.000901    |
+|    std                  | 0.983        |
+|    value_loss           | 7.63e+03     |
+------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 328          |
+|    ep_rew_mean          | 1.89e+03     |
+| time/                   |              |
+|    fps                  | 4316         |
+|    iterations           | 24           |
+|    time_elapsed         | 91           |
+|    total_timesteps      | 1015808      |
+| train/                  |              |
+|    approx_kl            | 0.0023738756 |
+|    clip_fraction        | 0.00273      |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.2         |
+|    explained_variance   | 9.85e-05     |
+|    learning_rate        | 0.0001       |
+|    loss                 | 3.65e+03     |
+|    n_updates            | 305          |
+|    policy_gradient_loss | -0.00148     |
+|    std                  | 0.981        |
+|    value_loss           | 7.41e+03     |
+------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 329          |
+|    ep_rew_mean          | 1.9e+03      |
+| time/                   |              |
+|    fps                  | 4317         |
+|    iterations           | 25           |
+|    time_elapsed         | 94           |
+|    total_timesteps      | 1032192      |
+| train/                  |              |
+|    approx_kl            | 0.0015422273 |
+|    clip_fraction        | 0.000537     |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.2         |
+|    explained_variance   | 9.79e-05     |
+|    learning_rate        | 0.0001       |
+|    loss                 | 3.85e+03     |
+|    n_updates            | 310          |
+|    policy_gradient_loss | -0.000903    |
+|    std                  | 0.981        |
+|    value_loss           | 7.74e+03     |
+------------------------------------------
+Finished at: Wed Jul  8 10:10:55 CEST 2026

@@ -1,0 +1,33 @@
+{
+    "model_path": "models/forwaaard_new/ppo_worm_swimmer_with_surface.zip",
+    "saved_at": "2026-07-08T10:25:38",
+    "reward_cfg": {
+        "surface_sharpness": 6.0,
+        "forward_weight": 12.0,
+        "surface_weight": 2.0,
+        "depth_weight": 3.0,
+        "ctrl_weight": 0.0001,
+        "termination_penalty": 1.0,
+        "max_height_above_target": 0.8
+    },
+    "water_level": 3.0,
+    "max_forward_vel": 20.0,
+    "max_qvel": 50.0,
+    "stages": [
+        [
+            "Stage 1: high buoyancy",
+            1.5,
+            300000
+        ],
+        [
+            "Stage 2: medium buoyancy",
+            1.0,
+            300000
+        ],
+        [
+            "Stage 3: near-neutral buoyancy",
+            0.8,
+            400000
+        ]
+    ]
+}

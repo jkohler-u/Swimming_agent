@@ -127,7 +127,7 @@ class WormSwimmingEnv(MujocoEnv):
         forward_progress = x_after - x_before
 
         # converts forward progress into velocity
-        forward_vel = forward_progress / (self.dt * self.frame_skip)
+        forward_vel = self.data.qvel[0] 
         
         vertical_vel = self.data.qvel[2]
 
@@ -157,11 +157,7 @@ class WormSwimmingEnv(MujocoEnv):
 
         #maybe this is better *surface_quality to reward forward velocity only when the worm is breathing
         target_vel = 0.1
-
-        forward_reward = (
-            reward_cfg["forward_weight"]
-            * np.clip(forward_vel / target_vel, 0, 1)
-        )
+        forward_reward = reward_cfg["forward_weight"] * forward_vel * surface_quality
 
         # penalty for beeing too deep, quadratic penalty for being below the target height
         depth_penalty = (
@@ -319,7 +315,7 @@ if __name__ == "__main__":
         )
 
 
-    save_dir = Path("models/sideways")
+    save_dir = Path("models/coupled")
     save_dir.mkdir(parents=True, exist_ok=True)
 
     model_path = save_dir / "ppo_worm_swimmer_with_surface"
