@@ -156,8 +156,7 @@ class WormSwimmingEnv(MujocoEnv):
 
 
         #maybe this is better *surface_quality to reward forward velocity only when the worm is breathing
-        target_vel = 0.1
-        forward_reward = reward_cfg["forward_weight"] * forward_vel * surface_quality
+        forward_reward = reward_cfg["forward_weight"] * forward_vel
 
         # penalty for beeing too deep, quadratic penalty for being below the target height
         depth_penalty = (
@@ -315,7 +314,7 @@ if __name__ == "__main__":
         )
 
 
-    save_dir = Path("models/coupled")
+    save_dir = Path("models/repplicate")
     save_dir.mkdir(parents=True, exist_ok=True)
 
     model_path = save_dir / "ppo_worm_swimmer_with_surface"
