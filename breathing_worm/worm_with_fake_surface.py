@@ -319,7 +319,7 @@ if __name__ == "__main__":
         )
 
 
-    save_dir = Path("models/higher_gear")
+    save_dir = Path("models/sideways")
     save_dir.mkdir(parents=True, exist_ok=True)
 
     model_path = save_dir / "ppo_worm_swimmer_with_surface"
