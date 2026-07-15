@@ -1,0 +1,245 @@
+Running on node: hpc3-11
+Start time: Wed Jul 15 12:47:12 CEST 2026
+Working directory: /share/users/student/m/mbraatz/Swimming_agent/breathing_worm
+Using cpu device
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 445      |
+|    ep_rew_mean     | 35       |
+| time/              |          |
+|    fps             | 7835     |
+|    iterations      | 1        |
+|    time_elapsed    | 2        |
+|    total_timesteps | 16384    |
+---------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 468          |
+|    ep_rew_mean          | 81.9         |
+| time/                   |              |
+|    fps                  | 7339         |
+|    iterations           | 2            |
+|    time_elapsed         | 4            |
+|    total_timesteps      | 32768        |
+| train/                  |              |
+|    approx_kl            | 0.0012371403 |
+|    clip_fraction        | 0.000208     |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -4.25        |
+|    explained_variance   | 0.000839     |
+|    learning_rate        | 0.0001       |
+|    loss                 | 1.15e+03     |
+|    n_updates            | 5            |
+|    policy_gradient_loss | -0.00138     |
+|    std                  | 0.998        |
+|    value_loss           | 2.25e+03     |
+------------------------------------------
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 436      |
+|    ep_rew_mean     | 151      |
+| time/              |          |
+|    fps             | 6846     |
+|    iterations      | 1        |
+|    time_elapsed    | 2        |
+|    total_timesteps | 49152    |
+---------------------------------
+-----------------------------------------
+| rollout/                |             |
+|    ep_len_mean          | 408         |
+|    ep_rew_mean          | 222         |
+| time/                   |             |
+|    fps                  | 4271        |
+|    iterations           | 2           |
+|    time_elapsed         | 7           |
+|    total_timesteps      | 65536       |
+| train/                  |             |
+|    approx_kl            | 0.000747998 |
+|    clip_fraction        | 0           |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.25       |
+|    explained_variance   | 0.00434     |
+|    learning_rate        | 0.0001      |
+|    loss                 | 922         |
+|    n_updates            | 15          |
+|    policy_gradient_loss | -0.00128    |
+|    std                  | 0.997       |
+|    value_loss           | 1.86e+03    |
+-----------------------------------------
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 382      |
+|    ep_rew_mean     | 306      |
+| time/              |          |
+|    fps             | 2975     |
+|    iterations      | 1        |
+|    time_elapsed    | 5        |
+|    total_timesteps | 81920    |
+---------------------------------
+-------------------------------------------
+| rollout/                |               |
+|    ep_len_mean          | 377           |
+|    ep_rew_mean          | 336           |
+| time/                   |               |
+|    fps                  | 2712          |
+|    iterations           | 2             |
+|    time_elapsed         | 12            |
+|    total_timesteps      | 98304         |
+| train/                  |               |
+|    approx_kl            | 0.00035257277 |
+|    clip_fraction        | 0             |
+|    clip_range           | 0.2           |
+|    entropy_loss         | -4.24         |
+|    explained_variance   | 0.00598       |
+|    learning_rate        | 0.0001        |
+|    loss                 | 874           |
+|    n_updates            | 25            |
+|    policy_gradient_loss | -0.000871     |
+|    std                  | 0.996         |
+|    value_loss           | 1.78e+03      |
+-------------------------------------------
+-------------------------------------------
+| rollout/                |               |
+|    ep_len_mean          | 357           |
+|    ep_rew_mean          | 319           |
+| time/                   |               |
+|    fps                  | 2561          |
+|    iterations           | 3             |
+|    time_elapsed         | 19            |
+|    total_timesteps      | 114688        |
+| train/                  |               |
+|    approx_kl            | 0.00047858112 |
+|    clip_fraction        | 0             |
+|    clip_range           | 0.2           |
+|    entropy_loss         | -4.24         |
+|    explained_variance   | 0.00824       |
+|    learning_rate        | 0.0001        |
+|    loss                 | 869           |
+|    n_updates            | 30            |
+|    policy_gradient_loss | -0.00118      |
+|    std                  | 0.995         |
+|    value_loss           | 1.82e+03      |
+-------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10001 env steps)
+
+Reward:
+  mean reward           :   -3.263
+  mean breathing reward :    0.531
+  mean swimming reward  :    0.171
+
+Swimming values:
+  mean forward velocity :    0.014
+  mean head height error          :   -0.935
+  mean successful breathing :    0.033
+
+Penalties:
+  mean depth penalty    :    3.965
+  mean ctrl cost        :   0.0000
+
+Episodes:
+  terminations          : 0
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :   -3.211
+  mean breathing reward :    0.538
+  mean swimming reward  :    0.177
+
+Swimming values:
+  mean forward velocity :    0.015
+  mean head height error          :   -0.927
+  mean successful breathing :    0.035
+
+Penalties:
+  mean depth penalty    :    3.926
+  mean ctrl cost        :   0.0000
+
+Episodes:
+  terminations          : 0
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :   -3.269
+  mean breathing reward :    0.531
+  mean swimming reward  :    0.173
+
+Swimming values:
+  mean forward velocity :    0.014
+  mean head height error          :   -0.935
+  mean successful breathing :    0.036
+
+Penalties:
+  mean depth penalty    :    3.974
+  mean ctrl cost        :   0.0000
+
+Episodes:
+  terminations          : 0
+--------------------------------------------------
+
+--------------------------------------------------
+Training diagnostics (last 10000 env steps)
+
+Reward:
+  mean reward           :   -3.260
+  mean breathing reward :    0.532
+  mean swimming reward  :    0.176
+
+Swimming values:
+  mean forward velocity :    0.015
+  mean head height error          :   -0.936
+  mean successful breathing :    0.034
+
+Penalties:
+  mean depth penalty    :    3.968
+  mean ctrl cost        :   0.0000
+
+Episodes:
+  terminations          : 0
+--------------------------------------------------
+        percent_time_head_above_water  ...  average_forward_velocity
+mean                        11.530000  ...                  0.014546
+std                          2.934211  ...                  0.000937
+median                      12.000000  ...                  0.014439
+min                          2.800000  ...                  0.011857
+max                         16.400000  ...                  0.016773
+
+[5 rows x 3 columns]
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Apperently I was flying!!!
+Finished at: Wed Jul 15 12:48:24 CEST 2026
