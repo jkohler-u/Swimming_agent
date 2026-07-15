@@ -1,5 +1,7 @@
-from pathlib import Path
+import os
 
+from pathlib import Path
+import imageio.v2 as imageio
 import json
 from datetime import datetime
 
@@ -22,7 +24,7 @@ import mujoco
 
 
 class WormSwimmingEnv(MujocoEnv):
-    def __init__(self, render_mode=None):
+    def __init__(self, render_mode=None, camera_name="side_follow"):
         xml_path = Path(__file__).parent / "worm_water_surface.xml"
 
         self.log_interval = 10000
@@ -43,6 +45,7 @@ class WormSwimmingEnv(MujocoEnv):
             frame_skip=5,
             observation_space=None,
             render_mode=render_mode,
+            camera_name=camera_name
         )
 
         obs_size = self.model.nq + self.model.nv
@@ -67,16 +70,30 @@ class WormSwimmingEnv(MujocoEnv):
         self.max_forward_vel = 20.0
         self.max_qvel = 50.0
 
+        self.forward_velocity_sum = 0.0
+
         self.reward_cfg = {
-            "surface_sharpness": 6.0, # how quickly the surface reward drops off as the head moves away from the target height
-            "forward_weight": 12.0, # how much reward for forward progress
+            "surface_sharpness": 10.0, # how quickly the surface reward drops off as the head moves away from the target height
+            "forward_weight": 20.0, # how much reward for forward progress
             #"max_rewarded_forward_vel": 1.5,
-            "surface_weight": 2.0,
-            "depth_weight": 3.0,
+            "surface_weight": 4.0,
+            "depth_weight": 0.5,
             "ctrl_weight": 0.0001,
-            "termination_penalty": 1.0,
+            "termination_penalty": 2.0,
             "max_height_above_target": 0.8,
         }
+
+
+        # =========================
+        # Episode success metrics
+        # =========================
+        self.head_radius = 0.05
+
+        self.episode_steps = 0
+        self.episode_above_water_steps = 0
+        self.current_underwater_steps = 0
+        self.longest_underwater_steps = 0
+        self.episode_start_x = 0.0
 
     def _get_obs(self):
         obs = np.concatenate([self.data.qpos, self.data.qvel])
@@ -95,10 +112,12 @@ class WormSwimmingEnv(MujocoEnv):
         return False
 
     def step(self, action):
+        breathing_tolerance = 0.03 
 
         ### probably not needed
-        # PPO can only send actions within the allowed actuator range
-        action = np.clip(action, self.action_space.low, self.action_space.high)
+        # PPO can only send actions within the allowed actuator range 
+        #action = np.clip(action, self.action_space.low, self.action_space.high)
+
 
         # =========================
         # Tunable reward parameters
@@ -106,7 +125,7 @@ class WormSwimmingEnv(MujocoEnv):
         reward_cfg = self.reward_cfg
 
         # x position before the step
-        x_before = self.data.qpos[0]
+        #x_before = self.data.qpos[0]
 
         for _ in range(self.frame_skip):
             self.data.ctrl[:] = action
@@ -124,24 +143,57 @@ class WormSwimmingEnv(MujocoEnv):
         obs = self._get_obs()
 
         # actual distance moved in x direction during this step
-        forward_progress = x_after - x_before
+        #forward_progress = x_after - x_before
 
-        # converts forward progress into velocity
         forward_vel = self.data.qvel[0] 
+        self.forward_velocity_sum += forward_vel
         
-        vertical_vel = self.data.qvel[2]
-
+        #vertical_vel = self.data.qvel[2]
         head_id = self.model.body("head").id
 
         # get the z position of the head
         head_z = self.data.xpos[head_id, 2]
-
-        head_radius = 0.05
+        head_radius = self.head_radius
         target_head_z = self.water_level + head_radius
         #how far the head is from the target height <0 --> heas is too low, >0 --> head is too high
         head_error = head_z - target_head_z
 
-        breathing_tolerance = 0.03   
+        # =========================
+        # Update success metrics
+        # =========================
+
+        # The whole head is above water when its lowest point is at or above
+        # the water surface.
+        head_above_water = head_z >= target_head_z - breathing_tolerance
+
+        self.episode_steps += 1
+
+        if head_above_water:
+            self.episode_above_water_steps += 1
+            self.current_underwater_steps = 0
+        else:
+            self.current_underwater_steps += 1
+            self.longest_underwater_steps = max(
+                self.longest_underwater_steps,
+                self.current_underwater_steps,
+            )
+
+        elapsed_time = self.episode_steps * self.dt
+
+        percent_time_head_above_water = (
+            100.0
+            * self.episode_above_water_steps
+            / self.episode_steps
+        )
+
+        longest_time_head_underwater = (
+            self.longest_underwater_steps * self.dt
+        )
+
+        average_forward_velocity = (
+            self.forward_velocity_sum / self.episode_steps
+        )
+  
         distance = max(
             0.0,
             abs(head_error) - breathing_tolerance
@@ -149,10 +201,34 @@ class WormSwimmingEnv(MujocoEnv):
 
 
         # smooth score for being close to the target height
-        surface_quality = np.exp(
-            -reward_cfg["surface_sharpness"] * distance**2
+        #surface_quality = np.exp(
+        #    -reward_cfg["surface_sharpness"] * distance**2
+        #)
+        #surface_reward = reward_cfg["surface_weight"] * surface_quality
+
+        abs_head_error = abs(head_error)
+
+        breathing_reward_range = 0.30
+
+        if abs_head_error <= breathing_tolerance:
+            breathing_quality = 1.0
+        else:
+            breathing_quality = max(
+                0.0,
+                1.0
+                - (
+                    abs_head_error - breathing_tolerance
+                ) / breathing_reward_range
+            )
+
+        surface_reward = (
+            reward_cfg["surface_weight"]
+            * breathing_quality
         )
-        surface_reward = reward_cfg["surface_weight"] * surface_quality
+
+        successful_breathing = (
+            abs_head_error <= breathing_tolerance
+        )
 
 
         #maybe this is better *surface_quality to reward forward velocity only when the worm is breathing
@@ -191,7 +267,7 @@ class WormSwimmingEnv(MujocoEnv):
             terminated = True
             reward -= reward_cfg["termination_penalty"]
 
-        successful_breathing = distance == 0
+        #successful_breathing = distance == 0
 
         self.log_buffer["reward"].append(reward)
         self.log_buffer["forward_reward"].append(forward_reward)
@@ -204,8 +280,23 @@ class WormSwimmingEnv(MujocoEnv):
         self.log_buffer["terminated"].append(float(terminated))
 
         info = {
-            "head_z": head_z,
-            "reward": reward,
+            # Instantaneous quantities
+            "head_z": float(head_z),
+            "head_above_water": bool(head_above_water),
+            "forward_velocity": float(forward_vel),
+            "reward": float(reward),
+
+            # Episode-level success metrics up to the current step
+            "percent_time_head_above_water": float(
+                percent_time_head_above_water
+            ),
+            "longest_time_head_underwater": float(
+                longest_time_head_underwater
+            ),
+            "average_forward_velocity": float(
+                average_forward_velocity
+            ),
+            "episode_elapsed_time": float(elapsed_time),
         }
 
         if self.counter % self.log_interval == 0 and self.counter > 0:
@@ -225,8 +316,10 @@ class WormSwimmingEnv(MujocoEnv):
                 f"(last {len(reward_arr)} env steps)"
                 "\n\nReward:"
                 f"\n  mean reward           : {reward_arr.mean():8.3f}"
-                f"\n  mean breathing reward : {surface_arr.mean():8.3f}"
-                f"\n  mean swimming reward  : {forward_reward_arr.mean():8.3f}"
+                f"\n  + mean breathing reward : {surface_arr.mean():8.3f}"
+                f"\n  + mean swimming reward  : {forward_reward_arr.mean():8.3f}"
+                f"\n  - mean depth    : {depth_arr.mean():8.3f}"
+                f"\n  - mean control  : {ctrl_arr.mean():8.4f}"
                 "\n\nSwimming values:"
                 f"\n  mean forward velocity : {forward_vel_arr.mean():8.3f}"
                 f"\n  mean head height error          : {head_error_arr.mean():8.3f}"
@@ -254,16 +347,138 @@ class WormSwimmingEnv(MujocoEnv):
             -0.05, 0.05, size=self.init_qpos.shape
         )
 
-        # start close to but above the surface
+        # Start close to but above the surface.
         qpos[2] = self.water_level + 0.05
+
+        self.forward_velocity_sum = 0.0
 
         qvel = np.zeros_like(self.init_qvel)
         self.set_state(qpos, qvel)
+
+        # Reset episode success metrics.
+        self.episode_steps = 0
+        self.episode_above_water_steps = 0
+        self.current_underwater_steps = 0
+        self.longest_underwater_steps = 0
+        self.episode_start_x = float(self.data.qpos[0])
+
         return self._get_obs()
 
 
-def make_worm_env(render_mode=None):
-    env = WormSwimmingEnv(render_mode=render_mode)
+def evaluate_episode(model, env, deterministic=True):
+    obs, info = env.reset()
+
+    terminated = False
+    truncated = False
+    final_info = {}
+
+    while not (terminated or truncated):
+        action, _ = model.predict(
+            obs,
+            deterministic=deterministic,
+        )
+
+        obs, reward, terminated, truncated, info = env.step(action)
+        final_info = info
+
+    return {
+        "percent_time_head_above_water":
+            final_info.get("percent_time_head_above_water", np.nan),
+
+        "longest_time_head_underwater":
+            final_info.get("longest_time_head_underwater", np.nan),
+
+        "average_forward_velocity":
+            final_info.get("average_forward_velocity", np.nan),
+
+        "episode_duration":
+            final_info.get("episode_elapsed_time", np.nan),
+
+        "terminated": bool(terminated),
+        "truncated": bool(truncated),
+        "unstable": bool(final_info.get("unstable", False)),
+    }
+
+
+def evaluate_model(model, n_episodes=100):
+    env = make_worm_env(render_mode=None)
+    episode_results = []
+
+    for episode_idx in range(n_episodes):
+        result = evaluate_episode(
+            model=model,
+            env=env,
+            deterministic=True,
+        )
+
+        result["episode"] = episode_idx
+        episode_results.append(result)
+
+    env.close()
+    return episode_results
+
+
+def save_policy_video(
+    model,
+    output_path,
+    seed=42,
+    max_episode_steps=500,
+):
+    env = make_worm_env(render_mode="rgb_array", camera_name="side_follow")
+
+    obs, info = env.reset(seed=seed)
+
+    frames = []
+
+    frame = env.render()
+    if frame is not None:
+        frames.append(frame)
+
+    terminated = False
+    truncated = False
+    step_count = 0
+
+    while (
+        not terminated
+        and not truncated
+        and step_count < max_episode_steps
+    ):
+        action, _ = model.predict(
+            obs,
+            deterministic=True,
+        )
+
+        obs, reward, terminated, truncated, info = env.step(action)
+
+        frame = env.render()
+        if frame is not None:
+            frames.append(frame)
+
+        step_count += 1
+
+    fps = round(1.0 / env.unwrapped.dt)
+    env.close()
+
+    if not frames:
+        raise RuntimeError(
+            "No frames were rendered. Check that the environment "
+            "supports render_mode='rgb_array'."
+        )
+
+    output_path = Path(output_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    imageio.mimsave(
+        output_path,
+        frames,
+        fps=fps,
+    )
+
+    print(f"Saved rollout video to: {output_path}")
+
+
+def make_worm_env(render_mode=None, camera_name="side_follow"):
+    env = WormSwimmingEnv(render_mode=render_mode, camera_name=camera_name)
     return TimeLimit(env, max_episode_steps=500)
 
 if __name__ == "__main__":
@@ -314,7 +529,7 @@ if __name__ == "__main__":
         )
 
 
-    save_dir = Path("models/repplicate")
+    save_dir = Path("models/new_breathing")
     save_dir.mkdir(parents=True, exist_ok=True)
 
     model_path = save_dir / "ppo_worm_swimmer_with_surface"
@@ -332,6 +547,43 @@ if __name__ == "__main__":
 
     with open(save_dir / "ppo_worm_swimmer_with_surface_metadata.json", "w") as f:
         json.dump(metadata, f, indent=4)
+
+
+    import pandas as pd
+
+    results = evaluate_model(model, n_episodes=100)
+    results_df = pd.DataFrame(results)
+
+    metric_columns = [
+        "percent_time_head_above_water",
+        "longest_time_head_underwater",
+        "average_forward_velocity",
+    ]
+
+    summary = results_df[metric_columns].agg(
+        ["mean", "std", "median", "min", "max"]
+    )
+
+    print(summary)
+
+    results_df.to_csv(
+        save_dir / "worm_success_metrics_per_episode.csv",
+        index=False,
+    )
+
+    summary.to_csv(
+        save_dir / "worm_success_metrics_summary.csv",
+    )
+
+
+    #video_path = save_dir / "trained_policy_rollout.mp4"
+
+    #save_policy_video(
+    #    model=model,
+    #    output_path=video_path,
+    #    seed=42,
+    #    max_episode_steps=500,
+    #)
 
     train_env.close()
 

@@ -1,6 +1,6 @@
 {
     "model_path": "models/repplicate/ppo_worm_swimmer_with_surface.zip",
-    "saved_at": "2026-07-08T11:00:37",
+    "saved_at": "2026-07-08T11:08:32",
     "reward_cfg": {
         "surface_sharpness": 6.0,
         "forward_weight": 12.0,

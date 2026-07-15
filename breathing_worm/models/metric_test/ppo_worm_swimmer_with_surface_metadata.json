@@ -1,14 +1,14 @@
 {
-    "model_path": "models/sanity_check_movement/ppo_worm_swimmer_with_surface.zip",
-    "saved_at": "2026-07-07T17:15:52",
+    "model_path": "models/metric_test/ppo_worm_swimmer_with_surface.zip",
+    "saved_at": "2026-07-15T13:02:28",
     "reward_cfg": {
-        "surface_sharpness": 4.0,
+        "surface_sharpness": 6.0,
         "forward_weight": 12.0,
-        "surface_weight": 0,
-        "depth_weight": 3.0,
+        "surface_weight": 4.0,
+        "depth_weight": 0.5,
         "ctrl_weight": 0.0001,
-        "termination_penalty": 0.0,
-        "max_height_above_target": 1.0
+        "termination_penalty": 1.0,
+        "max_height_above_target": 0.8
     },
     "water_level": 3.0,
     "max_forward_vel": 20.0,
