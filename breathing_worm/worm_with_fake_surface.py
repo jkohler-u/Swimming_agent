@@ -73,13 +73,13 @@ class WormSwimmingEnv(MujocoEnv):
         self.forward_velocity_sum = 0.0
 
         self.reward_cfg = {
-            "surface_sharpness": 6.0, # how quickly the surface reward drops off as the head moves away from the target height
-            "forward_weight": 12.0, # how much reward for forward progress
+            "surface_sharpness": 10.0, # how quickly the surface reward drops off as the head moves away from the target height
+            "forward_weight": 20.0, # how much reward for forward progress
             #"max_rewarded_forward_vel": 1.5,
             "surface_weight": 4.0,
             "depth_weight": 0.5,
             "ctrl_weight": 0.0001,
-            "termination_penalty": 1.0,
+            "termination_penalty": 2.0,
             "max_height_above_target": 0.8,
         }
 
@@ -112,12 +112,11 @@ class WormSwimmingEnv(MujocoEnv):
         return False
 
     def step(self, action):
-
         breathing_tolerance = 0.03 
 
         ### probably not needed
         # PPO can only send actions within the allowed actuator range 
-        action = np.clip(action, self.action_space.low, self.action_space.high)
+        #action = np.clip(action, self.action_space.low, self.action_space.high)
 
 
         # =========================
@@ -126,7 +125,7 @@ class WormSwimmingEnv(MujocoEnv):
         reward_cfg = self.reward_cfg
 
         # x position before the step
-        x_before = self.data.qpos[0]
+        #x_before = self.data.qpos[0]
 
         for _ in range(self.frame_skip):
             self.data.ctrl[:] = action
@@ -149,18 +148,15 @@ class WormSwimmingEnv(MujocoEnv):
         forward_vel = self.data.qvel[0] 
         self.forward_velocity_sum += forward_vel
         
-        vertical_vel = self.data.qvel[2]
-
+        #vertical_vel = self.data.qvel[2]
         head_id = self.model.body("head").id
 
         # get the z position of the head
         head_z = self.data.xpos[head_id, 2]
-
         head_radius = self.head_radius
         target_head_z = self.water_level + head_radius
         #how far the head is from the target height <0 --> heas is too low, >0 --> head is too high
         head_error = head_z - target_head_z
-
 
         # =========================
         # Update success metrics
@@ -205,10 +201,34 @@ class WormSwimmingEnv(MujocoEnv):
 
 
         # smooth score for being close to the target height
-        surface_quality = np.exp(
-            -reward_cfg["surface_sharpness"] * distance**2
+        #surface_quality = np.exp(
+        #    -reward_cfg["surface_sharpness"] * distance**2
+        #)
+        #surface_reward = reward_cfg["surface_weight"] * surface_quality
+
+        abs_head_error = abs(head_error)
+
+        breathing_reward_range = 0.30
+
+        if abs_head_error <= breathing_tolerance:
+            breathing_quality = 1.0
+        else:
+            breathing_quality = max(
+                0.0,
+                1.0
+                - (
+                    abs_head_error - breathing_tolerance
+                ) / breathing_reward_range
+            )
+
+        surface_reward = (
+            reward_cfg["surface_weight"]
+            * breathing_quality
         )
-        surface_reward = reward_cfg["surface_weight"] * surface_quality
+
+        successful_breathing = (
+            abs_head_error <= breathing_tolerance
+        )
 
 
         #maybe this is better *surface_quality to reward forward velocity only when the worm is breathing
@@ -247,7 +267,7 @@ class WormSwimmingEnv(MujocoEnv):
             terminated = True
             reward -= reward_cfg["termination_penalty"]
 
-        successful_breathing = distance == 0
+        #successful_breathing = distance == 0
 
         self.log_buffer["reward"].append(reward)
         self.log_buffer["forward_reward"].append(forward_reward)
@@ -509,7 +529,7 @@ if __name__ == "__main__":
         )
 
 
-    save_dir = Path("models/metric_test")
+    save_dir = Path("models/new_breathing")
     save_dir.mkdir(parents=True, exist_ok=True)
 
     model_path = save_dir / "ppo_worm_swimmer_with_surface"
