@@ -5,7 +5,8 @@ from stable_baselines3 import PPO
 from stable_baselines3.common.env_util import make_vec_env
 import numpy as np
 from scipy.spatial.transform import Rotation as R
-from stable_baselines3.common.vec_env import VecNormalize
+from stable_baselines3.common.vec_env import VecNormalize, DummyVecEnv
+from gymnasium.wrappers import RecordVideo # <--- Added for video recording
 import os
 import shutil
 import csv
@@ -20,7 +21,7 @@ class HumanSwimmingEnv(MujocoEnv):
                  cont_head_reward=5, cont_body_reward=5, cont_body_punishment=1.0, 
                  roll_punishment=0.1, pitch_punishment=0.5):
         
-        self._model_path = '/home/judith/swimming/Swimming_agent/underwater_swimming_simple_human/humanoid.xml'
+        self._model_path = '/home/judith/swimming/Swimming_agent/underwater_swimming_simple_human/humanoid_laying.xml'
         super().__init__(
             self._model_path, 
             frame_skip=5, 
@@ -28,7 +29,6 @@ class HumanSwimmingEnv(MujocoEnv):
             render_mode=render_mode,
         )
         
-        # Reward Hyperparameters
         self.survival_reward = survival_reward
         self.leniency = leniency
         self.forward_reward = forward_reward
@@ -83,7 +83,6 @@ class HumanSwimmingEnv(MujocoEnv):
         hand_height_1 = self.data.body('hand_right').xpos[2]
         hand_height_2 = self.data.body('hand_left').xpos[2]
 
-        # Fixed: Use self. instead of global variables
         reward += self.cont_head_reward * (head_height - WATER_SURFACE_HEIGHT)**2 if WATER_SURFACE_HEIGHT < head_height < WATER_SURFACE_HEIGHT + 0.3 else 0
         reward += self.cont_body_reward * (WATER_SURFACE_HEIGHT - body_height)**2 if body_height < WATER_SURFACE_HEIGHT else 0
         
@@ -101,7 +100,7 @@ class HumanSwimmingEnv(MujocoEnv):
         self.prev_action = action
 
         terminated = False
-        self.hard_termination = self.total_timesteps_trained > 1_000_000
+        self.hard_termination = self.total_timesteps_trained > 700_000
         if (body_height < 0 or body_height > WATER_SURFACE_HEIGHT):
             reward -= self.body_punishment
             if self.hard_termination: terminated = True
@@ -112,7 +111,8 @@ class HumanSwimmingEnv(MujocoEnv):
             terminated = True
             reward -= self.vel_punishment
 
-        if head_height < WATER_SURFACE_HEIGHT: self.hight_counter += 1
+        if head_height < WATER_SURFACE_HEIGHT: 
+            self.hight_counter += 1
         else: self.hight_counter = 0
         if self.hight_counter > self.leniency:
             terminated = True
@@ -138,57 +138,54 @@ def make_human_env(render_mode=None, **kwargs):
     return HumanSwimmingEnv(render_mode=render_mode, **kwargs)
 
 def main():
-    # --- Hyperparameters ---
     lr = 0.001
     batch_size = 64
-    
-    # Reward parameters
     env_params = {
-        "leniency": 200,
-        "survival_reward": 0.01,
-        "forward_reward": 40,
+        "leniency": 180,
+        "survival_reward": 0.05,
+        "forward_reward": 70,
         "scaling": 0.1,
         "head_punishment": 5,
         "vel_punishment": 1,
         "body_punishment": 5,
-        "smothness_reward": 0.01,
+        "smothness_reward": 0.02,
         "cont_head_reward": 5,
         "cont_body_reward": 5,
-        "cont_body_punishment": 1,
+        "cont_body_punishment": 0.5,
         "roll_punishment": 0.1,
-        "pitch_punishment": 0.5
-    }
+        "pitch_punishment": 0.1
+                }
+    # tbc = ["head_punishment", "vel_punishment", "body_punishment","smothness_reward", "cont_head_reward", "cont_body_reward", "cont_body_punishment","roll_punishment", "pitch_punishment"]
+    # for entry in tbc:
+        # env_params[entry] = 0
 
-    output_dir = "human_swimmer_baseline"
+    output_dir = f"human_swimmer_laying_v5"
     os.makedirs(output_dir, exist_ok=True)
     shutil.copy(sys.argv[0], os.path.join(output_dir, "train_script.py"))
 
-    # Use a dictionary to unpack all parameters into the environment
-    train_env = make_vec_env(
-        lambda: make_human_env(**env_params), 
-        n_envs=8
-    )
-    
+    train_env = make_vec_env(lambda: make_human_env(**env_params), n_envs=8)
     train_env = VecNormalize(train_env, norm_obs=True, norm_reward=True)
     train_env.save(os.path.join(output_dir, "vec_normalize.pkl"))
 
-    model = PPO(
-        "MlpPolicy", train_env, verbose=1, 
-        learning_rate=lr, n_steps=4048, batch_size=batch_size, 
-        gae_lambda=0.95, gamma=0.99, ent_coef=0.01
-    )
-    
-    print(f"Training with lr={lr}, forward_reward={env_params['forward_reward']}")
-    model.learn(total_timesteps=2)
+    model = PPO("MlpPolicy", train_env, verbose=1, learning_rate=lr, n_steps=4048, batch_size=batch_size)
+    model.learn(total_timesteps=2500_000)
     model.save(os.path.join(output_dir, "ppo_human_swimmer"))
     train_env.close()
 
-    print("Running Evaluation...")
-    # Evaluate with same params
-    test_env_raw = make_human_env(**env_params)
-    from stable_baselines3.common.vec_env import DummyVecEnv
-    test_env = DummyVecEnv([lambda: test_env_raw])
+    print("Running Evaluation and Recording Video...")
+    # 1. Create the environment with rgb_array mode for recording
+    eval_env = make_human_env(render_mode="rgb_array", **env_params)
     
+    # 2. Wrap with RecordVideo
+    video_folder = os.path.join(output_dir, "videos")
+    eval_env = RecordVideo(
+        eval_env, 
+        video_folder=video_folder, 
+        episode_trigger=lambda x: x == 0 # Record the first episode
+    )
+    
+    # 3. Wrap in DummyVecEnv and Normalize to match training
+    test_env = DummyVecEnv([lambda: eval_env])
     norm_env = VecNormalize.load(os.path.join(output_dir, "vec_normalize.pkl"), test_env)
     norm_env.training = False
     norm_env.norm_reward = False
@@ -208,6 +205,9 @@ def main():
         results.append([i, alive, head_above, f_vel])
         if done[0]: break
 
+    # Close the environment to ensure the video file is finalized
+    norm_env.close()
+
     csv_path = os.path.join(output_dir, "test_results.csv")
     with open(csv_path, mode='w', newline='') as f:
         writer = csv.writer(f)
@@ -218,7 +218,7 @@ def main():
     folder_name = os.path.basename(os.path.abspath(output_dir))
     shutil.make_archive(os.path.join(parent_dir, folder_name), 'zip', parent_dir, folder_name)
     
-    print(f"All files saved to {output_dir} and zipped.")
+    print(f"All files (including videos) saved to {output_dir} and zipped.")
 
 if __name__ == "__main__":
     main()
