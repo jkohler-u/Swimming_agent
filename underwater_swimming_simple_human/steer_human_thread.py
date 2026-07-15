@@ -21,10 +21,11 @@ prev_act = []
 
 class SimulationRecorder:
     """Handles recording frames and saving them to a video file."""
-    def __init__(self, model, data):
+    def __init__(self, model, data, width=1280, height=720): # <--- Added width and height params
         self.model = model
         self.data = data
-        self.renderer = mujoco.Renderer(model)
+        # Initialize renderer with specific resolution
+        self.renderer = mujoco.Renderer(model, width=width, height=height) 
         self.frames = []
 
     def record_frame(self):
@@ -101,7 +102,7 @@ class LLMHumanoidController:
         self.prev_error = {body_name: float('inf') for body_name in self.current_targets.keys()}
     
     def physics_step(self) -> bool:
-        KP, KI, MAX_DELTA, THRESHOLD, ACCEPTABLE_ERROR = 500.0, 40.0, 2, 0.05, 0.001
+        KP, KI, MAX_DELTA, THRESHOLD, ACCEPTABLE_ERROR = 700.0, 40.0, 2, 0.05, 0.001
         self.model.opt.timestep = 0.002
         self.data.ctrl[:] = 0.0
         reached_cnt = 0
@@ -114,9 +115,9 @@ class LLMHumanoidController:
             dist = np.linalg.norm(error_vec)
            
            
-            # if dist <= THRESHOLD or self.prev_error.get(body_name, float('inf')) - round(dist, 5) <= ACCEPTABLE_ERROR:
-            #     reached_cnt += 1
-            #     continue
+            if dist <= THRESHOLD:
+                reached_cnt += 1
+                continue
             self.prev_error[body_name] = dist 
 
             # PI controller
@@ -138,7 +139,7 @@ class LLMHumanoidController:
                 if act.trntype == mujoco.mjtTrn.mjTRN_JOINT and len(act.trnid) > 0:
                     dof_addr = self.model.jnt_dofadr[act.trnid[0]]
                     gear_val = float(act.gear[0])
-                    if gear_val != 0.0: self.data.ctrl[act_id] += tau[dof_addr] / gear_val * 10
+                    if gear_val != 0.0: self.data.ctrl[act_id] += (tau[dof_addr] * gear_val) * 0.0035
 
         # self.data.ctrl[:] = np.clip(self.data.ctrl, -1.0, 1.0)
         for _ in range(5): mujoco.mj_step(self.model, self.data)
@@ -155,7 +156,7 @@ def llm_worker(action_queue, controller):
     while True:
         obs = controller.get_obs()
         prompt = f"""You are an AI controlling a humanoid robot learning to swim backstroke.
-                The coordinates are LOCAL to the base joint of the limb (Shoulder for arms, Hip for legs): 
+                The coordinates are LOCAL to the torso: 
                 Current State:
                 - Head Height Error: {obs['head_height'] - WATER_SURFACE_HEIGHT:.2f} (Positive means head is above water)
                 - Body Height Error: { obs['body_height'] -WATER_SURFACE_HEIGHT} (Negative means body is below water)
@@ -163,8 +164,8 @@ def llm_worker(action_queue, controller):
                 - Limb Positions (Relative to Torso):
                 L_Hand (x, y, z): {obs['full_state']['left_arm_pos']}
                 R_Hand (x, y, z): {obs['full_state']['right_arm_pos']}
-                eg
-                L_Hand: [0, 0.01, -0.63] R_Hand: [0, 0.01, -0.63] arms parralel to the torso, pointing towards the feet
+                eg.:
+                L_Hand: [0, 0.01, -0.63] R_Hand: [0, 0.01, -0.63] arms parallel to the torso, pointing towards the feet
                 if x is positive - the hand reaches up towards the sky, if its negative, it reaches towards the floor
                 if y is positive . the hand reaches towards the left, if its negative, it reaches towards the right
                 if z is positive - the hand reaches above the head, if its negative it reaches towards the feet (see example)
@@ -182,20 +183,20 @@ def llm_worker(action_queue, controller):
                 Goal:
                 You start out lying on your back at the water surface, looking up to the sky.
                  Backstroke Motion: 
-                - Arms: One pulls back in water (S-shape), one recovers in a semi-circle above water.
-                - Legs: Alternating flutter kick (one up, one down).
+                - Arms: The arms alternatingly perform the following motion. While nearly stretched out, pull up from beside the hip towards the sky. Then enter the Water over the head and pull down towards the floor, befor exiting the water beside the hip.
+                - Legs: Alternatingly, move one leg slightly up while the other is moved slightly down. Both legs are stretched out
 
                 Physical Constraints (STRICT):
+                - Move incrementally. Max change per step: 0.1m.
                 - Reach Limit: Do not suggest coordinates that exceed the physical length of the limbs.
-                - Arms: Max reach is approx 0.75m from the shoulder. Keep X and Z within [-0.75, 0.75] and Y within [-0.65, 0.65].
-                - Legs: Max reach is approx 1.27m from the hip. Keep X and Y within [-0.3, 0.3] and Z within [-1.27, 0.1].
-                - Avoid "teleporting" limbs; suggest movements that are incremental from the current state.
+                - Arms: Max reach is approx 0.6m from the shoulder. Keep X and Z within [-0.6, 0.6] .
+                - Legs: Max reach is approx 1m from the hip. Keep X and Y within [-0.3, 0.3] and Z within [-1, 0.1].
 
                 Constraint: 
                 Return ONLY a valid JSON object. Do not include any conversational text, explanation, or nested keys.
 
                 Example Output:
-                {{"left_arm": [0.2, 0.3, 0.1] # , "right_arm": [-0.2, -0.3, 0.1], "left_leg": [0.1, 0.1, -0.5], "right_leg": [0.1, -0.1, -0.5]}}
+                {{"left_arm": [0.1, 0.1, -0.6] , "right_arm": [0.1, 0.1, -0.6], "left_leg": [0.2, 0.09, -0.7], "right_leg": [-0.05, -0.09, -0.7]}}
 
                 Your Turn (JSON only):"""
         prompt += f"For reference: The last 10 actions you chose: {prev_act[10:]}"
@@ -227,7 +228,7 @@ with mujoco.viewer.launch_passive(controller.model, controller.data) as viewer:
         if action and (k in action for k in ['left_arm', 'right_arm', 'left_leg', 'right_leg']):
             controller.set_targets(action)
             targets_reached = False
-            max_target_steps = controller.step_count + 1000
+            max_target_steps = controller.step_count + 400
             
             while not targets_reached and controller.step_count < max_target_steps:
                 targets_reached = controller.physics_step()
