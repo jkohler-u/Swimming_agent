@@ -177,7 +177,7 @@ def llm_worker(action_queue, controller):
                 If the y is positive, the foot is to the left side of the torso; if negative, it is on the right side.
                 If the z is positive, the left foot is trying to reach towards the the torso; if negative, it is streched out away from the torso.
 
-                Keep in mind that the movenets have to be incremental and within the physical limits of the humanoid.
+                Keep in mind that the movements have to be incremental and within the physical limits of the humanoid.
                 Moving the hand from in front of the torso eg. x = 0.5 to behind the torso x = -0.5 in one step is not physically possible.
                  
                 Goal:

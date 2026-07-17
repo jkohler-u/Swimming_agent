@@ -187,6 +187,7 @@
             <!-- Shoulder joint(s) are attached to the *origin* of this body -->
             <joint name="shoulder1_right" axis="0 0 1" class="shoulder"/>
             <joint name="shoulder2_right" axis="0 1 0" class="shoulder"/>
+            <joint name="shoulder3_right" axis="1 0 0" class="shoulder"/>
 
             <!-- Upper‑arm geometry (drawn from the shoulder origin to the elbow) -->
             <geom name="upper_arm_right"
@@ -215,6 +216,7 @@
         <body name="upper_arm_left" pos="0 .17 .06">
             <joint name="shoulder1_left" axis="0 0 1" class="shoulder"/>
             <joint name="shoulder2_left" axis="0 1 0" class="shoulder"/>
+            <joint name="shoulder3_left" axis="1 0 0" class="shoulder"/>
 
             <geom name="upper_arm_left"
                   fromto="0 0 0 0 0 -0.3"
@@ -272,9 +274,11 @@
     <motor name="ankle_x_left"    gear="20"  joint="ankle_x_left"/>
     <motor name="shoulder1_right" gear="20"  joint="shoulder1_right"/>
     <motor name="shoulder2_right" gear="20"  joint="shoulder2_right"/>
+    <motor name="shoulder3_right" gear="20"  joint="shoulder3_right"/>
     <motor name="elbow_right"     gear="40"  joint="elbow_right"/>
     <motor name="shoulder1_left"  gear="20"  joint="shoulder1_left"/>
     <motor name="shoulder2_left"  gear="20"  joint="shoulder2_left"/>
+    <motor name="shoulder3_left"  gear="20"  joint="shoulder3_left"/>
     <motor name="elbow_left"      gear="40"  joint="elbow_left"/>
   </actuator>
 </mujoco>
