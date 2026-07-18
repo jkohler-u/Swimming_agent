@@ -136,14 +136,9 @@ class WormSwimmingEnv(MujocoEnv):
                 print("Unstable state detected! Terminating episode.")
                 return obs, -self.reward_cfg["termination_penalty"], True, False, {"unstable": True}
 
-        # x position after the step
-        x_after = self.data.qpos[0]
-
+    
         # returns state that PPO sees (qpos and qvel)
         obs = self._get_obs()
-
-        # actual distance moved in x direction during this step
-        #forward_progress = x_after - x_before
 
         forward_vel = self.data.qvel[0] 
         self.forward_velocity_sum += forward_vel
@@ -210,71 +205,74 @@ class WormSwimmingEnv(MujocoEnv):
 
         breathing_reward_range = 0.30
 
-        if abs_head_error <= breathing_tolerance:
-            breathing_quality = 1.0
-        else:
-            breathing_quality = max(
-                0.0,
-                1.0
-                - (
-                    abs_head_error - breathing_tolerance
-                ) / breathing_reward_range
-            )
+        # if abs_head_error <= breathing_tolerance:
+        #     breathing_quality = 1.0
+        # else:
+        #     breathing_quality = max(
+        #         0.0,
+        #         1.0
+        #         - (
+        #             abs_head_error - breathing_tolerance
+        #         ) / breathing_reward_range
+        #     )
 
-        surface_reward = (
-            reward_cfg["surface_weight"]
-            * breathing_quality
-        )
+        # surface_reward = (
+        #     reward_cfg["surface_weight"]
+        #     * breathing_quality
+        # )
 
-        successful_breathing = (
-            abs_head_error <= breathing_tolerance
-        )
+        # successful_breathing = (
+        #     abs_head_error <= breathing_tolerance
+        # )
 
 
         #maybe this is better *surface_quality to reward forward velocity only when the worm is breathing
-        forward_reward = reward_cfg["forward_weight"] * forward_vel
+        forward_reward = 40.0 * forward_vel
 
         # penalty for beeing too deep, quadratic penalty for being below the target height
         depth_penalty = (
-            reward_cfg["depth_weight"]
+            0.5
             * max(0.0, target_head_z - head_z) ** 2
         )
 
-        ctrl_cost = reward_cfg["ctrl_weight"] * np.square(action).sum()
+        hight_reward = 2 * (head_z - target_head_z)**2 if self.water_level < head_z < target_head_z else 0
 
+       
+
+        ctrl_cost = 0.01 * np.square(action).sum()
+        
         reward = (
-            forward_reward
-            + surface_reward
-            - depth_penalty
-            - ctrl_cost
+            forward_reward # reward forward vell
+            # + surface_reward
+            + hight_reward
+            - depth_penalty # punish head below water
+            - ctrl_cost # encurage smmoth movements 
+            + 0.05 # survival reward
         )
 
         terminated = False
         truncated = False
 
 
-        if head_z < target_head_z - self.termination_depth:
+        if head_z < target_head_z - self.termination_depth and self.current_underwater_steps > 100:
             terminated = True
-            reward -= reward_cfg["termination_penalty"]
+            reward -= 2
 
-        if head_z > target_head_z + reward_cfg["max_height_above_target"]:
-            print("Apperently I was flying!!!")
-            terminated = True
-            reward -= reward_cfg["termination_penalty"]
+        # if head_z > target_head_z + reward_cfg["max_height_above_target"]:
+        #     print("Apperently I was flying!!!")
+        #     terminated = True
+        #     reward -= 2
 
-        if abs(forward_vel) > self.max_forward_vel:
-            print(f"I was tooo fast!!! vel: {forward_vel}")
-            terminated = True
-            reward -= reward_cfg["termination_penalty"]
+        
 
         #successful_breathing = distance == 0
 
         self.log_buffer["reward"].append(reward)
         self.log_buffer["forward_reward"].append(forward_reward)
-        self.log_buffer["successful_breathing"].append(float(successful_breathing))
+        # self.log_buffer["successful_breathing"].append(float(successful_breathing))
         self.log_buffer["head_error"].append(head_error)
         self.log_buffer["forward_vel"].append(forward_vel)
-        self.log_buffer["surface_reward"].append(surface_reward)
+        # self.log_buffer["surface_reward"].append(surface_reward)
         self.log_buffer["depth_penalty"].append(depth_penalty)
         self.log_buffer["ctrl_cost"].append(ctrl_cost)
         self.log_buffer["terminated"].append(float(terminated))
@@ -484,7 +482,7 @@ def make_worm_env(render_mode=None, camera_name="side_follow"):
 if __name__ == "__main__":
 
 
-    n_envs = 16
+    n_envs = 8
 
 
     train_env = make_vec_env(
@@ -505,9 +503,9 @@ if __name__ == "__main__":
     )
 
     stages = [
-        ("Stage 1: high buoyancy", 1.5, 300_000),
-        ("Stage 2: medium buoyancy", 1.0, 300_000),
-        ("Stage 3: near-neutral buoyancy", 0.8, 400_000),
+        ("Stage 1: termination depth", 1.5, 1_000_000),
+        # ("Stage 2: medium buoyancy", 1.0, 300_000),
+        # ("Stage 3: near-neutral buoyancy", 0.8, 400_000),
     ]
 
     for i, (name, term_depth, steps) in enumerate(stages):
