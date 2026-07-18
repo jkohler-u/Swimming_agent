@@ -6,14 +6,16 @@ import numpy as np
 import requests
 import json
 import time
+import math
 from scipy.spatial.transform import Rotation as R  # <--- Add this import
 
 
-# --- Configuration ---
 MODEL_PATH = 'underwater_swimming_simple_human/humanoid_laying.xml'
 WATER_SURFACE_HEIGHT = 3.0
 OLLAMA_URL = "http://localhost:11434/api/generate"
 MODEL_NAME = "llama3"
+
+
 class LLMHumanoidController:
     def __init__(self, model_path):
         self.model = mujoco.MjModel.from_xml_path(model_path)
@@ -79,26 +81,13 @@ class LLMHumanoidController:
         }
     
     def physics_step(self, debug=False) -> bool:
-        """
-        Move active end-effectors toward torso-relative Cartesian targets
-        using Jacobian-transpose PD control.
 
-        Returns True when every active target is within the position
-        threshold and below the velocity threshold.
-        """
+        KP = 70.0
+        KD = 20.0
 
-        KP = 100.0
-        KD = 12.0
-        KI =  0.0 #12.0
-
-        
-
-        POSITION_THRESHOLD = 0.01
-        VELOCITY_THRESHOLD = 0.05
-        MAX_CARTESIAN_FORCE = 100.0
-        INTEGRAL_LIMIT = 0.15
-
-        PHYSICS_STEPS_PER_CONTROL = 1
+        POSITION_THRESHOLD = 0.03
+        VELOCITY_THRESHOLD = 0.15
+        MAX_CARTESIAN_FORCE = 70.0
 
         self.model.opt.timestep = 0.002
 
@@ -262,25 +251,12 @@ class LLMHumanoidController:
                 error_local * dt
             )
 
-            # Anti-windup.
-            self.integral_error[body_name] = np.clip(
-                self.integral_error[body_name],
-                -INTEGRAL_LIMIT,
-                INTEGRAL_LIMIT,
-            )
-
             p_force = KP * error_local
-
-            i_force = (
-                KI
-                * self.integral_error[body_name]
-            )
 
             d_force = -KD * velocity_local
 
             cartesian_force = (
                 p_force
-                + i_force
                 + d_force
             )
 
@@ -441,11 +417,11 @@ class LLMHumanoidController:
                 )
 
 
-        for _ in range(PHYSICS_STEPS_PER_CONTROL):
-            mujoco.mj_step(
-                self.model,
-                self.data,
-            )
+
+        mujoco.mj_step(
+            self.model,
+            self.data,
+        )
 
         self.step_count += 1
 
@@ -618,9 +594,9 @@ def run_single_limb_test(
 
 
 
-FIRST_TEST_BLOCK = False
+RUN_CONTROLLER_TEST = False
 
-if FIRST_TEST_BLOCK:
+if RUN_CONTROLLER_TEST:
 
 
     print("Initializing controller...")
@@ -702,16 +678,60 @@ SWIMMING_SIMULATION = True
 
 if SWIMMING_SIMULATION:
 
-    LEG_Z = -1.20
-
     print("Initializing LLM Humanoid Environment...")
 
-    
     controller = LLMHumanoidController(MODEL_PATH)
 
+    # ------------------------------------------------------------------
+    # Backstroke configuration
+    # ------------------------------------------------------------------
+    #
+    # Coordinates are torso-local Cartesian positions:
+    #   x: toward sky / floor
+    #   y: left / right
+    #   z: toward head / feet
+    #
+    # The arms follow a closed elliptical path. The right arm is exactly
+    # 180 degrees out of phase with the left arm, producing an alternating
+    # backstroke cycle.
+    #
+    # Positive local x is used for the recovery over the body.
+    # Lower local x is used for the underwater pull.
+    # ------------------------------------------------------------------
+
+    LEG_Z = -1.20
+
+    # Number of Cartesian targets in one complete arm cycle.
+    # Increase this value for smoother motion.
+    STROKE_STEPS = 32
+
+    # Number of complete arm cycles to simulate.
+    STROKE_CYCLES = 10
+
+    # Number of low-level controller steps spent moving toward each pose.
+    MAX_STEPS_PER_POSE = 100
+
+    # Viewer refresh interval in physics steps.
+    VIEWER_SYNC_INTERVAL = 10
+
+    # Arm ellipse in the torso-local x-z plane.
+
+    ARM_X_CENTER = 0.04
+    ARM_X_RADIUS = 0.3
+
+    ARM_Z_CENTER = -0.03
+    ARM_Z_RADIUS = 0.25
 
 
-    # Every action must contain exactly these four limb targets.
+    ARM_RECOVERY_Y = 0.18
+    ARM_PULL_Y = 0.18
+
+    LEFT_LEG_Y = 0.09
+    RIGHT_LEG_Y = -0.09
+    KICK_AMPLITUDE = 0.1
+
+    KICK_CYCLES_PER_ARM_CYCLE = 3
+
     required_action_keys = {
         "left_arm",
         "right_arm",
@@ -719,80 +739,8 @@ if SWIMMING_SIMULATION:
         "right_leg",
     }
 
-    # Conservative initial backstroke-like test sequence.
-    #
-    # Coordinates are torso-local Cartesian positions:
-    #   x: toward sky / floor
-    #   y: left / right
-    #   z: toward head / feet
-    #
-    # Consecutive targets are intentionally closer together than in the
-    # original sequence to avoid large Cartesian jumps.
-    stroke_actions = [
-        {
-            "left_arm":  [0.10,  0.10, -0.55],
-            "right_arm": [0.10, -0.10,  0.45],
-            "left_leg":  [0.08,  0.09, LEG_Z],
-            "right_leg": [-0.03, -0.09, LEG_Z],
-        },
-        {
-            "left_arm":  [0.20,  0.16, -0.40],
-            "right_arm": [0.16, -0.16,  0.35],
-            "left_leg":  [0.03,  0.09, LEG_Z],
-            "right_leg": [0.03, -0.09, LEG_Z],
-        },
-        {
-            "left_arm":  [0.32,  0.22, -0.20],
-            "right_arm": [0.25, -0.22,  0.18],
-            "left_leg":  [-0.03,  0.09, LEG_Z],
-            "right_leg": [0.08, -0.09, LEG_Z],
-        },
-        {
-            "left_arm":  [0.38,  0.25,  0.00],
-            "right_arm": [0.32, -0.25,  0.00],
-            "left_leg":  [0.03,  0.09, LEG_Z],
-            "right_leg": [0.03, -0.09, LEG_Z],
-        },
-        {
-            "left_arm":  [0.28,  0.20,  0.20],
-            "right_arm": [0.38, -0.20, -0.20],
-            "left_leg":  [0.08,  0.09, LEG_Z],
-            "right_leg": [-0.03, -0.09, LEG_Z],
-        },
-        {
-            "left_arm":  [0.16,  0.14,  0.38],
-            "right_arm": [0.28, -0.14, -0.38],
-            "left_leg":  [0.03,  0.09, LEG_Z],
-            "right_leg": [0.03, -0.09, LEG_Z],
-        },
-        {
-            "left_arm":  [0.10,  0.10,  0.48],
-            "right_arm": [0.16, -0.10, -0.52],
-            "left_leg":  [-0.03,  0.09, LEG_Z],
-            "right_leg": [0.08, -0.09, LEG_Z],
-        },
-        {
-            "left_arm":  [0.10,  0.10,  0.30],
-            "right_arm": [0.10, -0.10, -0.55],
-            "left_leg":  [0.03,  0.09, LEG_Z],
-            "right_leg": [0.03, -0.09, LEG_Z],
-        },
-        {
-            "left_arm":  [0.10,  0.10,  0.05],
-            "right_arm": [0.20, -0.16, -0.40],
-            "left_leg":  [0.08,  0.09, LEG_Z],
-            "right_leg": [-0.03, -0.09, LEG_Z],
-        },
-        {
-            "left_arm":  [0.10,  0.10, -0.25],
-            "right_arm": [0.32, -0.22, -0.20],
-            "left_leg":  [0.03,  0.09, LEG_Z],
-            "right_leg": [0.03, -0.09, LEG_Z],
-        },
-    ]
-
     def format_for_print(value):
-        """Round nested floating-point values for compact debug output."""
+
         if isinstance(value, dict):
             return {
                 key: format_for_print(item)
@@ -816,55 +764,91 @@ if SWIMMING_SIMULATION:
 
         return value
 
-    def validate_action(action):
-        """Validate the structure and numerical contents of an action."""
-        if not isinstance(action, dict):
-            return False
 
-        if not required_action_keys.issubset(action.keys()):
-            return False
+    def smoothstep01(x):
+        x = np.clip(x, 0.0, 1.0)
+        return x * x * (3.0 - 2.0 * x)
 
-        for key in required_action_keys:
-            target = action[key]
 
-            if not isinstance(
-                target,
-                (list, tuple, np.ndarray),
-            ):
-                return False
+    def make_arm_target(phase, side):
+        s = math.sin(phase)
+        c = math.cos(phase)
 
-            if len(target) != 3:
-                return False
+        # Smoothly blend between pull and recovery.
+        # blend=1 during recovery, blend=0 during pull.
+        blend = smoothstep01(0.5 * (s + 1.0))
 
-            try:
-                target_array = np.asarray(
-                    target,
-                    dtype=float,
-                )
-            except (TypeError, ValueError):
-                return False
+        x = ARM_X_CENTER + ARM_X_RADIUS * s
+        z = ARM_Z_CENTER + ARM_Z_RADIUS * c
 
-            if target_array.shape != (3,):
-                return False
+        x = (1.0 - blend) * x + blend * x
+        z = (1.0 - blend) * z + blend * z
 
-            if not np.all(np.isfinite(target_array)):
-                return False
+        y_distance = (
+            (1.0 - blend) * ARM_PULL_Y
+            + blend * ARM_RECOVERY_Y
+        )
 
-        return True
+        return [x, side * y_distance, z]
 
-    # Number of discrete Cartesian poses to execute.
-    max_runs = 40
+    def make_leg_target(kick_phase, side):
+        """Return one alternating flutter-kick foot target."""
 
-    # Fixed simulation duration for each pose.
-    #
-    # Do not wait indefinitely for every target to be reached. Swimming
-    # should remain continuous, even if some poses retain a small error.
-    steps_per_pose = 150
+        if side > 0.0:
+            y = LEFT_LEG_Y
+        else:
+            y = RIGHT_LEG_Y
 
-    # Update the viewer every few physics steps rather than every step.
-    viewer_sync_interval = 10
+        x = KICK_AMPLITUDE * math.sin(kick_phase)
 
-    # Record the initial torso position for a rough propulsion measurement.
+        return [
+            x,
+            y,
+            LEG_Z,
+        ]
+
+    def make_backstroke_action(phase):
+
+
+        left_arm_phase = phase
+        right_arm_phase = phase + math.pi
+
+        kick_phase = (
+            KICK_CYCLES_PER_ARM_CYCLE
+            * phase
+        )
+
+        action = {
+            "left_arm": make_arm_target(
+                left_arm_phase,
+                side=1.0,
+            ),
+            "right_arm": make_arm_target(
+                right_arm_phase,
+                side=-1.0,
+            ),
+            "left_leg": make_leg_target(
+                kick_phase,
+                side=1.0,
+            ),
+            "right_leg": make_leg_target(
+                kick_phase + math.pi,
+                side=-1.0,
+            ),
+        }
+
+        return action
+
+    # Generate one complete closed cycle.
+
+    stroke_actions = [
+        make_backstroke_action(
+            2.0 * math.pi * step / STROKE_STEPS
+        )
+        for step in range(STROKE_STEPS)
+    ]
+
+    print(f"Generated {len(stroke_actions)} poses for one complete backstroke cycle.")
     torso_body_id = controller.model.body("torso").id
 
     mujoco.mj_forward(
@@ -878,252 +862,100 @@ if SWIMMING_SIMULATION:
         ].copy()
     )
 
-    # Clear residual actuator commands before starting.
+    # Clear any residual actuator commands.
     controller.data.ctrl[:] = 0.0
 
-    # Reset integral state once at the beginning, when supported by the
-    # controller implementation.
-    if hasattr(controller, "reset_integral"):
-        controller.reset_integral()
+    total_poses = (
+        STROKE_CYCLES
+        * len(stroke_actions)
+    )
 
-    runs = 0
+    pose_number = 0
 
     with mujoco.viewer.launch_passive(
         controller.model,
         controller.data,
     ) as viewer:
 
-        while viewer.is_running():
-            runs += 1
-
-            if runs > max_runs:
-                break
-
-            action_index = (
-                runs - 1
-            ) % len(stroke_actions)
-
-            action = stroke_actions[
-                action_index
-            ]
-
-            if not validate_action(action):
-                print(
-                    f"Invalid action at index "
-                    f"{action_index}. Skipping."
-                )
-
-                controller.data.ctrl[:] = 0.0
-
-                for _ in range(50):
-                    controller.physics_step()
-
-                    if (
-                        controller.step_count
-                        % viewer_sync_interval
-                        == 0
-                    ):
-                        viewer.sync()
-
-                    if not viewer.is_running():
-                        break
-
-                continue
-
-            obs_before = controller.get_obs()
-
-            torso_position_before = (
-                controller.data.xpos[
-                    torso_body_id
-                ].copy()
-            )
-
-            print()
-            print("=" * 70)
-            print(
-                f"SWIMMING POSE "
-                f"{runs}/{max_runs}"
-            )
-            print(
-                f"Stroke action index: "
-                f"{action_index}"
-            )
-            print(
-                "Target action:",
-                format_for_print(action),
-            )
-            print(
-                "State before:"
-            )
-            print(
-                "  L-ARM:",
-                format_for_print(
-                    obs_before[
-                        "full_state"
-                    ][
-                        "left_arm_pos"
-                    ]
-                ),
-            )
-            print(
-                "  R-ARM:",
-                format_for_print(
-                    obs_before[
-                        "full_state"
-                    ][
-                        "right_arm_pos"
-                    ]
-                ),
-            )
-            print(
-                "  L-LEG:",
-                format_for_print(
-                    obs_before[
-                        "full_state"
-                    ][
-                        "left_leg_pos"
-                    ]
-                ),
-            )
-            print(
-                "  R-LEG:",
-                format_for_print(
-                    obs_before[
-                        "full_state"
-                    ][
-                        "right_leg_pos"
-                    ]
-                ),
-            )
-
-            # Do not reset integral error for every new trajectory point.
-            #
-            # Use the first version when set_targets supports the argument:
-            try:
-                controller.set_targets(
-                    action,
-                    reset_integral=False,
-                )
-            except TypeError:
-                # Compatibility fallback if the current set_targets method
-                # does not yet expose reset_integral.
-                controller.set_targets(action)
-
-            completed_steps = 0
-            target_reached_at_least_once = False
-
-            for _ in range(steps_per_pose):
-                if not viewer.is_running():
-                    break
-
-                targets_reached = (
-                    controller.physics_step()
-                )
-
-                completed_steps += 1
-
-                if targets_reached:
-                    target_reached_at_least_once = True
-
-                if (
-                    controller.step_count
-                    % viewer_sync_interval
-                    == 0
-                ):
-                    viewer.sync()
+        for cycle_index in range(STROKE_CYCLES):
 
             if not viewer.is_running():
                 break
 
-            # Read a fresh observation after executing the action.
-            obs_after = controller.get_obs()
-
-            torso_position_after = (
-                controller.data.xpos[
-                    torso_body_id
-                ].copy()
-            )
-
-            pose_displacement = (
-                torso_position_after
-                - torso_position_before
-            )
-
-            total_displacement = (
-                torso_position_after
-                - initial_torso_position
-            )
-
+            print()
+            print("=" * 70)
             print(
-                "State after:"
-            )
-            print(
-                "  L-ARM:",
-                format_for_print(
-                    obs_after[
-                        "full_state"
-                    ][
-                        "left_arm_pos"
-                    ]
-                ),
-            )
-            print(
-                "  R-ARM:",
-                format_for_print(
-                    obs_after[
-                        "full_state"
-                    ][
-                        "right_arm_pos"
-                    ]
-                ),
-            )
-            print(
-                "  L-LEG:",
-                format_for_print(
-                    obs_after[
-                        "full_state"
-                    ][
-                        "left_leg_pos"
-                    ]
-                ),
-            )
-            print(
-                "  R-LEG:",
-                format_for_print(
-                    obs_after[
-                        "full_state"
-                    ][
-                        "right_leg_pos"
-                    ]
-                ),
-            )
-            print(
-                "Steps executed:",
-                completed_steps,
-            )
-            print(
-                "Target reached at least once:",
-                target_reached_at_least_once,
-            )
-            print(
-                "Torso displacement this pose:",
-                format_for_print(
-                    pose_displacement
-                ),
-            )
-            print(
-                "Total torso displacement:",
-                format_for_print(
-                    total_displacement
-                ),
+                f"BACKSTROKE CYCLE "
+                f"{cycle_index + 1}/{STROKE_CYCLES}"
             )
             print("=" * 70)
 
-            # Small visualization delay only. Avoid the original one-second
-            # freeze between poses.
-            time.sleep(0.02)
+            for action_index, action in enumerate(stroke_actions):
 
-        # Explicitly clear the controls before leaving the viewer.
+                if not viewer.is_running():
+                    break
+
+                pose_number += 1
+
+                torso_position_before = (
+                    controller.data.xpos[
+                        torso_body_id
+                    ].copy()
+                )
+
+                controller.set_targets(action)
+
+                target_reached_at_least_once = False
+                completed_steps = 0
+
+                targets_reached = False
+
+                for control_step in range(MAX_STEPS_PER_POSE):
+                    if not viewer.is_running():
+                        break
+
+                    targets_reached = controller.physics_step()
+                    completed_steps = control_step + 1
+
+                    if controller.step_count % VIEWER_SYNC_INTERVAL == 0:
+                        viewer.sync()
+
+                    if targets_reached:
+                        target_reached_at_least_once = True
+                        break
+
+                torso_position_after = (
+                    controller.data.xpos[
+                        torso_body_id
+                    ].copy()
+                )
+
+                pose_displacement = (
+                    torso_position_after
+                    - torso_position_before
+                )
+
+                total_displacement = (
+                    torso_position_after
+                    - initial_torso_position
+                )
+
+                print(
+                    f"Pose {pose_number}/{total_poses} | "
+                    f"cycle pose "
+                    f"{action_index + 1}/{len(stroke_actions)}"
+                )
+
+                print("  Target:",format_for_print(action),)
+
+                print("  Steps:",completed_steps,"| reached:",target_reached_at_least_once,)
+
+                print("  Pose torso displacement:",format_for_print(pose_displacement),)
+
+                print("  Total torso displacement:",format_for_print(total_displacement),
+                )
+
+        # Stop all actuator commands before closing.
         controller.data.ctrl[:] = 0.0
 
     final_torso_position = (
@@ -1139,7 +971,7 @@ if SWIMMING_SIMULATION:
 
     print()
     print("=" * 70)
-    print("SWIMMING TEST COMPLETE")
+    print("BACKSTROKE SWIMMING TEST COMPLETE")
     print(
         "Final torso displacement:",
         format_for_print(
