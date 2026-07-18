@@ -17,12 +17,11 @@ from pathlib import Path
 WATER_SURFACE_HEIGHT = 3.0
 
 class HumanSwimmingEnv(MujocoEnv):
-    def __init__(self, render_mode=None, leniency=200, survival_reward=0.01, forward_reward=40, scaling=1.0, 
-                 head_punishment=5, vel_punishment=1, body_punishment=5, smothness_reward=0.01,
-                 cont_head_reward=5, cont_body_reward=5, cont_body_punishment=1.0, 
-                 roll_punishment=0.1, pitch_punishment=0.5):
+    def __init__(self, render_mode=None, leniency=200, survival_reward=0.01, forward_reward=40, 
+                 head_punishment=5, vel_punishment=1, smothness_reward=0.01,
+                 cont_head_reward=5, cont_body_reward=5, cont_body_punishment=1.0):
         
-        self._model_path = "/home/judith/swimming/Swimming_agent/breathing_worm/worm_water_surface_rev.xml"
+        self._model_path = "/home/judith/swimming/Swimming_agent/breathing_worm/worm_water_surface.xml"
         super().__init__(
             self._model_path, 
             frame_skip=5, 
@@ -33,16 +32,13 @@ class HumanSwimmingEnv(MujocoEnv):
         self.survival_reward = survival_reward
         self.leniency = leniency
         self.forward_reward = forward_reward
-        self.scaling = scaling
         self.head_punishment = head_punishment
         self.vel_punishment = vel_punishment
-        self.body_punishment = body_punishment
         self.smothness_reward = smothness_reward
         self.cont_head_reward = cont_head_reward
         self.cont_body_reward = cont_body_reward
         self.cont_body_punishment = cont_body_punishment
-        self.roll_punishment = roll_punishment
-        self.pitch_punishment = pitch_punishment
+  
 
         self.prev_action = np.zeros(self.model.nu)
         self.current_step = 0
@@ -50,7 +46,6 @@ class HumanSwimmingEnv(MujocoEnv):
         self.hight_counter = 0
         self.max_body_hight_counter = 0
         self.total_timesteps_trained = 0
-        self.start_pos = 0
 
         obs_size = (self.model.nq) + self.model.nv  + 2 +3
         self.observation_space = spaces.Box(low=-np.inf, high=np.inf, shape=(obs_size,), dtype=np.float32)
@@ -77,46 +72,36 @@ class HumanSwimmingEnv(MujocoEnv):
         self.total_timesteps_trained += 1
 
         forward_vel = self.data.qvel[0] 
-        current_pos = self.data.qpos[0]
-        # Reward the distance traveled from the start
-        reward = (self.start_pos - current_pos) * self.forward_reward
+        reward = forward_vel * self.forward_reward *10
 
         body_height = self.data.qpos[2]
         head_height = self.data.body('head').xpos[2]
-        foot_height_1 = self.data.body('segment1').xpos[2]
-        foot_height_2 = self.data.body('segment2').xpos[2]
-        hand_height_1 = self.data.body('segment3').xpos[2]
+        segment1 = self.data.body('segment1').xpos[2]
+        segment2 = self.data.body('segment2').xpos[2]
+        segment3 = self.data.body('segment3').xpos[2]
 
-        reward += self.cont_head_reward * (head_height - WATER_SURFACE_HEIGHT) if WATER_SURFACE_HEIGHT < head_height < WATER_SURFACE_HEIGHT + 0.3 else 0
-        reward += self.cont_body_reward * (1 - (WATER_SURFACE_HEIGHT - body_height)) if (WATER_SURFACE_HEIGHT - 1) < body_height < WATER_SURFACE_HEIGHT  else 0
+        reward += self.cont_head_reward * (head_height - WATER_SURFACE_HEIGHT)**2 if WATER_SURFACE_HEIGHT < head_height < WATER_SURFACE_HEIGHT + 0.3 else 0
+        reward += self.cont_body_reward * (WATER_SURFACE_HEIGHT - body_height)**2 if body_height < WATER_SURFACE_HEIGHT else 0
         
-        reward -= self.cont_body_punishment * (foot_height_1 - WATER_SURFACE_HEIGHT) if foot_height_1 > WATER_SURFACE_HEIGHT else 0
-        reward -= self.cont_body_punishment * (foot_height_2 - WATER_SURFACE_HEIGHT) if foot_height_2 > WATER_SURFACE_HEIGHT else 0
-        reward -= self.cont_body_punishment * (hand_height_1 - WATER_SURFACE_HEIGHT) if hand_height_1 > WATER_SURFACE_HEIGHT else 0
+        reward -= self.cont_body_punishment * (segment1 - WATER_SURFACE_HEIGHT - 0.5) **2 if segment1 > WATER_SURFACE_HEIGHT else 0
+        reward -= self.cont_body_punishment * (segment2 - WATER_SURFACE_HEIGHT - 0.5) **2 if segment2 > WATER_SURFACE_HEIGHT else 0
+        reward -= self.cont_body_punishment * (segment3 - WATER_SURFACE_HEIGHT - 0.5) **2 if segment3 > WATER_SURFACE_HEIGHT else 0
 
         reward += self.survival_reward
-        reward -= self.roll_punishment * np.abs(roll) 
-        reward -= self.pitch_punishment * np.abs(pitch) 
         
         action_diff = np.square(action - self.prev_action).sum()
         reward -= self.smothness_reward * action_diff  
         self.prev_action = action
 
         terminated = False
-        leniency =  75 + self.leniency * (self.total_timesteps_trained / 1_000_000)
-        # self.hard_termination = self.total_timesteps_trained > 500_000
-        if (body_height < 0 or body_height > WATER_SURFACE_HEIGHT): self.max_body_hight_counter += 1
-        else: self.max_body_hight_counter = 0
-        if  self.max_body_hight_counter > leniency:
-            reward -= self.body_punishment
+        leniency =  100 + self.leniency * (self.total_timesteps_trained / 1_000_000)
+     
 
-            # if self.hard_termination: terminated = True
-
-        # if forward_vel < 0.05: self.min_vel_counter += 1
-        # else: self.min_vel_counter = 0
-        # if self.min_vel_counter > leniency:
-        #     terminated = True
-        #     reward -= self.vel_punishment
+        if forward_vel < 0.05: self.min_vel_counter += 1
+        else: self.min_vel_counter = 0
+        if self.min_vel_counter > leniency:
+            terminated = True
+            reward -= self.vel_punishment
 
         if head_height < WATER_SURFACE_HEIGHT: 
             self.hight_counter += 1
@@ -124,8 +109,6 @@ class HumanSwimmingEnv(MujocoEnv):
         if self.hight_counter > leniency:
             terminated = True
             reward -= self.head_punishment
-
-        reward *= self.scaling
 
         truncated = False
         info = {'head_height': head_height, 'forward_vel': forward_vel, 'step': self.current_step, 'body': body_height}
@@ -135,7 +118,6 @@ class HumanSwimmingEnv(MujocoEnv):
         qpos = self.init_qpos.copy()
         qpos[2] = WATER_SURFACE_HEIGHT - 0.1 + self.np_random.uniform(-0.05, 0.05)
         qvel = np.zeros_like(self.init_qvel)
-        self.start_pos = self.data.qpos[0]
         self.set_state(qpos, qvel)
         self.current_step = 0
         self.min_vel_counter = 0
@@ -150,30 +132,23 @@ def main():
     lr = 0.001
     batch_size = 64
     env_params = {
-       "leniency": 250,
-        "survival_reward": 0.2,
-        "smothness_reward": 0.05,
+       "leniency": 150,
+        "survival_reward": 0.1,
+        "smothness_reward": 0.2,
 
-        "forward_reward": 1,
-        "vel_punishment": 0,
+        "forward_reward": 3,
+        "vel_punishment": 1,
 
-        "cont_head_reward": 4,
-        "head_punishment":2,
+        "cont_head_reward": 2,
+        "head_punishment":3,
 
-        "body_punishment":3,
-        "cont_body_reward": 1,
+        "cont_body_reward": 2,
         "cont_body_punishment": 1,
 
-        "roll_punishment": 0, 
-        "pitch_punishment": 0,
-        "scaling": 1
-
                 }
-    # tbc = ["head_punishment", "vel_punishment", "body_punishment","smothness_reward", "cont_head_reward", "cont_body_reward", "cont_body_punishment","roll_punishment", "pitch_punishment"]
-    # for entry in tbc:
-        # env_params[entry] = 0
 
-    output_dir = f"worm_human_v19.8"
+
+    output_dir = f"worm_human_v18.1"
     os.makedirs(output_dir, exist_ok=True)
     shutil.copy(sys.argv[0], os.path.join(output_dir, "train_script.py"))
 
@@ -182,7 +157,7 @@ def main():
     train_env.save(os.path.join(output_dir, "vec_normalize.pkl"))
 
     model = PPO("MlpPolicy", train_env, verbose=1, learning_rate=lr, n_steps=4048, batch_size=batch_size)
-    model.learn(total_timesteps=2500_000)
+    model.learn(total_timesteps=2000_000)
     model.save(os.path.join(output_dir, "ppo_human_swimmer"))
     train_env.close()
 
