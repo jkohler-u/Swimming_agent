@@ -6,7 +6,7 @@ from stable_baselines3.common.vec_env import VecNormalize, DummyVecEnv, VecFrame
 # IMPORTANT: Import the class you actually used to train!
 # If MyCustomHumanoidEnv is in training_script.py, use:
 # from training_script import MyCustomHumanoidEnv 
-from human_training_simple import HumanSwimmingEnv
+from reinforcement_learning.human.simplified_human.human_training_simple import HumanSwimmingEnv
 # from human_training_walk import HumanWalkingEnv
 
 def make_custom_env(render_mode="human"):
