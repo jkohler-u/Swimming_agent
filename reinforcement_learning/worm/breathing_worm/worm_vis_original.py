@@ -6,7 +6,7 @@ from stable_baselines3 import PPO
 # IMPORTANT: Import the class you actually used to train!
 # If MyCustomHumanoidEnv is in training_script.py, use:
 # from training_script import MyCustomHumanoidEnv 
-from worm_with_fake_surface import WormSwimmingEnv 
+from reinforcement_learning.worm.breathing_worm.worm_with_fake_surface import WormSwimmingEnv 
 
 def make_custom_env(render_mode="human"):
     return WormSwimmingEnv(
