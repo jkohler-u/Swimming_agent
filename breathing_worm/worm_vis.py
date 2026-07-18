@@ -18,7 +18,7 @@ env = make_custom_env(render_mode="human")
 
 print("Loading model...")
 # The model expects an observation space of 47 (float32)
-model = PPO.load("breathing_worm/models/ppo_worm_swimmer_with_surface", env=env)
+model = PPO.load("breathing_worm/models/metric_test/ppo_worm_swimmer_with_surface", env=env)
 print("Model loaded")
 
 obs, info = env.reset()
