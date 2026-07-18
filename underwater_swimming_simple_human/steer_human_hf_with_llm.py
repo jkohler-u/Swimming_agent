@@ -6,6 +6,7 @@ import numpy as np
 import requests
 import json
 import time
+import json
 
 import queue
 import threading
@@ -16,8 +17,29 @@ from scipy.spatial.transform import Rotation as R  # <--- Add this import
 # --- Configuration ---
 MODEL_PATH = 'underwater_swimming_simple_human/humanoid_laying.xml'
 WATER_SURFACE_HEIGHT = 3.0
-OLLAMA_URL = "http://localhost:11434/api/generate"
-MODEL_NAME = "qwen2.5:3b" #"llama3"
+import os
+
+from huggingface_hub import InferenceClient
+
+
+HF_TOKEN = os.environ.get("HF_TOKEN")
+
+if not HF_TOKEN:
+    raise RuntimeError(
+        "HF_TOKEN is not set. Set it before starting the simulation."
+    )
+
+
+MODEL_NAME = os.environ.get(
+    "HF_MODEL",
+    "Qwen/Qwen2.5-7B-Instruct",
+)
+
+
+hf_client = InferenceClient(
+    provider="auto",
+    api_key=HF_TOKEN,
+)
 class LLMHumanoidController:
     def __init__(self, model_path):
         self.model = mujoco.MjModel.from_xml_path(model_path)
@@ -125,8 +147,8 @@ class LLMHumanoidController:
 
         
 
-        POSITION_THRESHOLD = 0.03
-        VELOCITY_THRESHOLD = 0.1
+        POSITION_THRESHOLD = 0.01
+        VELOCITY_THRESHOLD = 0.05
         MAX_CARTESIAN_FORCE = 100.0
         INTEGRAL_LIMIT = 0.15
 
@@ -280,31 +302,6 @@ class LLMHumanoidController:
                     )
 
                 continue
-
-
-            if (
-                not target_reached
-                and self.step_count % 30 == 0
-            ):
-                reasons = []
-
-                if distance > POSITION_THRESHOLD:
-                    reasons.append(
-                        f"position error {distance:.4f} m "
-                        f"> {POSITION_THRESHOLD:.4f} m"
-                    )
-
-                if speed > VELOCITY_THRESHOLD:
-                    reasons.append(
-                        f"speed {speed:.4f} m/s "
-                        f"> {VELOCITY_THRESHOLD:.4f} m/s"
-                    )
-
-                print(
-                    f"{body_name} not reached: "
-                    + "; ".join(reasons),
-                    flush=True,
-                )
 
             # ---------------------------------
             # 5. Cartesian PD in torso frame
@@ -507,11 +504,7 @@ class LLMHumanoidController:
         self.step_count += 1
 
         if active_target_count == 0:
-            print(
-                "ERROR: No active controller targets.",
-                flush=True,
-            )
-            return False
+            return True
 
         return reached_count == active_target_count
 # ---------------------------------------------------------------------
@@ -533,79 +526,170 @@ ACTION_TO_OBSERVATION_KEY = {
 }
 
 # Maximum change for each Cartesian coordinate between two actions.
-MAX_ACTION_DELTA = 0.20
+MAX_ACTION_DELTA = 0.10
 
 # Broad physical workspaces.
 # These are safety limits, not desired poses.
 ACTION_LIMITS = {
     "left_arm": {
-        "min": np.array([-0.40, -0.40, -0.45]),
-        "max": np.array([ 0.40,  0.40,  0.45]),
+        "min": np.array(
+            [-0.60, -0.65, -0.60],
+            dtype=np.float64,
+        ),
+        "max": np.array(
+            [0.60, 0.65, 0.60],
+            dtype=np.float64,
+        ),
     },
     "right_arm": {
-        "min": np.array([-0.40, -0.40, -0.45]),
-        "max": np.array([ 0.40,  0.40,  0.45]),
+        "min": np.array(
+            [-0.60, -0.65, -0.60],
+            dtype=np.float64,
+        ),
+        "max": np.array(
+            [0.60, 0.65, 0.60],
+            dtype=np.float64,
+        ),
     },
     "left_leg": {
-        "min": np.array([-0.25, -0.20, -1.18]),
-        "max": np.array([ 0.25,  0.20, -0.75]),
+        "min": np.array(
+            [-0.30, -0.30, -1.20],
+            dtype=np.float64,
+        ),
+        "max": np.array(
+            [0.30, 0.30, 0.10],
+            dtype=np.float64,
+        ),
     },
     "right_leg": {
-        "min": np.array([-0.25, -0.20, -1.18]),
-        "max": np.array([ 0.25,  0.20, -0.75]),
+        "min": np.array(
+            [-0.30, -0.30, -1.20],
+            dtype=np.float64,
+        ),
+        "max": np.array(
+            [0.30, 0.30, 0.10],
+            dtype=np.float64,
+        ),
     },
 }
 
 
+def extract_json_object(text):
+    """
+    Extract and decode a JSON object from a model response.
+    """
+
+    if isinstance(text, dict):
+        return text
+
+    if not isinstance(text, str):
+        print(
+            f"Unexpected response type: {type(text).__name__}",
+            flush=True,
+        )
+        return None
+
+    text = text.strip()
+
+    # The model already returns clean JSON in your logs,
+    # so this will normally succeed immediately.
+    try:
+        return json.loads(text)
+
+    except json.JSONDecodeError:
+        pass
+
+    # Fallback for responses containing Markdown or explanations.
+    first_brace = text.find("{")
+    last_brace = text.rfind("}")
+
+    if (
+        first_brace == -1
+        or last_brace == -1
+        or last_brace <= first_brace
+    ):
+        print(
+            "No JSON object found in model response.",
+            flush=True,
+        )
+        return None
+
+    json_candidate = text[
+        first_brace:last_brace + 1
+    ]
+
+    try:
+        return json.loads(json_candidate)
+
+    except json.JSONDecodeError as exc:
+        print(
+            f"Could not decode model JSON: {exc}",
+            flush=True,
+        )
+        return None
+
 def get_llm_action(prompt):
     """
-    Request one Cartesian swimming action from Ollama.
+    Request one Cartesian action from a hosted Hugging Face model.
 
-    Returns:
-        dict | None
+    Returns
+    -------
+    dict | None
+        Valid decoded JSON, or None on failure.
     """
-    payload = {
-        "model": MODEL_NAME,
-        "prompt": prompt,
-        "stream": False,
-        "format": "json",
-        "keep_alive": "30m",
-        "options": {
-            "temperature": 0.2,
-            "num_predict": 250,
-        },
-    }
 
     request_start = time.perf_counter()
 
     print(
-        f"Sending request to local Ollama model "
+        f"Sending request to Hugging Face model "
         f"{MODEL_NAME}...",
         flush=True,
     )
 
     try:
-        response = requests.post(
-            OLLAMA_URL,
-            json=payload,
-            timeout=300,
+        response = hf_client.chat_completion(
+            model=MODEL_NAME,
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "You control a MuJoCo humanoid swimmer. "
+                        "Return only the requested JSON object. "
+                        "Do not include Markdown or explanations."
+                    ),
+                },
+                {
+                    "role": "user",
+                    "content": prompt,
+                },
+            ],
+            temperature=0.2,
+            max_tokens=150,
         )
 
-        response.raise_for_status()
-
-        elapsed = time.perf_counter() - request_start
+        elapsed = (
+            time.perf_counter()
+            - request_start
+        )
 
         print(
-            f"Ollama replied after {elapsed:.1f} seconds.",
+            f"Hugging Face replied after "
+            f"{elapsed:.1f} seconds.",
             flush=True,
         )
 
-        response_data = response.json()
-
-        raw_response = response_data.get(
-            "response",
-            "",
+        raw_response = (
+            response.choices[0]
+            .message
+            .content
         )
+
+        if not raw_response:
+            print(
+                "Hugging Face returned an empty response.",
+                flush=True,
+            )
+            return None
 
         print(
             "Raw model response:",
@@ -613,40 +697,25 @@ def get_llm_action(prompt):
             flush=True,
         )
 
-        if isinstance(raw_response, dict):
-            return raw_response
+        return extract_json_object(
+            raw_response
+        )
 
-        return json.loads(raw_response)
-
-    except requests.Timeout:
-        elapsed = time.perf_counter() - request_start
+    except Exception as exc:
+        elapsed = (
+            time.perf_counter()
+            - request_start
+        )
 
         print(
-            f"Ollama timed out after "
-            f"{elapsed:.1f} seconds.",
+            f"Hugging Face request failed after "
+            f"{elapsed:.1f} seconds: "
+            f"{type(exc).__name__}: {exc}",
             flush=True,
         )
 
         return None
 
-    except requests.RequestException as exc:
-        print(
-            f"Ollama request error: {exc}",
-            flush=True,
-        )
-        return None
-
-    except (
-        json.JSONDecodeError,
-        TypeError,
-        ValueError,
-        KeyError,
-    ) as exc:
-        print(
-            f"Ollama response error: {exc}",
-            flush=True,
-        )
-        return None
 
 def validate_action(action):
     """
@@ -688,29 +757,77 @@ def validate_action(action):
     return True
 
 
-def sanitize_action(requested_action):
+def sanitize_action(
+    requested_action,
+    current_positions,
+):
     """
-    Convert targets to floats and clip only to the limb workspaces.
+    Apply only general safety constraints.
+
+    This function:
+    - converts targets to floats
+    - limits movement to MAX_ACTION_DELTA per coordinate
+    - clips targets to broad limb workspaces
+
+    It does not impose a preferred leg posture.
     """
     sanitized_action = {}
 
     for action_name in REQUIRED_ACTION_KEYS:
+        observation_name = (
+            ACTION_TO_OBSERVATION_KEY[
+                action_name
+            ]
+        )
+
         requested_target = np.asarray(
             requested_action[action_name],
             dtype=np.float64,
         )
 
-        limits = ACTION_LIMITS[action_name]
-
-        safe_target = np.clip(
-            requested_target,
-            limits["min"],
-            limits["max"],
+        current_position = np.asarray(
+            current_positions[
+                observation_name
+            ],
+            dtype=np.float64,
         )
 
-        sanitized_action[action_name] = safe_target.tolist()
+        requested_delta = (
+            requested_target
+            - current_position
+        )
+
+        safe_delta = np.clip(
+            requested_delta,
+            -MAX_ACTION_DELTA,
+            MAX_ACTION_DELTA,
+        )
+
+        safe_target = (
+            current_position
+            + safe_delta
+        )
+
+        lower_limit = ACTION_LIMITS[
+            action_name
+        ]["min"]
+
+        upper_limit = ACTION_LIMITS[
+            action_name
+        ]["max"]
+
+        safe_target = np.clip(
+            safe_target,
+            lower_limit,
+            upper_limit,
+        )
+
+        sanitized_action[action_name] = (
+            safe_target.tolist()
+        )
 
     return sanitized_action
+
 
 def format_for_print(value):
     """
@@ -749,182 +866,121 @@ def build_llm_prompt(
     """
     Construct the swimming prompt from the latest state.
     """
-    obs = observation["full_state"]
+    full_state = observation["full_state"]
 
-    recent_actions = action_history[-3:]
-
-    head_height_relative = (
-        observation["head_height"]
-        - WATER_SURFACE_HEIGHT
-    )
-
-    body_height_relative = (
-        observation["body_height"]
-        - WATER_SURFACE_HEIGHT
-    )
+    recent_actions = action_history[-4:]
 
     return f"""
-You control a humanoid robot performing continuous backstroke in MuJoCo.
+You control a humanoid robot learning to swim backstroke in MuJoCo.
 
-All limb coordinates are expressed in the torso's local coordinate frame.
+All limb coordinates are expressed in the LOCAL TORSO FRAME.
 
 CURRENT STATE
 
 Head height relative to the water surface:
-{head_height_relative}
-
-* Positive: head is above the water surface.
-* Negative: head is below the water surface.
+{observation["head_height"] - WATER_SURFACE_HEIGHT:.3f}
 
 Torso height relative to the water surface:
-{body_height_relative}
+{observation["body_height"] - WATER_SURFACE_HEIGHT:.3f}
 
-* Positive: torso is above the water surface.
-* Negative: torso is below the water surface.
-
-Current limb positions relative to the torso:
+Current torso-relative limb positions:
 
 left_arm:
-{obs['left_arm_pos']}
+{full_state["left_arm_pos"]}
 
 right_arm:
-{obs['right_arm_pos']}
+{full_state["right_arm_pos"]}
 
 left_leg:
-{obs['left_leg_pos']}
+{full_state["left_leg_pos"]}
 
 right_leg:
-{obs['right_leg_pos']}
-
-Most recent target action:
-
-{json.dumps(action_history[-1] if action_history else None)}
+{full_state["right_leg_pos"]}
 
 COORDINATE SYSTEM
 
-For every limb, coordinates use the format [x, y, z].
+x:
+- positive moves toward the sky
+- negative moves toward the floor
 
-x-axis:
+y:
+- positive moves toward the humanoid's left
+- negative moves toward the humanoid's right
 
-* Positive x moves toward the sky.
-* Negative x moves toward the pool floor.
+z:
+- positive moves toward the head
+- negative moves toward the feet and away from the torso
 
-y-axis:
+SWIMMING GOAL
 
-* Positive y moves toward the humanoid's left side.
-* Negative y moves toward the humanoid's right side.
-
-z-axis:
-
-* Positive z moves toward the head.
-* Negative z moves toward the feet.
-
-Example arm position:
-
-[0.0, 0.01, -0.63]
-
-This means the arm is approximately parallel to the torso and points toward the feet.
-
-Example leg position:
-
-[-0.20, -0.01, -1.00]
-
-This means the leg is extended away from the torso and points slightly toward the pool floor.
-
-OBJECTIVE
-
-Generate the next Cartesian waypoint in a continuous backstroke cycle.
-
-Do not select a stationary pose.
-
-Assume the previous target has already been attempted. Produce a new target that advances the swimmer to the next part of the stroke.
-
-Do not return the current positions unchanged.
-
-Do not repeat the most recent target.
-
-BACKSTROKE MOTION
+Perform a continuous backstroke motion.
 
 Arms:
-
-* The arms must remain in different phases of the stroke.
-* One arm performs recovery while the other performs the underwater pull.
-* During recovery, move the hand from beside the hip, upward toward the sky, and then toward the head.
-* During the pull, move the hand from above the head toward the pool floor and then toward the hip.
-* Gradually exchange the roles of the two arms.
-* Do not move both arms through the same phase simultaneously.
+- Alternate the arms.
+- One arm should recover toward and above the head.
+- The other arm should pull through the water toward the hip.
+- Advance the stroke gradually.
+- Avoid moving both arms through exactly the same phase.
 
 Legs:
+- Produce a smooth alternating kicking motion.
+- Move one foot toward the sky while the other moves toward the floor.
+- Reverse their directions gradually.
+- Choose the leg extension based on the current pose and swimming motion.
+- Avoid sudden, extreme or physically impossible changes.
 
-* Keep both legs mostly extended.
-* Perform a small alternating flutter kick.
-* Move one foot slightly toward the sky while the other moves slightly toward the pool floor.
-* Reverse their directions gradually.
-* Leg movements should be smaller than arm movements.
+GENERAL MOVEMENT RULES
 
-INCREMENTAL MOVEMENT
+- Return targets for all four limbs.
+- Each target must contain exactly three numbers.
+- Change each coordinate by at most {MAX_ACTION_DELTA:.2f} metres.
+- Make smooth and incremental movements.
+- Continue from the current pose.
+- Do not jump directly to a distant stroke pose.
+- Avoid repeatedly returning exactly the same action.
+- Avoid large sideways movements unless needed for the stroke.
+- Remain within the specified workspaces.
 
-Each target must be close to the corresponding current limb position.
+WORKSPACE LIMITS
 
-For each limb:
+left_arm:
+- x: -0.60 to 0.60
+- y: -0.65 to 0.65
+- z: -0.60 to 0.60
 
-distance(new_target, current_position) must not exceed 0.10 metres.
+right_arm:
+- x: -0.60 to 0.60
+- y: -0.65 to 0.65
+- z: -0.60 to 0.60
 
-This is the total three-dimensional Euclidean distance, not a separate 0.10-metre allowance for each coordinate.
+left_leg:
+- x: -0.30 to 0.30
+- y: -0.30 to 0.30
+- z: -1.20 to 0.10
 
-Prefer movements between 0.03 and 0.08 metres.
+right_leg:
+- x: -0.30 to 0.30
+- y: -0.30 to 0.30
+- z: -1.20 to 0.10
 
-Do not move a limb directly from one extreme of its workspace to the opposite extreme.
+RECENT ACTIONS
 
-PHYSICAL LIMITS
+{json.dumps(recent_actions)}
 
-left_arm and right_arm:
+OUTPUT FORMAT
 
-* x must be between -0.60 and 0.60.
-* y must be between -0.45 and 0.45.
-* z must be between -0.60 and 0.60.
-* Keep the target within approximately 0.60 metres of the corresponding shoulder.
-* Avoid extreme workspace corners.
+Return only one valid JSON object.
 
-left_leg and right_leg:
-
-* x must be between -0.30 and 0.30.
-* y must be between -0.30 and 0.30.
-* z must be between -1.00 and -0.65.
-* Keep the target within approximately 1.00 metre of the corresponding hip.
-* Avoid extreme workspace corners.
-
-STABILITY
-
-* Keep the head near or above the water surface.
-* Avoid large simultaneous downward movements of all four limbs.
-* Avoid perfectly symmetric arm motion.
-* Maintain smooth continuous movement.
-* Every output must advance the swimming cycle.
-
-OUTPUT
-
-Return exactly one valid JSON object.
-
-Return all four required keys.
-
-Include at most 3 decimal numbers
-
-Each value must be an array containing exactly three finite numbers.
-
-Use no more than three decimal places.
-
-Do not return Markdown, comments, explanations, units, or additional keys.
+Do not include explanations, Markdown or nested objects.
 
 Use exactly this structure:
 
 {{
-"left_arm": [x, y, z],
-"right_arm": [x, y, z],
-"left_leg": [x, y, z],
-"right_leg": [x, y, z]
+  "left_arm": [x, y, z],
+  "right_arm": [x, y, z],
+  "left_leg": [x, y, z],
+  "right_leg": [x, y, z]
 }}
-
 """.strip()
 
 
@@ -968,13 +1024,13 @@ def llm_worker(
         )
 
         if raw_action is None:
-            print(
-                "No valid Ollama action received. "
-                "Retrying in 5 seconds.",
-                flush=True,
-            )
-            time.sleep(5.0)
+            time.sleep(0.5)
             continue
+
+        print(
+            "Raw LLM action:",
+            format_for_print(raw_action),
+        )
 
         if not validate_action(raw_action):
             print(
@@ -985,14 +1041,9 @@ def llm_worker(
 
         safe_action = sanitize_action(
             raw_action,
+            observation["full_state"],
         )
 
-
-        print(
-            "Raw LLM action:",
-            format_for_print(raw_action),
-            flush=True,
-        )
         print(
             "Sanitized action:",
             format_for_print(safe_action),
@@ -1083,7 +1134,7 @@ MAX_ACTIONS = 25
 
 # Fixed-duration poses are generally more suitable for
 # continuous swimming than waiting for exact convergence.
-STEPS_PER_ACTION = 500
+STEPS_PER_ACTION = 150
 
 VIEWER_SYNC_INTERVAL = 10
 RECORD_INTERVAL = 5
@@ -1131,6 +1182,9 @@ try:
 
             action = sanitize_action(
                 queued_action,
+                current_observation[
+                    "full_state"
+                ],
             )
 
             executed_actions += 1
@@ -1150,49 +1204,30 @@ try:
                 format_for_print(action)
             )
 
-
-            print()
-            print("=" * 70)
-            print(
-                f"Executing LLM action "
-                f"{executed_actions}/{MAX_ACTIONS}"
-            )
-            print(
-                format_for_print(action)
-            )
-
             with controller_lock:
-                controller.set_targets(action)
-
-                print(
-                    "Controller targets:",
-                    {
-                        body_name: target.tolist()
-                        for body_name, target
-                        in controller.current_targets.items()
-                    },
-                    flush=True,
+                controller.set_targets(
+                    action
                 )
 
             target_reached_at_least_once = False
 
-            for action_step in range(STEPS_PER_ACTION):
+            for _ in range(
+                STEPS_PER_ACTION
+            ):
                 if not viewer.is_running():
                     break
 
                 with controller_lock:
-                    targets_reached = controller.physics_step()
-                    current_step = controller.step_count
+                    targets_reached = (
+                        controller.physics_step()
+                    )
+
+                    current_step = (
+                        controller.step_count
+                    )
 
                 if targets_reached:
                     target_reached_at_least_once = True
-
-                    print(
-                        f"All targets reached after "
-                        f"{action_step + 1} steps.",
-                        flush=True,
-                    )
-                    break
 
                 # Record only when a recorder exists.
                 if (
