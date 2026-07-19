@@ -1,8 +1,3 @@
-import os
-
-# Required for rendering on many headless HPC nodes.
-# Change "egl" to "osmesa" if EGL is unavailable on your cluster.
-os.environ.setdefault("MUJOCO_GL", "egl")
 
 import shutil
 from pathlib import Path
@@ -12,22 +7,24 @@ from stable_baselines3 import PPO
 from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
 
 # Import the environment definition from the training script.
-# The training script must use:
+#
+# The training script must end with:
 #
 # if __name__ == "__main__":
 #     main()
 #
-# so importing it does not start training.
+# This prevents training from starting when this file imports make_env.
 from worm_training_updated import make_env
 
 
 # Directory containing this evaluation script and the experiment folders.
 SCRIPT_DIRECTORY = Path(__file__).resolve().parent
 
-MODEL_FILENAME = "ppo_human_swimmer.zip"
+# These filenames must match the files created by the training script.
+MODEL_FILENAME = "ppo_swimmer.zip"
 NORMALIZATION_FILENAME = "vec_normalize.pkl"
 
-MAX_EVALUATION_STEPS = 1000
+MAX_EVALUATION_STEPS = 5000
 DETERMINISTIC = True
 
 BASE_ENV_PARAMS = {
@@ -45,11 +42,13 @@ BASE_ENV_PARAMS = {
 
 def get_environment_parameters(experiment_directory: Path) -> dict:
     """
-    Reconstruct the reward parameters used for an experiment based on its
-    directory name.
+    Reconstruct the environment parameters used for an experiment from the
+    experiment folder name.
 
-    Examples:
+    Supported folder names include:
+
         worm_baseline
+        worm_without_survival_reward
         worm_without_forward_reward
         worm_without_head_punishment
     """
@@ -63,29 +62,33 @@ def get_environment_parameters(experiment_directory: Path) -> dict:
 
     if not folder_name.startswith(prefix):
         raise ValueError(
-            f"Unrecognized experiment folder name: {folder_name}"
+            f"Unrecognized experiment folder name: '{folder_name}'."
         )
 
-    removed_reward = folder_name[len(prefix):]
+    removed_parameter = folder_name[len(prefix):]
 
-    if removed_reward not in env_params:
+    if removed_parameter not in env_params:
         raise ValueError(
-            f"Folder '{folder_name}' refers to unknown reward parameter "
-            f"'{removed_reward}'."
+            f"Folder '{folder_name}' refers to the unknown environment "
+            f"parameter '{removed_parameter}'."
         )
 
-    env_params[removed_reward] = 0
+    env_params[removed_parameter] = 0
     return env_params
 
 
 def find_experiment_directories() -> list[Path]:
-    """Find baseline and reward-ablation experiment directories."""
-    directories = []
+    """
+    Find all experiment folders stored beside this evaluation script.
+
+    ZIP files are ignored. Only normal directories are used.
+    """
+    experiment_directories: list[Path] = []
 
     baseline_directory = SCRIPT_DIRECTORY / "worm_baseline"
 
     if baseline_directory.is_dir():
-        directories.append(baseline_directory)
+        experiment_directories.append(baseline_directory)
 
     ablation_directories = sorted(
         directory
@@ -93,86 +96,116 @@ def find_experiment_directories() -> list[Path]:
         if directory.is_dir()
     )
 
-    directories.extend(ablation_directories)
-    return directories
+    experiment_directories.extend(ablation_directories)
+    return experiment_directories
+
+
+def validate_experiment_files(
+    experiment_directory: Path,
+) -> tuple[Path, Path]:
+    """
+    Check that the trained model and normalization file exist.
+
+    Returns:
+        A tuple containing the model path and normalization path.
+
+    Raises:
+        FileNotFoundError: If one or both required files are missing.
+    """
+    model_path = experiment_directory / MODEL_FILENAME
+    normalization_path = (
+        experiment_directory / NORMALIZATION_FILENAME
+    )
+
+    missing_files = []
+
+    if not model_path.is_file():
+        missing_files.append(MODEL_FILENAME)
+
+    if not normalization_path.is_file():
+        missing_files.append(NORMALIZATION_FILENAME)
+
+    if missing_files:
+        missing_text = ", ".join(missing_files)
+
+        raise FileNotFoundError(
+            f"Missing required file(s) in "
+            f"'{experiment_directory.name}': {missing_text}"
+        )
+
+    return model_path, normalization_path
 
 
 def record_experiment(experiment_directory: Path) -> bool:
-    """Load one trained experiment and record a deterministic episode."""
-    model_path = experiment_directory / MODEL_FILENAME
-    normalization_path = experiment_directory / NORMALIZATION_FILENAME
+    """
+    Load one trained experiment from its folder and record one deterministic
+    evaluation episode.
 
-    if not model_path.exists():
-        print(
-            f"Skipping {experiment_directory.name}: "
-            f"{MODEL_FILENAME} was not found."
-        )
-        return False
+    The resulting MP4 file is saved inside:
 
-    if not normalization_path.exists():
-        print(
-            f"Skipping {experiment_directory.name}: "
-            f"{NORMALIZATION_FILENAME} was not found."
-        )
-        return False
+        <experiment folder>/videos/
+    """
+    model_path, normalization_path = validate_experiment_files(
+        experiment_directory
+    )
 
-    try:
-        env_params = get_environment_parameters(experiment_directory)
-    except ValueError as error:
-        print(f"Skipping {experiment_directory.name}: {error}")
-        return False
+    env_params = get_environment_parameters(experiment_directory)
 
     video_directory = experiment_directory / "videos"
 
-    # Remove old videos so every run produces one clean result.
+    # Remove previous recordings so each run leaves only the newest video.
     if video_directory.exists():
         shutil.rmtree(video_directory)
 
     video_directory.mkdir(parents=True, exist_ok=True)
 
     print()
-    print(f"Recording: {experiment_directory.name}")
-    print(f"Model: {model_path}")
-    print(f"Video directory: {video_directory}")
+    print(f"Recording experiment: {experiment_directory.name}")
+    print(f"Model file: {model_path}")
+    print(f"Normalization file: {normalization_path}")
+    print(f"Video output: {video_directory}")
 
-    # Create the unnormalized environment with image rendering enabled.
+    # Create the original unnormalized environment with RGB rendering.
     raw_env = make_env(
         render_mode="rgb_array",
         **env_params,
     )
 
-    # Record the first evaluation episode.
+    # Record the first episode started by this environment.
     recorded_env = RecordVideo(
-        raw_env,
+        env=raw_env,
         video_folder=str(video_directory),
         episode_trigger=lambda episode_number: episode_number == 0,
         name_prefix=experiment_directory.name,
         disable_logger=True,
     )
 
-    # Stable-Baselines3 models expect a vectorized environment.
-    vector_env = DummyVecEnv([lambda: recorded_env])
+    # Stable-Baselines3 expects a vectorized environment.
+    vector_env = DummyVecEnv(
+        [lambda: recorded_env]
+    )
 
-    # Restore the observation-normalization statistics learned during training.
+    # Restore the observation normalization statistics from training.
     normalized_env = VecNormalize.load(
         str(normalization_path),
         vector_env,
     )
 
-    # Do not update normalization statistics during evaluation.
+    # Evaluation must not modify the saved normalization statistics.
     normalized_env.training = False
     normalized_env.norm_reward = False
 
-    # Load the model and attach the correctly normalized environment.
+    # Load the trained PPO model.
     model = PPO.load(
         str(model_path),
         env=normalized_env,
     )
 
+    completed_steps = 0
+    episode_finished = False
+
     try:
         observation = normalized_env.reset()
-        completed_steps = 0
-        episode_finished = False
 
         for step in range(MAX_EVALUATION_STEPS):
             action, _ = model.predict(
@@ -180,7 +213,7 @@ def record_experiment(experiment_directory: Path) -> bool:
                 deterministic=DETERMINISTIC,
             )
 
-            observation, reward, done, info = normalized_env.step(action)
+            observation, _, done, _ = normalized_env.step(action)
 
             completed_steps = step + 1
 
@@ -188,41 +221,45 @@ def record_experiment(experiment_directory: Path) -> bool:
                 episode_finished = True
                 break
 
-        print(f"Recorded steps: {completed_steps}")
-
-        if episode_finished:
-            print("Episode ended because the environment terminated.")
-        else:
-            print(
-                f"Episode reached the {MAX_EVALUATION_STEPS}-step "
-                "recording limit."
-            )
-
     finally:
-        # Closing is necessary to finalize and write the MP4 file.
+        # Closing the environment finalizes the MP4 file.
         normalized_env.close()
+
+    print(f"Recorded steps: {completed_steps}")
+
+    if episode_finished:
+        print("The episode ended because the environment terminated.")
+    else:
+        print(
+            f"The episode reached the "
+            f"{MAX_EVALUATION_STEPS}-step recording limit."
+        )
 
     video_files = sorted(video_directory.glob("*.mp4"))
 
-    if video_files:
-        for video_file in video_files:
-            print(f"Saved video: {video_file}")
-        return True
+    if not video_files:
+        print(
+            f"Warning: no MP4 file was created in "
+            f"'{video_directory}'."
+        )
+        return False
 
-    print(
-        f"Warning: no MP4 file was found in {video_directory}."
-    )
-    return False
+    for video_file in video_files:
+        print(f"Saved video: {video_file}")
+
+    return True
 
 
-def main():
+def main() -> None:
     experiment_directories = find_experiment_directories()
 
     if not experiment_directories:
         raise FileNotFoundError(
-            "No experiment folders were found. Expected folders such as "
-            "'worm_baseline' or 'worm_without_forward_reward' in:\n"
-            f"{SCRIPT_DIRECTORY}"
+            "No experiment folders were found beside this script.\n"
+            "Expected folders such as:\n"
+            "  worm_baseline\n"
+            "  worm_without_forward_reward\n"
+            f"\nSearch directory:\n{SCRIPT_DIRECTORY}"
         )
 
     print(
@@ -233,23 +270,26 @@ def main():
 
     for experiment_directory in experiment_directories:
         try:
-            recorded = record_experiment(experiment_directory)
+            recording_succeeded = record_experiment(
+                experiment_directory
+            )
 
-            if recorded:
+            if recording_succeeded:
                 successful_recordings += 1
 
         except Exception as error:
-            # Continue with the remaining experiments when one recording fails.
+            # Continue recording the remaining experiments if one fails.
             print()
             print(
-                f"Failed to record {experiment_directory.name}: "
+                f"Failed to record '{experiment_directory.name}': "
                 f"{type(error).__name__}: {error}"
             )
 
     print()
     print(
         f"Finished: {successful_recordings} of "
-        f"{len(experiment_directories)} experiment(s) recorded successfully."
+        f"{len(experiment_directories)} experiment(s) "
+        "recorded successfully."
     )
 
 

@@ -21,11 +21,16 @@ class HumanSwimmingEnv(MujocoEnv):
                  head_punishment=5, vel_punishment=1, smothness_reward=0.01,
                  cont_head_reward=5, cont_body_reward=5, cont_body_punishment=1.0):
         
-        self._model_path = str(Path(
-            "/share/users/student/m/mbraatz/Swimming_agent/"
-            "reinforcement_learning/worm/breathing_worm/"
-            "worm_water_surface.xml"
-        ))
+        script_directory = Path(__file__).resolve().parent
+        model_path = script_directory / "worm_water_surface.xml"
+
+        if not model_path.is_file():
+            raise FileNotFoundError(
+                "The MuJoCo XML model could not be found:\n"
+                f"{model_path}"
+            )
+
+        self._model_path = str(model_path)
         super().__init__(
             self._model_path, 
             frame_skip=5, 
