@@ -10,7 +10,7 @@ import math
 from scipy.spatial.transform import Rotation as R  # <--- Add this import
 
 
-MODEL_PATH = 'underwater_swimming_simple_human/humanoid_laying.xml'
+MODEL_PATH = 'humanoid_laying.xml'
 WATER_SURFACE_HEIGHT = 3.0
 OLLAMA_URL = "http://localhost:11434/api/generate"
 MODEL_NAME = "llama3"
@@ -28,7 +28,6 @@ class LLMHumanoidController:
             'foot_left': 'torso',
             'foot_right': 'torso',
         }
-        self.integral_error = {limb: np.zeros(3) for limb in self.limb_bases.keys()}
         self.prev_error = {}
 
     def get_euler_angles(self):
@@ -72,8 +71,6 @@ class LLMHumanoidController:
             and action_json[action_name] is not None
         }
 
-        for body_name in self.current_targets:
-            self.integral_error[body_name] = np.zeros(3)
 
         self.prev_error = {
             body_name: float("inf")
@@ -236,20 +233,11 @@ class LLMHumanoidController:
                         round(speed, 5),
                     )
 
-                continue
 
             # ---------------------------------
             # 5. Cartesian PD in torso frame
             # ---------------------------------
-            dt = self.model.opt.timestep
-
-            if distance < 0.005:
-                self.integral_error[body_name] *= 0.9
-
-            # Accumulate Cartesian error.
-            self.integral_error[body_name] += (
-                error_local * dt
-            )
+            #dt = self.model.opt.timestep
 
             p_force = KP * error_local
 
@@ -367,14 +355,6 @@ class LLMHumanoidController:
                     "D-force norm:",
                     round(
                         np.linalg.norm(d_force),
-                        5,
-                    ),
-                )
-
-                print(
-                    "I-force norm:",
-                    round(
-                        np.linalg.norm(i_force),
                         5,
                     ),
                 )
@@ -781,8 +761,6 @@ if SWIMMING_SIMULATION:
         x = ARM_X_CENTER + ARM_X_RADIUS * s
         z = ARM_Z_CENTER + ARM_Z_RADIUS * c
 
-        x = (1.0 - blend) * x + blend * x
-        z = (1.0 - blend) * z + blend * z
 
         y_distance = (
             (1.0 - blend) * ARM_PULL_Y
