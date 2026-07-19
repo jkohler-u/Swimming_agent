@@ -132,7 +132,7 @@ def main():
     lr = 0.001
     batch_size = 64
     env_params = {
-       "leniency": 150,
+        "leniency": 150,
         "survival_reward": 0.1,
         "smothness_reward": 0.2,
 
@@ -146,68 +146,75 @@ def main():
         "cont_body_punishment": 1,
 
                 }
-
-
-    output_dir = f"worm_human_v18.1"
-    os.makedirs(output_dir, exist_ok=True)
-    shutil.copy(sys.argv[0], os.path.join(output_dir, "train_script.py"))
-
-    train_env = make_vec_env(lambda: make_human_env(**env_params), n_envs=8)
-    train_env = VecNormalize(train_env, norm_obs=True, norm_reward=True)
-    train_env.save(os.path.join(output_dir, "vec_normalize.pkl"))
-
-    model = PPO("MlpPolicy", train_env, verbose=1, learning_rate=lr, n_steps=4048, batch_size=batch_size)
-    model.learn(total_timesteps=2000_000)
-    model.save(os.path.join(output_dir, "ppo_human_swimmer"))
-    train_env.close()
-
-    print("Running Evaluation and Recording Video...")
-    # 1. Create the environment with rgb_array mode for recording
-    eval_env = make_human_env(render_mode="rgb_array", **env_params)
+    # test the impart of different reward types             
+    tbc = ["survival_reward", "smothness_reward", "forward_reward","vel_punishment",
+            "cont_head_reward", "head_punishment", "cont_body_punishment","cont_body_reward"]
     
-    # 2. Wrap with RecordVideo
-    video_folder = os.path.join(output_dir, "videos")
-    eval_env = RecordVideo(
-        eval_env, 
-        video_folder=video_folder, 
-        episode_trigger=lambda x: x == 0 # Record the first episode
-    )
-    
-    # 3. Wrap in DummyVecEnv and Normalize to match training
-    test_env = DummyVecEnv([lambda: eval_env])
-    norm_env = VecNormalize.load(os.path.join(output_dir, "vec_normalize.pkl"), test_env)
-    norm_env.training = False
-    norm_env.norm_reward = False
+    for entry in tbc:
+        env_params[entry] = 0
 
-    obs = norm_env.reset()
-    results = []
-    
-    for i in range(1000):
-        action, _ = model.predict(obs, deterministic=True)
-        obs, reward, done, info = norm_env.step(action)
+        # make output directory 
+        output_dir = f"worm_{entry}"
+
+        os.makedirs(output_dir, exist_ok=True)
+        shutil.copy(sys.argv[0], os.path.join(output_dir, "train_script.py"))
+
+        train_env = make_vec_env(lambda: make_human_env(**env_params), n_envs=8)
+        train_env = VecNormalize(train_env, norm_obs=True, norm_reward=True)
+        train_env.save(os.path.join(output_dir, "vec_normalize.pkl"))
+
+        model = PPO("MlpPolicy", train_env, verbose=1, learning_rate=lr, n_steps=4048, batch_size=batch_size)
+        model.learn(total_timesteps=2000_000)
+        model.save(os.path.join(output_dir, "ppo_human_swimmer"))
+        train_env.close()
+
+        print("Running Evaluation and Recording Video...")
+        # 1. Create the environment with rgb_array mode for recording
+        eval_env = make_human_env(render_mode="rgb_array", **env_params)
         
-        head_h = info[0]['head_height']
-        f_vel = info[0]['forward_vel']
-        alive = not done[0]
-        head_above = head_h > WATER_SURFACE_HEIGHT
+        # 2. Wrap with RecordVideo
+        video_folder = os.path.join(output_dir, "videos")
+        eval_env = RecordVideo(
+            eval_env, 
+            video_folder=video_folder, 
+            episode_trigger=lambda x: x == 0 # Record the first episode
+        )
         
-        results.append([i, alive, head_above, f_vel])
-        if done[0]: break
+        # 3. Wrap in DummyVecEnv and Normalize to match training
+        test_env = DummyVecEnv([lambda: eval_env])
+        norm_env = VecNormalize.load(os.path.join(output_dir, "vec_normalize.pkl"), test_env)
+        norm_env.training = False
+        norm_env.norm_reward = False
 
-    # Close the environment to ensure the video file is finalized
-    norm_env.close()
+        obs = norm_env.reset()
+        results = []
+        
+        for i in range(1000):
+            action, _ = model.predict(obs, deterministic=True)
+            obs, reward, done, info = norm_env.step(action)
+            
+            head_h = info[0]['head_height']
+            f_vel = info[0]['forward_vel']
+            alive = not done[0]
+            head_above = head_h > WATER_SURFACE_HEIGHT
+            
+            results.append([i, alive, head_above, f_vel])
+            if done[0]: break
 
-    csv_path = os.path.join(output_dir, "test_results.csv")
-    with open(csv_path, mode='w', newline='') as f:
-        writer = csv.writer(f)
-        writer.writerow(["step", "alive", "head_above_water", "forward_velocity"])
-        writer.writerows(results)
+        # Close the environment to ensure the video file is finalized
+        norm_env.close()
 
-    parent_dir = os.path.dirname(os.path.abspath(output_dir))
-    folder_name = os.path.basename(os.path.abspath(output_dir))
-    shutil.make_archive(os.path.join(parent_dir, folder_name), 'zip', parent_dir, folder_name)
-    
-    print(f"All files (including videos) saved to {output_dir} and zipped.")
+        csv_path = os.path.join(output_dir, "test_results.csv")
+        with open(csv_path, mode='w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(["step", "alive", "head_above_water", "forward_velocity"])
+            writer.writerows(results)
+
+        parent_dir = os.path.dirname(os.path.abspath(output_dir))
+        folder_name = os.path.basename(os.path.abspath(output_dir))
+        shutil.make_archive(os.path.join(parent_dir, folder_name), 'zip', parent_dir, folder_name)
+        
+        print(f"All files (including videos) saved to {output_dir} and zipped.")
 
 if __name__ == "__main__":
     main()
