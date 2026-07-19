@@ -5,7 +5,7 @@ from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
 # Load env and normalizer
 env = DummyVecEnv([lambda: gym.make("Humanoid-v4", render_mode="human")])
 env = VecNormalize.load("vec_normalize.pkl", env)
-# Do not update them at test time
+
 env.training = False
 env.norm_reward = False
 
