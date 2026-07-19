@@ -6,13 +6,12 @@ from stable_baselines3.common.env_util import make_vec_env
 import numpy as np
 from scipy.spatial.transform import Rotation as R
 from stable_baselines3.common.vec_env import VecNormalize, DummyVecEnv
-from gymnasium.wrappers import RecordVideo # <--- Added for video recording
+from gymnasium.wrappers import RecordVideo 
 import os
 import shutil
 import csv
 import sys
 
-# Constant
 WATER_SURFACE_HEIGHT = 3.0
 
 class HumanSwimmingEnv(MujocoEnv):
