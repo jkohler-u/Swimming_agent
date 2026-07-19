@@ -21,7 +21,7 @@ class HumanSwimmingEnv(MujocoEnv):
                  cont_head_reward=5, cont_body_reward=5, cont_body_punishment=1.0, 
                  roll_punishment=0.1, pitch_punishment=0.5):
         
-        self._model_path = '/home/judith/swimming/Swimming_agent/underwater_swimming_simple_human/humanoid.xml'
+        self._model_path = 'reinforcement_learning/human/breathing_human/humanoid.xml'
         super().__init__(
             self._model_path, 
             frame_skip=5, 
@@ -49,33 +49,39 @@ class HumanSwimmingEnv(MujocoEnv):
         self.hight_counter = 0
         self.total_timesteps_trained = 0
 
-        obs_size = (self.model.nq) + self.model.nv + 3 + 2 
+        obs_size = (self.model.nq) + self.model.nv 
+        obs_size += 3 # euler angles 
+        obs_size += 2 # waterline information 
+
         self.observation_space = spaces.Box(low=-np.inf, high=np.inf, shape=(obs_size,), dtype=np.float32)
         self.action_space = spaces.Box(low=-1.0, high=1.0, shape=(self.model.nu,), dtype=np.float32)
     
     def get_euler_angles(self):
+        """ Convert quaternions into euler angels """
         quat_mujoco = self.data.qpos[3:7] 
         quat_scipy = np.array([quat_mujoco[1], quat_mujoco[2], quat_mujoco[3], quat_mujoco[0]])
         rotation = R.from_quat(quat_scipy)
         return rotation.as_euler('xyz', degrees=False)
 
     def _get_obs(self):
-        relative_qpos = self.data.qpos
+        """ Observations contain: limb position & velocities, Torso position as euler angles, position relative to the waterline"""
         euler = self.get_euler_angles()
         body_below_surface = False if self.data.qpos[2] - WATER_SURFACE_HEIGHT < 0 else True
         head_above_surface = False if self.data.body('head').xpos[2] - WATER_SURFACE_HEIGHT < 0 else True
-        return np.concatenate([relative_qpos, self.data.qvel, euler, [body_below_surface], [head_above_surface]]).astype(np.float32)
+        return np.concatenate([self.data.qpos, self.data.qvel, euler, [body_below_surface], [head_above_surface]]).astype(np.float32)
 
     def step(self, action):
-        roll, pitch, yaw = self.get_euler_angles()
+        # setup
         self.do_simulation(action, self.frame_skip)
         obs = self._get_obs()
         self.current_step += 1
         self.total_timesteps_trained += 1
+        terminated = False
 
+        
+        # get positions to calculate reward
+        roll, pitch, _ = self.get_euler_angles()
         forward_vel = self.data.qvel[0] 
-        reward = forward_vel * self.forward_reward  
-
         body_height = self.data.qpos[2]
         head_height = self.data.body('head').xpos[2]
         foot_height_1 = self.data.body('foot_left').xpos[2]
@@ -83,34 +89,49 @@ class HumanSwimmingEnv(MujocoEnv):
         hand_height_1 = self.data.body('hand_right').xpos[2]
         hand_height_2 = self.data.body('hand_left').xpos[2]
 
+
+        # REWARD: foreward movement
+        reward = forward_vel * self.forward_reward  
+
+        # REWARD: head above water
         reward += self.cont_head_reward * (head_height - WATER_SURFACE_HEIGHT)**2 if WATER_SURFACE_HEIGHT < head_height < WATER_SURFACE_HEIGHT + 0.3 else 0
+        
+        # REWARD: torso below water 
         reward += self.cont_body_reward * (WATER_SURFACE_HEIGHT - body_height)**2 if body_height < WATER_SURFACE_HEIGHT else 0
         
+        # REWARD: limbs below water 
         reward -= self.cont_body_punishment * (foot_height_1 - WATER_SURFACE_HEIGHT - 0.5) **2 if foot_height_1 > WATER_SURFACE_HEIGHT + 0.5 else 0
         reward -= self.cont_body_punishment * (foot_height_2 - WATER_SURFACE_HEIGHT - 0.5) **2 if foot_height_2 > WATER_SURFACE_HEIGHT + 0.5 else 0
         reward -= self.cont_body_punishment * (hand_height_1 - WATER_SURFACE_HEIGHT - 0.5) **2 if hand_height_1 > WATER_SURFACE_HEIGHT + 0.5 else 0
         reward -= self.cont_body_punishment * (hand_height_2 - WATER_SURFACE_HEIGHT - 0.5) **2 if hand_height_2 > WATER_SURFACE_HEIGHT + 0.5 else 0
 
+        # REWARD: survival 
         reward += self.survival_reward
+
+        # REWARD: no spinning
         reward -= self.roll_punishment * np.abs(roll) 
         reward -= self.pitch_punishment * np.abs(pitch) 
         
+        # REWARD: smooth movements
         action_diff = np.square(action - self.prev_action).sum()
         reward -= self.smothness_reward * action_diff  
         self.prev_action = action
 
-        terminated = False
+        # -------- TERMINATION CONDITIONS -------
+        # REWARD: torso in the water 
         self.hard_termination = self.total_timesteps_trained > 700_000
         if (body_height < 0 or body_height > WATER_SURFACE_HEIGHT):
             reward -= self.body_punishment
             if self.hard_termination: terminated = True
 
+        # REWARD: consistent foreward movement
         if forward_vel < 0.05: self.min_vel_counter += 1
         else: self.min_vel_counter = 0
         if self.min_vel_counter > self.leniency:
             terminated = True
             reward -= self.vel_punishment
 
+        # REWARD: consistent head above water
         if head_height < WATER_SURFACE_HEIGHT: 
             self.hight_counter += 1
         else: self.hight_counter = 0
@@ -118,6 +139,7 @@ class HumanSwimmingEnv(MujocoEnv):
             terminated = True
             reward -= self.head_punishment
 
+        # scale the reward to be between -1 and 1
         reward *= self.scaling
 
         truncated = False
@@ -138,10 +160,11 @@ def make_human_env(render_mode=None, **kwargs):
     return HumanSwimmingEnv(render_mode=render_mode, **kwargs)
 
 def main():
+
+    # set defaults 
     lr = 0.001
     batch_size = 64
     env_params = {
-        
         "leniency": 200,
         "survival_reward": 0.01,
         "forward_reward": 40,
@@ -156,71 +179,65 @@ def main():
         "roll_punishment": 0,
         "pitch_punishment": 0
     }
-                
-    # tbc = ["head_punishment", "vel_punishment", "body_punishment","smothness_reward", "cont_head_reward", "cont_body_reward", "cont_body_punishment","roll_punishment", "pitch_punishment"]
-    # for entry in tbc:
-        # env_params[entry] = 0
 
-    output_dir = f"human_swimmer_optimized"
-    os.makedirs(output_dir, exist_ok=True)
-    shutil.copy(sys.argv[0], os.path.join(output_dir, "train_script.py"))
+    # test the impart of different reward types             
+    tbc = ["head_punishment", "vel_punishment", "body_punishment","smothness_reward", "cont_head_reward", "cont_body_reward", "cont_body_punishment","roll_punishment", "pitch_punishment"]
+    for entry in tbc:
+        env_params[entry] = 0
 
-    train_env = make_vec_env(lambda: make_human_env(**env_params), n_envs=8)
-    train_env = VecNormalize(train_env, norm_obs=True, norm_reward=True)
-    train_env.save(os.path.join(output_dir, "vec_normalize.pkl"))
+        # make output directory 
+        output_dir = f"human_swimmer_{entry}"
+        os.makedirs(output_dir, exist_ok=True)
+        shutil.copy(sys.argv[0], os.path.join(output_dir, "train_script.py"))
 
-    model = PPO("MlpPolicy", train_env, verbose=1, learning_rate=lr, n_steps=4048, batch_size=batch_size)
-    model.learn(total_timesteps=2500_000)
-    model.save(os.path.join(output_dir, "ppo_human_swimmer"))
-    train_env.close()
+        # train model
+        train_env = make_vec_env(lambda: make_human_env(**env_params), n_envs=8)
+        train_env = VecNormalize(train_env, norm_obs=True, norm_reward=True)
+        train_env.save(os.path.join(output_dir, "vec_normalize.pkl"))
 
-    print("Running Evaluation and Recording Video...")
-    # 1. Create the environment with rgb_array mode for recording
-    eval_env = make_human_env(render_mode="rgb_array", **env_params)
-    
-    # 2. Wrap with RecordVideo
-    video_folder = os.path.join(output_dir, "videos")
-    eval_env = RecordVideo(
-        eval_env, 
-        video_folder=video_folder, 
-        episode_trigger=lambda x: x == 0 # Record the first episode
-    )
-    
-    # 3. Wrap in DummyVecEnv and Normalize to match training
-    test_env = DummyVecEnv([lambda: eval_env])
-    norm_env = VecNormalize.load(os.path.join(output_dir, "vec_normalize.pkl"), test_env)
-    norm_env.training = False
-    norm_env.norm_reward = False
+        model = PPO("MlpPolicy", train_env, verbose=1, learning_rate=lr, n_steps=4048, batch_size=batch_size)
+        model.learn(total_timesteps=2500_000)
+        model.save(os.path.join(output_dir, "ppo_human_swimmer"))
+        train_env.close()
 
-    obs = norm_env.reset()
-    results = []
-    
-    for i in range(1000):
-        action, _ = model.predict(obs, deterministic=True)
-        obs, reward, done, info = norm_env.step(action)
+        # record footage of the trained model to see resulting swimming motion 
+        print("Running Evaluation and Recording Video...")
+        eval_env = make_human_env(render_mode="rgb_array", **env_params)
+        video_folder = os.path.join(output_dir, "videos")
+        eval_env = RecordVideo(eval_env,  video_folder=video_folder, episode_trigger=lambda x: x == 0)
+        test_env = DummyVecEnv([lambda: eval_env])
+        norm_env = VecNormalize.load(os.path.join(output_dir, "vec_normalize.pkl"), test_env)
+        norm_env.training = False
+        norm_env.norm_reward = False
+        obs = norm_env.reset()
+        results = []
+
+        # record and save eval metrics for the resulting swimming motion
+        for i in range(1000):
+            action, _ = model.predict(obs, deterministic=True)
+            obs, reward, done, info = norm_env.step(action)
+            
+            head_h = info[0]['head_height']
+            f_vel = info[0]['forward_vel']
+            alive = not done[0]
+            head_above = head_h > WATER_SURFACE_HEIGHT
+            
+            results.append([i, alive, head_above, f_vel])
+            if done[0]: break
+        norm_env.close()
+
+        csv_path = os.path.join(output_dir, "test_results.csv")
+        with open(csv_path, mode='w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(["step", "alive", "head_above_water", "forward_velocity"])
+            writer.writerows(results)
+
+        # make a zip file of the evaluation containing, this script, the trained model, video recording, the eval metric
+        parent_dir = os.path.dirname(os.path.abspath(output_dir))
+        folder_name = os.path.basename(os.path.abspath(output_dir))
+        shutil.make_archive(os.path.join(parent_dir, folder_name), 'zip', parent_dir, folder_name)
         
-        head_h = info[0]['head_height']
-        f_vel = info[0]['forward_vel']
-        alive = not done[0]
-        head_above = head_h > WATER_SURFACE_HEIGHT
-        
-        results.append([i, alive, head_above, f_vel])
-        if done[0]: break
-
-    # Close the environment to ensure the video file is finalized
-    norm_env.close()
-
-    csv_path = os.path.join(output_dir, "test_results.csv")
-    with open(csv_path, mode='w', newline='') as f:
-        writer = csv.writer(f)
-        writer.writerow(["step", "alive", "head_above_water", "forward_velocity"])
-        writer.writerows(results)
-
-    parent_dir = os.path.dirname(os.path.abspath(output_dir))
-    folder_name = os.path.basename(os.path.abspath(output_dir))
-    shutil.make_archive(os.path.join(parent_dir, folder_name), 'zip', parent_dir, folder_name)
-    
-    print(f"All files (including videos) saved to {output_dir} and zipped.")
+        print(f"All files (including videos) saved to {output_dir} and zipped.")
 
 if __name__ == "__main__":
     main()
