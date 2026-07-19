@@ -127,7 +127,7 @@ class HumanSwimmingEnv(MujocoEnv):
         self.hight_counter = 0
         return self._get_obs()
 
-def make_human_env(render_mode=None, **kwargs):
+def make_env(render_mode=None, **kwargs):
     return HumanSwimmingEnv(render_mode=render_mode, **kwargs)
 
 def main():
@@ -169,18 +169,18 @@ def main():
         os.makedirs(output_dir, exist_ok=True)
         shutil.copy(sys.argv[0], os.path.join(output_dir, "train_script.py"))
 
-        train_env = make_vec_env(lambda: make_human_env(**env_params), n_envs=8)
+        train_env = make_vec_env(lambda: make_env(**env_params), n_envs=8)
         train_env = VecNormalize(train_env, norm_obs=True, norm_reward=True)
 
         model = PPO("MlpPolicy", train_env, verbose=1, learning_rate=lr, n_steps=4048, batch_size=batch_size)
         model.learn(total_timesteps=2000_000)
-        model.save(os.path.join(output_dir, "ppo_human_swimmer"))
+        model.save(os.path.join(output_dir, "ppo_swimmer"))
         train_env.save(os.path.join(output_dir, "vec_normalize.pkl"))
         train_env.close()
 
         print("Running Evaluation and Recording Video...")
         # 1. Create the environment with rgb_array mode for recording
-        eval_env = make_human_env(render_mode="rgb_array", **env_params)
+        eval_env = make_env(render_mode="rgb_array", **env_params)
         
         # 2. Wrap with RecordVideo
         #video_folder = os.path.join(output_dir, "videos")
