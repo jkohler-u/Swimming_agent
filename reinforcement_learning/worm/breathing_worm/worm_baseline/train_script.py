@@ -22,8 +22,10 @@ class HumanSwimmingEnv(MujocoEnv):
                  cont_head_reward=5, cont_body_reward=5, cont_body_punishment=1.0):
         
         self._model_path = str(Path(
-    "C:/Users/malin/Documents/Uni/Master/neuromorphic control/Swimming_agent/reinforcement_learning/worm/breathing_worm/worm_water_surface.xml"
-))
+            "/share/users/student/m/mbraatz/Swimming_agent/"
+            "reinforcement_learning/worm/breathing_worm/"
+            "worm_water_surface.xml"
+        ))
         super().__init__(
             self._model_path, 
             frame_skip=5, 
@@ -127,7 +129,7 @@ class HumanSwimmingEnv(MujocoEnv):
         self.hight_counter = 0
         return self._get_obs()
 
-def make_human_env(render_mode=None, **kwargs):
+def make_env(render_mode=None, **kwargs):
     return HumanSwimmingEnv(render_mode=render_mode, **kwargs)
 
 def main():
@@ -169,26 +171,26 @@ def main():
         os.makedirs(output_dir, exist_ok=True)
         shutil.copy(sys.argv[0], os.path.join(output_dir, "train_script.py"))
 
-        train_env = make_vec_env(lambda: make_human_env(**env_params), n_envs=8)
+        train_env = make_vec_env(lambda: make_env(**env_params), n_envs=8)
         train_env = VecNormalize(train_env, norm_obs=True, norm_reward=True)
-        train_env.save(os.path.join(output_dir, "vec_normalize.pkl"))
 
         model = PPO("MlpPolicy", train_env, verbose=1, learning_rate=lr, n_steps=4048, batch_size=batch_size)
         model.learn(total_timesteps=2000_000)
-        model.save(os.path.join(output_dir, "ppo_human_swimmer"))
+        model.save(os.path.join(output_dir, "ppo_swimmer"))
+        train_env.save(os.path.join(output_dir, "vec_normalize.pkl"))
         train_env.close()
 
         print("Running Evaluation and Recording Video...")
         # 1. Create the environment with rgb_array mode for recording
-        eval_env = make_human_env(render_mode="rgb_array", **env_params)
+        eval_env = make_env(render_mode="rgb_array", **env_params)
         
         # 2. Wrap with RecordVideo
-        video_folder = os.path.join(output_dir, "videos")
-        eval_env = RecordVideo(
-            eval_env, 
-            video_folder=video_folder, 
-            episode_trigger=lambda x: x == 0 # Record the first episode
-        )
+        #video_folder = os.path.join(output_dir, "videos")
+        #eval_env = RecordVideo(
+        #    eval_env, 
+        #    video_folder=video_folder, 
+        #    episode_trigger=lambda x: x == 0 # Record the first episode
+        #)
         
         # 3. Wrap in DummyVecEnv and Normalize to match training
         test_env = DummyVecEnv([lambda: eval_env])
@@ -222,6 +224,40 @@ def main():
 
         parent_dir = os.path.dirname(os.path.abspath(output_dir))
         folder_name = os.path.basename(os.path.abspath(output_dir))
+
+
+        forward_velocities = [r[3] for r in results]
+        head_above = [r[2] for r in results]
+
+        avg_forward_velocity = np.mean(forward_velocities)
+        head_above_percentage = 100 * np.mean(head_above)
+
+        longest_below = 0
+        current_below = 0
+
+        for above in head_above:
+            if above:
+                current_below = 0
+            else:
+                current_below += 1
+                longest_below = max(longest_below, current_below)
+
+        summary_path = os.path.join(output_dir, "summary.csv")
+
+        with open(summary_path, "w", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow([
+                "evaluation_steps",
+                "average_forward_velocity",
+                "head_above_water_percent",
+                "longest_head_below_water_streak"
+            ])
+            writer.writerow([
+                len(results),
+                avg_forward_velocity,
+                head_above_percentage,
+                longest_below
+            ])
         shutil.make_archive(os.path.join(parent_dir, folder_name), 'zip', parent_dir, folder_name)
         
         print(f"All files (including videos) saved to {output_dir} and zipped.")
