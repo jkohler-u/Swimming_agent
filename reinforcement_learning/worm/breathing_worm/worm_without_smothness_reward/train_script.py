@@ -159,10 +159,11 @@ def main():
                 }
     
     # test the impart of different reward types             
-    tbc = ["survival_reward", "smothness_reward", "forward_reward","vel_punishment","cont_head_reward", "head_punishment", "cont_body_punishment","cont_body_reward"]
-    
+    #tbc = ["survival_reward", "smothness_reward", "forward_reward","vel_punishment","cont_head_reward", "head_punishment", "cont_body_punishment","cont_body_reward"]
+    tbc = ["smothness_reward", "forward_reward"]
     # None to also also include the baseline (no reward set to 0)
-    experiments = [None] + tbc
+    #experiments = [None] + tbc
+    experiments = tbc
 
     for entry in experiments:
         env_params = base_env_params.copy()
