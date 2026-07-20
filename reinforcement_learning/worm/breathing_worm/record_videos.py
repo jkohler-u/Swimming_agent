@@ -1,6 +1,7 @@
 
 import shutil
 from pathlib import Path
+import mujoco
 
 from gymnasium.wrappers import RecordVideo
 from stable_baselines3 import PPO
@@ -14,7 +15,7 @@ from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
 #     main()
 #
 # This prevents training from starting when this file imports make_env.
-from worm_training_updated import make_env
+from adjusted_worm_training_updated import make_env
 
 
 # Directory containing this evaluation script and the experiment folders.
@@ -24,7 +25,9 @@ SCRIPT_DIRECTORY = Path(__file__).resolve().parent
 MODEL_FILENAME = "ppo_swimmer.zip"
 NORMALIZATION_FILENAME = "vec_normalize.pkl"
 
-MAX_EVALUATION_STEPS = 5000
+MAX_EVALUATION_STEPS = 500
+
+CAMERA_ID = 0
 DETERMINISTIC = True
 
 BASE_ENV_PARAMS = {
@@ -38,6 +41,8 @@ BASE_ENV_PARAMS = {
     "cont_body_reward": 2,
     "cont_body_punishment": 1,
 }
+
+
 
 
 def get_environment_parameters(experiment_directory: Path) -> dict:
@@ -149,6 +154,8 @@ def record_experiment(experiment_directory: Path) -> bool:
         experiment_directory
     )
 
+
+
     env_params = get_environment_parameters(experiment_directory)
 
     video_directory = experiment_directory / "videos"
@@ -170,6 +177,18 @@ def record_experiment(experiment_directory: Path) -> bool:
         render_mode="rgb_array",
         **env_params,
     )
+
+    print("Number of cameras:", raw_env.model.ncam)
+    for i in range(raw_env.model.ncam):
+        print(i, mujoco.mj_id2name(raw_env.model, mujoco.mjtObj.mjOBJ_CAMERA, i))
+
+
+    # Select XML camera:
+    # 0 = side_follow
+    # 1 = oblique_follow
+    # 2 = top_follow
+    raw_env.camera_id = CAMERA_ID
+    raw_env.mujoco_renderer.camera_id = CAMERA_ID
 
     # Record the first episode started by this environment.
     recorded_env = RecordVideo(
