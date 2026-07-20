@@ -1,5 +1,0 @@
-Traceback (most recent call last):
-  File "/share/users/student/m/mbraatz/Swimming_agent/reinforcement_learning/worm/breathing_worm/worm_training_updated.py", line 7, in <module>
-    from scipy.spatial.transform import Rotation as R
-ModuleNotFoundError: No module named 'scipy'
-srun: error: hpc3-4: task 0: Exited with exit code 1

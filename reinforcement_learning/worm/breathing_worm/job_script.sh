@@ -24,6 +24,6 @@ source /home/student/m/mbraatz/miniconda/etc/profile.d/conda.sh
 conda activate mujoco
 
 # Run your script
-srun python -u worm_training_updated.py
+srun python -u adjusted_worm_training_updated.py
 
 echo "Finished at: $(date)"
