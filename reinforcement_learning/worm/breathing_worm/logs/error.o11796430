@@ -1,4 +1,0 @@
-/share/users/student/m/mbraatz/Swimming_agent/reinforcement_learning/worm/breathing_worm/adjusted_worm_training_updated.py:79: UserWarning: Gimbal lock detected. Setting third angle to zero since it is not possible to uniquely determine all angles.
-  obs = self._get_obs()
-/home/student/m/mbraatz/miniconda/envs/mujoco/lib/python3.10/site-packages/stable_baselines3/common/monitor.py:94: UserWarning: Gimbal lock detected. Setting third angle to zero since it is not possible to uniquely determine all angles.
-  observation, reward, terminated, truncated, info = self.env.step(action)
