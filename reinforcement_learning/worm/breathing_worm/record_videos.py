@@ -7,7 +7,7 @@ from gymnasium.wrappers import RecordVideo
 from stable_baselines3 import PPO
 from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
 
-from Swimming_agent.reinforcement_learning.worm.breathing_worm.worm_training import make_env
+from Swimming_agent.reinforcement_learning.worm.breathing_worm.worm_training_systematic_reward_testing import make_env
 
 
 # Directory containing this evaluation script and the experiment folders.

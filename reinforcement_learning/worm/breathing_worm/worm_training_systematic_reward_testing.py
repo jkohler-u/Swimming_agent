@@ -158,114 +158,116 @@ def main():
         "cont_body_punishment": 1,
                 }
     
-                
+    # test the impart of different reward types             
+    tbc = ["survival_reward", "smothness_reward", "forward_reward","vel_punishment","cont_head_reward", "head_punishment", "cont_body_punishment","cont_body_reward"]
     
-    
+    # None to also also include the baseline (no reward set to 0)
+    experiments = [None] + tbc
 
+    for entry in experiments:
+        env_params = base_env_params.copy()
+        if entry is not None:
+            env_params[entry] = 0
 
-    env_params = base_env_params.copy()
-    if entry is not None:
-        env_params[entry] = 0
-
-    # make output directory 
-    if entry is None:
-        output_dir = "worm_baseline"
-    else:
-        output_dir = f"worm_without_{entry}"
-
-    os.makedirs(output_dir, exist_ok=True)
-    shutil.copy(sys.argv[0], os.path.join(output_dir, "train_script.py"))
-
-    train_env = make_vec_env(lambda: make_env(**env_params), n_envs=8)
-    train_env = VecNormalize(train_env, norm_obs=True, norm_reward=True)
-
-    model = PPO("MlpPolicy", train_env, verbose=1, learning_rate=lr, n_steps=4048, batch_size=batch_size)
-    model.learn(total_timesteps=2000_000)
-    model.save(os.path.join(output_dir, "ppo_swimmer"))
-    train_env.save(os.path.join(output_dir, "vec_normalize.pkl"))
-    train_env.close()
-
-    print("Running Evaluation and Recording Video...")
-    # 1. Create the environment with rgb_array mode for recording
-    eval_env = make_env(render_mode="rgb_array", **env_params)
-    
-    # 2. Wrap with RecordVideo
-    #video_folder = os.path.join(output_dir, "videos")
-    #eval_env = RecordVideo(
-    #    eval_env, 
-    #    video_folder=video_folder, 
-    #    episode_trigger=lambda x: x == 0 # Record the first episode
-    #)
-    
-    # 3. Wrap in DummyVecEnv and Normalize to match training
-    test_env = DummyVecEnv([lambda: eval_env])
-    norm_env = VecNormalize.load(os.path.join(output_dir, "vec_normalize.pkl"), test_env)
-    norm_env.training = False
-    norm_env.norm_reward = False
-
-    obs = norm_env.reset()
-    results = []
-    
-    for i in range(1000):
-        action, _ = model.predict(obs, deterministic=True)
-        obs, reward, done, info = norm_env.step(action)
-        
-        head_h = info[0]['head_height']
-        f_vel = info[0]['forward_vel']
-        alive = not done[0]
-        head_above = head_h > WATER_SURFACE_HEIGHT
-        
-        results.append([i, alive, head_above, f_vel])
-        if done[0]: break
-
-    # Close the environment to ensure the video file is finalized
-    norm_env.close()
-
-    csv_path = os.path.join(output_dir, "test_results.csv")
-    with open(csv_path, mode='w', newline='') as f:
-        writer = csv.writer(f)
-        writer.writerow(["step", "alive", "head_above_water", "forward_velocity"])
-        writer.writerows(results)
-
-    parent_dir = os.path.dirname(os.path.abspath(output_dir))
-    folder_name = os.path.basename(os.path.abspath(output_dir))
-
-
-    forward_velocities = [r[3] for r in results]
-    head_above = [r[2] for r in results]
-
-    avg_forward_velocity = np.mean(forward_velocities)
-    head_above_percentage = 100 * np.mean(head_above)
-
-    longest_below = 0
-    current_below = 0
-
-    for above in head_above:
-        if above:
-            current_below = 0
+        # make output directory 
+        if entry is None:
+            output_dir = "worm_baseline"
         else:
-            current_below += 1
-            longest_below = max(longest_below, current_below)
+            output_dir = f"worm_without_{entry}"
 
-    summary_path = os.path.join(output_dir, "summary.csv")
+        os.makedirs(output_dir, exist_ok=True)
+        shutil.copy(sys.argv[0], os.path.join(output_dir, "train_script.py"))
 
-    with open(summary_path, "w", newline="") as f:
-        writer = csv.writer(f)
-        writer.writerow([
-            "evaluation_steps",
-            "average_forward_velocity",
-            "head_above_water_percent",
-            "longest_head_below_water_streak"
-        ])
-        writer.writerow([
-            len(results),
-            avg_forward_velocity,
-            head_above_percentage,
-            longest_below
-        ])
-    shutil.make_archive(os.path.join(parent_dir, folder_name), 'zip', parent_dir, folder_name)
-    
-    print(f"All files (including videos) saved to {output_dir} and zipped.")
+        train_env = make_vec_env(lambda: make_env(**env_params), n_envs=8)
+        train_env = VecNormalize(train_env, norm_obs=True, norm_reward=True)
+
+        model = PPO("MlpPolicy", train_env, verbose=1, learning_rate=lr, n_steps=4048, batch_size=batch_size)
+        model.learn(total_timesteps=2000_000)
+        model.save(os.path.join(output_dir, "ppo_swimmer"))
+        train_env.save(os.path.join(output_dir, "vec_normalize.pkl"))
+        train_env.close()
+
+        print("Running Evaluation and Recording Video...")
+        # 1. Create the environment with rgb_array mode for recording
+        eval_env = make_env(render_mode="rgb_array", **env_params)
+        
+        # 2. Wrap with RecordVideo
+        #video_folder = os.path.join(output_dir, "videos")
+        #eval_env = RecordVideo(
+        #    eval_env, 
+        #    video_folder=video_folder, 
+        #    episode_trigger=lambda x: x == 0 # Record the first episode
+        #)
+        
+        # 3. Wrap in DummyVecEnv and Normalize to match training
+        test_env = DummyVecEnv([lambda: eval_env])
+        norm_env = VecNormalize.load(os.path.join(output_dir, "vec_normalize.pkl"), test_env)
+        norm_env.training = False
+        norm_env.norm_reward = False
+
+        obs = norm_env.reset()
+        results = []
+        
+        for i in range(1000):
+            action, _ = model.predict(obs, deterministic=True)
+            obs, reward, done, info = norm_env.step(action)
+            
+            head_h = info[0]['head_height']
+            f_vel = info[0]['forward_vel']
+            alive = not done[0]
+            head_above = head_h > WATER_SURFACE_HEIGHT
+            
+            results.append([i, alive, head_above, f_vel])
+            if done[0]: break
+
+        # Close the environment to ensure the video file is finalized
+        norm_env.close()
+
+        csv_path = os.path.join(output_dir, "test_results.csv")
+        with open(csv_path, mode='w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(["step", "alive", "head_above_water", "forward_velocity"])
+            writer.writerows(results)
+
+        parent_dir = os.path.dirname(os.path.abspath(output_dir))
+        folder_name = os.path.basename(os.path.abspath(output_dir))
+
+
+        forward_velocities = [r[3] for r in results]
+        head_above = [r[2] for r in results]
+
+        avg_forward_velocity = np.mean(forward_velocities)
+        head_above_percentage = 100 * np.mean(head_above)
+
+        longest_below = 0
+        current_below = 0
+
+        for above in head_above:
+            if above:
+                current_below = 0
+            else:
+                current_below += 1
+                longest_below = max(longest_below, current_below)
+
+        summary_path = os.path.join(output_dir, "summary.csv")
+
+        with open(summary_path, "w", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow([
+                "evaluation_steps",
+                "average_forward_velocity",
+                "head_above_water_percent",
+                "longest_head_below_water_streak"
+            ])
+            writer.writerow([
+                len(results),
+                avg_forward_velocity,
+                head_above_percentage,
+                longest_below
+            ])
+        shutil.make_archive(os.path.join(parent_dir, folder_name), 'zip', parent_dir, folder_name)
+        
+        print(f"All files (including videos) saved to {output_dir} and zipped.")
 
 if __name__ == "__main__":
     main()
