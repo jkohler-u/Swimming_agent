@@ -7,15 +7,7 @@ from gymnasium.wrappers import RecordVideo
 from stable_baselines3 import PPO
 from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
 
-# Import the environment definition from the training script.
-#
-# The training script must end with:
-#
-# if __name__ == "__main__":
-#     main()
-#
-# This prevents training from starting when this file imports make_env.
-from adjusted_worm_training_updated import make_env
+from Swimming_agent.reinforcement_learning.worm.breathing_worm.worm_training import make_env
 
 
 # Directory containing this evaluation script and the experiment folders.

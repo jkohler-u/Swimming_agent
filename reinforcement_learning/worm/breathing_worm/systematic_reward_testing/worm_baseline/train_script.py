@@ -21,11 +21,16 @@ class HumanSwimmingEnv(MujocoEnv):
                  head_punishment=5, vel_punishment=1, smothness_reward=0.01,
                  cont_head_reward=5, cont_body_reward=5, cont_body_punishment=1.0):
         
-        self._model_path = str(Path(
-            "/share/users/student/m/mbraatz/Swimming_agent/"
-            "reinforcement_learning/worm/breathing_worm/"
-            "worm_water_surface.xml"
-        ))
+        script_directory = Path(__file__).resolve().parent
+        model_path = script_directory / "adjusted_worm_water_surface.xml"
+
+        if not model_path.is_file():
+            raise FileNotFoundError(
+                "The MuJoCo XML model could not be found:\n"
+                f"{model_path}"
+            )
+
+        self._model_path = str(model_path)
         super().__init__(
             self._model_path, 
             frame_skip=5, 
@@ -83,6 +88,7 @@ class HumanSwimmingEnv(MujocoEnv):
         segment1 = self.data.body('segment1').xpos[2]
         segment2 = self.data.body('segment2').xpos[2]
         segment3 = self.data.body('segment3').xpos[2]
+        segment4 = self.data.body("segment4").xpos[2]
 
         reward += self.cont_head_reward * (head_height - WATER_SURFACE_HEIGHT)**2 if WATER_SURFACE_HEIGHT < head_height < WATER_SURFACE_HEIGHT + 0.3 else 0
         reward += self.cont_body_reward * (WATER_SURFACE_HEIGHT - body_height)**2 if body_height < WATER_SURFACE_HEIGHT else 0
@@ -90,6 +96,8 @@ class HumanSwimmingEnv(MujocoEnv):
         reward -= self.cont_body_punishment * (segment1 - WATER_SURFACE_HEIGHT - 0.5) **2 if segment1 > WATER_SURFACE_HEIGHT else 0
         reward -= self.cont_body_punishment * (segment2 - WATER_SURFACE_HEIGHT - 0.5) **2 if segment2 > WATER_SURFACE_HEIGHT else 0
         reward -= self.cont_body_punishment * (segment3 - WATER_SURFACE_HEIGHT - 0.5) **2 if segment3 > WATER_SURFACE_HEIGHT else 0
+        reward -= self.cont_body_punishment * (segment4 - WATER_SURFACE_HEIGHT - 0.5) **2 if segment4 > WATER_SURFACE_HEIGHT else 0
+
 
         reward += self.survival_reward
         
@@ -151,9 +159,8 @@ def main():
                 }
     
     # test the impart of different reward types             
-    tbc = ["survival_reward", "smothness_reward", "forward_reward","vel_punishment",
-            "cont_head_reward", "head_punishment", "cont_body_punishment","cont_body_reward"]
-    
+    #tbc = ["survival_reward", "smothness_reward", "forward_reward","vel_punishment","cont_head_reward", "head_punishment", "cont_body_punishment","cont_body_reward"]
+    tbc = ["survival_reward"]
     # None to also also include the baseline (no reward set to 0)
     experiments = [None] + tbc
 
