@@ -15,6 +15,7 @@
 
     <worldbody>
         <light name="main_light"
+            mode="trackcom"
             pos="0 -4 8"
             dir="0 1 -1"
             diffuse="1 1 1"
@@ -40,8 +41,8 @@
         <!-- Better side-follow camera -->
         <camera name="side_follow"
                 mode="trackcom"
-                pos="-1.0 -4.0 3.8"
-                xyaxes="1 0 0 0 0 1"/>
+                pos="1 -3.0 7.0"
+                xyaxes="1 0 0 0 0.707 0.707"/>
 
         <!-- Oblique camera: best for seeing swimming motion -->
         <camera name="oblique_follow"
