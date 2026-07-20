@@ -111,6 +111,6 @@
         <motor name="muscle1" joint="joint1" gear="60"/>
         <motor name="muscle2" joint="joint2" gear="60"/>
         <motor name="muscle3" joint="joint3" gear="60"/>
-        <motor name="muscle4" joint="joint3" gear="60"/>
+        <motor name="muscle4" joint="joint4" gear="60"/>
     </actuator>
 </mujoco>
