@@ -1,5 +1,5 @@
 # Sample videos of all agents
-In the folder "sample_videos_of_all_agents are result videos af all main approaches
+In the folder "sample_videos_of_all_agents" are result videos af all main approaches
 
 # Reinforcement Learning 
 Code to run and train our reinforcement learning agent 
