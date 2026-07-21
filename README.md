@@ -1,4 +1,4 @@
-# Sample videos of all agents
+# Main result Videos
 In the folder "sample_videos_of_all_agents" are result videos af all main approaches
 
 # Reinforcement Learning 
