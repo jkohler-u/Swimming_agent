@@ -1,3 +1,4 @@
+import os
 import gymnasium as gym
 from gymnasium.envs.mujoco import MujocoEnv
 from gymnasium import spaces
@@ -7,8 +8,8 @@ import numpy as np
 
 class WormSwimmingEnv(MujocoEnv):
     def __init__(self, render_mode=None):
-        # Update this path to where you saved the worm XML
-        self._model_path = '/home/judith/swimming/Swimming_agent/underwater_swimming_worm/worm.xml' 
+
+        self._model_path = os.path.join(os.path.dirname(__file__), "worm.xml")
         
         super().__init__(
             self._model_path, 
