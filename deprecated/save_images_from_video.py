@@ -41,7 +41,7 @@ def extract_frames(video_path, output_dir, frame_interval=30):
 
 if __name__ == "__main__":
     extract_frames(
-        video_path="swimming_llm//results//pattern_generated_bakstroke.mp4",
-        output_dir="results_in_pictures//pattern_generated_backstroke",
-        frame_interval=30,  # Save every 30th frame
+        video_path="reinforcement_learning//worm_baseline_cut.mp4",
+        output_dir="results_in_pictures//worm_baseline",
+        frame_interval=10,  # Save every x frame
     )
